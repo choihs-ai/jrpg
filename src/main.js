@@ -56,7 +56,23 @@ const Main = (() => {
     await Engine.fadeIn(400);
   }
 
+  // iOS 사파리는 user-scalable=no를 무시하므로 더블탭·핀치 확대를 직접 막는다
+  function blockZoom() {
+    const stop = (e) => e.preventDefault();
+    for (const ev of ['gesturestart', 'gesturechange', 'gestureend']) document.addEventListener(ev, stop, { passive: false });
+    document.addEventListener('dblclick', stop, { passive: false });
+    document.addEventListener('touchmove', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (e) => {
+      if (e.target && e.target.closest && e.target.closest('input, textarea')) return;
+      const now = Date.now();
+      if (now - lastTouchEnd < 350) e.preventDefault();
+      lastTouchEnd = now;
+    }, { passive: false });
+  }
+
   function boot() {
+    blockZoom();
     Settings.load();
     Engine.init(document.getElementById('game'));
     initTouch();

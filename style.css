@@ -2,14 +2,14 @@
 html, body {
   margin: 0; height: 100%; background: #05060f; color: #f4f1e6; overflow: hidden;
   font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-  -webkit-user-select: none; user-select: none; touch-action: none; overscroll-behavior: none;
+  -webkit-user-select: none; user-select: none; touch-action: manipulation; overscroll-behavior: none;
 }
 #app {
   position: fixed; inset: 0; height: 100vh; height: 100dvh; display: flex; flex-direction: column;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 #game-wrap { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
-#game { display: block; image-rendering: pixelated; image-rendering: crisp-edges; background: #000; border-radius: 4px; box-shadow: 0 0 40px rgba(80, 90, 200, 0.25); }
+#game { touch-action: none; display: block; image-rendering: pixelated; image-rendering: crisp-edges; background: #000; border-radius: 4px; box-shadow: 0 0 40px rgba(80, 90, 200, 0.25); }
 
 /* 터치 컨트롤 */
 #touch { display: none; }
