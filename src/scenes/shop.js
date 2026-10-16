@@ -1,0 +1,168 @@
+'use strict';
+// ─────────────────────────────────────────────────────────────
+// Shop: 상점 (구매/판매, 장비 비교, 수량 선택)
+// ─────────────────────────────────────────────────────────────
+const SHOPS = {
+  smithy: {
+    name: '「망치와 모루」', keeper: '드른',
+    stock: ['club', 'hunting_knife', 'copper_sword', 'oak_staff', 'clothes', 'leather_armor', 'mage_robe', 'wood_shield', 'leather_shield', 'leather_hat', 'wizard_hat'],
+    extra: [{ when: () => Game.flag('ironfang_defeated'), items: ['iron_axe', 'steel_sword', 'spellbook', 'chain_mail', 'thief_garb', 'iron_shield', 'iron_helm'] }],
+    bye: '또 와라. 무기는 손질도 중요하다.',
+  },
+  itemshop: {
+    name: '「초록 바구니」', keeper: '엘라 할머니',
+    stock: ['herb', 'antidote', 'smelling', 'return_wing', 'incense', 'firebomb'],
+    extra: [
+      { when: () => Game.flag('potion_stock'), items: ['potion'] },
+      { when: () => Game.flag('ironfang_defeated'), items: ['panacea', 'feather', 'antidote_bangle'] },
+      { when: () => Game.flag('chapter1_done'), items: ['ether'] },
+    ],
+    bye: '몸조심하렴. 약은 아끼지 말고 쓰고.',
+  },
+};
+
+const Shop = (() => {
+  function stock(shop) {
+    const list = shop.stock.slice();
+    for (const ex of shop.extra || []) if (ex.when()) for (const it of ex.items) if (!list.includes(it)) list.push(it);
+    return list;
+  }
+
+  // 장비 비교 패널
+  function comparePanel(getItem) {
+    return {
+      modal: false,
+      draw(ctx) {
+        UI.drawWindow(ctx, 392, 62, 236, 270);
+        const id = getItem();
+        if (!id) return;
+        const it = ITEMS[id];
+        Text.draw(ctx, it.name, 408, 74, { size: 17, bold: true, color: Theme.gold, maxW: 205 });
+        Text.draw(ctx, `소지: ${Game.count(id)}  (장비 중 ${Game.ownedTotal(id) - Game.count(id)})`, 408, 98, { size: 13, color: Theme.dim });
+        if (!EQUIP_SLOTS.includes(it.kind)) {
+          const lines = Text.layout(ctx, it.desc, 200, 14);
+          Text.drawLines(ctx, lines, 408, 124, 20, 14);
+          return;
+        }
+        const ids = Game.state.party.concat(Game.state.reserve);
+        ids.forEach((mid, i) => {
+          const y = 124 + i * 40;
+          Menu.charIcon(ctx, mid, 404, y - 6, 1.5);
+          Text.draw(ctx, Game.name(mid), 434, y, { size: 14, color: CHARACTERS[mid].color });
+          if (!Game.canEquip(mid, id)) { Text.draw(ctx, '장비 불가', 612, y + 2, { size: 13, align: 'right', color: Theme.disabled }); return; }
+          const eq = Object.assign({}, Game.state.members[mid].equip);
+          if (eq[it.kind] === id) { Text.draw(ctx, '장비 중', 612, y + 2, { size: 13, align: 'right', color: Theme.gold }); return; }
+          eq[it.kind] = id;
+          const cur = Game.stats(mid), nxt = Game.stats(mid, eq);
+          const diffs = [['atk', '공'], ['def', '방'], ['mag', '마'], ['spd', '민']].map(([k, n]) => [n, nxt[k] - cur[k]]).filter(([, d]) => d !== 0);
+          const txt = diffs.length ? diffs.map(([n, d]) => `${n}${d > 0 ? '[g]+' + d : '[r]' + d}[/]`).join(' ') : '[d]변화 없음[/]';
+          Text.draw(ctx, txt, 612, y + 18, { size: 13, align: 'right' });
+        });
+      },
+    };
+  }
+
+  const goldPanel = {
+    modal: false,
+    draw(ctx) {
+      UI.drawWindow(ctx, 392, 12, 236, 44);
+      Text.draw(ctx, `소지금 [y]${Game.gold}G[/]`, 610, 24, { size: 18, align: 'right', bold: true });
+    },
+  };
+
+  async function buy(shop) {
+    let hover = null;
+    const panel = comparePanel(() => hover);
+    Engine.push(panel);
+    const build = () => stock(shop).map((id) => ({ label: ITEMS[id].name, right: ITEMS[id].price + 'G', value: id, desc: ITEMS[id].desc, disabled: ITEMS[id].price > Game.gold, rightColor: ITEMS[id].price > Game.gold ? Theme.disabled : Theme.gold }));
+    const lw = new UI.ListWindow({ x: 12, y: 62, w: 372, items: build(), maxRows: 9, rowH: 30, title: '무엇을 살까?', cancel: true, help: { x: 12, y: 398, w: 616, h: 70 }, onHover: (it) => { hover = it ? it.value : null; }, onDisabled: () => {} });
+    hover = lw.items[0] ? lw.items[0].value : null;
+    Engine.push(lw);
+    try {
+      for (;;) {
+        lw.setItems(build());
+        const r = await lw.choose();
+        if (!r) break;
+        const id = r.value, it = ITEMS[id];
+        const isEquip = EQUIP_SLOTS.includes(it.kind);
+        const maxByGold = Math.floor(Game.gold / it.price);
+        const maxByBag = 99 - Game.count(id);
+        const max = Math.min(maxByGold, maxByBag, isEquip ? 9 : 99);
+        if (max <= 0) { Sound.sfx('buzzer'); await UI.message(maxByBag <= 0 ? '더 이상 가질 수 없다.' : '돈이 모자라다.'); continue; }
+        let n = 1;
+        if (!isEquip && max > 1) { n = await UI.number({ title: `${it.name} — 몇 개 살까?`, min: 1, max, unit: it.price, x: 340, y: 180 }); if (!n) continue; }
+        const total = n * it.price;
+        if (!Game.spend(total)) { Sound.sfx('buzzer'); await UI.message('돈이 모자라다.'); continue; }
+        Game.addItem(id, n);
+        Sound.sfx('coin');
+        await S.say(shop.keeper, `${it.name}${n > 1 ? ` ${n}개` : ''}, ${total}G. 고맙다!`);
+        if (isEquip) {
+          const can = Game.state.party.concat(Game.state.reserve).filter((mid) => Game.canEquip(mid, id));
+          if (can.length && (await Menu.confirm('지금 장비할까?'))) {
+            const who = can.length === 1 ? can[0] : await Menu.pickMember({ title: `${it.name} — 누가 장비할까?`, filter: (mid) => Game.canEquip(mid, id) });
+            if (who) {
+              const old = Game.state.members[who].equip[it.kind];
+              Game.equip(who, it.kind, id);
+              Sound.sfx('confirm');
+              let t = `${Game.name(who)}${Util.josa(Game.name(who), '은')} ${it.name}${Util.josa(it.name, '을')} 장비했다!`;
+              if (old && ITEMS[old].price > 0 && (await Menu.confirm(t + `\n원래 쓰던 ${ITEMS[old].name}${Util.josa(ITEMS[old].name, '은')} 팔까? (${Math.floor(ITEMS[old].price / 2)}G)`))) {
+                Game.removeItem(old); Game.addGold(Math.floor(ITEMS[old].price / 2)); Sound.sfx('coin');
+              } else if (!old || ITEMS[old].price <= 0) await UI.message(t);
+            }
+          }
+        }
+      }
+    } finally {
+      lw.close();
+      Engine.remove(panel);
+    }
+  }
+
+  async function sell(shop) {
+    let hover = null;
+    const panel = comparePanel(() => hover);
+    Engine.push(panel);
+    const build = () => Game.itemList((it) => it.kind !== 'key').map((id) => {
+      const p = Math.floor(ITEMS[id].price / 2);
+      return { label: `${ITEMS[id].name} ×${Game.count(id)}`, right: p > 0 ? p + 'G' : '팔 수 없음', value: id, disabled: p <= 0, desc: ITEMS[id].desc };
+    });
+    const lw = new UI.ListWindow({ x: 12, y: 62, w: 372, items: build(), maxRows: 9, rowH: 30, title: '무엇을 팔까? (장비 중인 것은 팔 수 없다)', cancel: true, empty: '팔 물건이 없다', help: { x: 12, y: 398, w: 616, h: 70 }, onHover: (it) => { hover = it ? it.value : null; }, onDisabled: () => {} });
+    hover = lw.items[0] ? lw.items[0].value : null;
+    Engine.push(lw);
+    try {
+      for (;;) {
+        lw.setItems(build());
+        const r = await lw.choose();
+        if (!r) break;
+        const id = r.value, it = ITEMS[id];
+        const price = Math.floor(it.price / 2);
+        const have = Game.count(id);
+        let n = 1;
+        if (have > 1) { n = await UI.number({ title: `${it.name} — 몇 개 팔까?`, min: 1, max: have, unit: price, x: 340, y: 180 }); if (!n) continue; }
+        if (!(await Menu.confirm(`${it.name}${n > 1 ? ` ${n}개` : ''}${Util.josa(it.name, '을')} ${price * n}G에 팔까?`))) continue;
+        if (Game.removeItem(id, n)) { Game.addGold(price * n); Sound.sfx('coin'); }
+      }
+    } finally {
+      lw.close();
+      Engine.remove(panel);
+    }
+  }
+
+  async function open(shopId) {
+    const shop = SHOPS[shopId];
+    Engine.push(goldPanel);
+    try {
+      for (;;) {
+        const r = await UI.list({ x: 12, y: 12, w: 220, items: [{ label: '산다', value: 'buy' }, { label: '판다', value: 'sell' }, { label: '나간다', value: 'exit' }], title: shop.name, rowH: 34, cancel: true });
+        if (!r || r.value === 'exit') break;
+        if (r.value === 'buy') await buy(shop);
+        else await sell(shop);
+      }
+    } finally {
+      Engine.remove(goldPanel);
+    }
+    await S.say(shop.keeper, shop.bye);
+  }
+
+  return { open, stock };
+})();

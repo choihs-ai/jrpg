@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="별빛 종">
+  <meta name="theme-color" content="#05060f">
+  <meta name="description" content="이세계 정통 JRPG — 별빛 종의 이방인 제1장">
+  <title>별빛 종의 이방인</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <div id="game-wrap"><canvas id="game" aria-label="게임 화면"></canvas></div>
+    <div id="touch" aria-hidden="true">
+      <div id="dpad"><span class="arr up">▲</span><span class="arr down">▼</span><span class="arr left">◀</span><span class="arr right">▶</span></div>
+      <div id="btns">
+        <button data-act="menu" class="small">☰</button>
+        <button data-act="cancel" class="b">B</button>
+        <button data-act="confirm" class="a">A</button>
+      </div>
+    </div>
+  </div>
+  <!-- @@SCRIPTS_START@@ -->
+  <script src="src/core/util.js"></script>
+  <script src="src/core/input.js"></script>
+  <script src="src/core/engine.js"></script>
+  <script src="src/core/audio.js"></script>
+  <script src="src/ui/text.js"></script>
+  <script src="src/ui/widgets.js"></script>
+  <script src="src/gfx/pixel.js"></script>
+  <script src="src/gfx/tiles.js"></script>
+  <script src="src/gfx/chars.js"></script>
+  <script src="src/gfx/monsters.js"></script>
+  <script src="src/gfx/objects.js"></script>
+  <script src="src/data/items.js"></script>
+  <script src="src/data/skills.js"></script>
+  <script src="src/data/characters.js"></script>
+  <script src="src/data/monsters.js"></script>
+  <script src="src/data/talk.js"></script>
+  <script src="src/systems/settings.js"></script>
+  <script src="src/systems/game.js"></script>
+  <script src="src/systems/quests.js"></script>
+  <script src="src/systems/save.js"></script>
+  <script src="src/systems/battlecore.js"></script>
+  <script src="src/maps/legend.js"></script>
+  <script src="src/maps/maps.js"></script>
+  <script src="src/maps/rivel.js"></script>
+  <script src="src/maps/field.js"></script>
+  <script src="src/maps/dungeons.js"></script>
+  <script src="src/maps/story.js"></script>
+  <script src="src/scenes/events.js"></script>
+  <script src="src/scenes/field.js"></script>
+  <script src="src/scenes/battle.js"></script>
+  <script src="src/scenes/menu.js"></script>
+  <script src="src/scenes/shop.js"></script>
+  <script src="src/scenes/mapview.js"></script>
+  <script src="src/scenes/title.js"></script>
+  <script src="src/main.js"></script>
+  <!-- @@SCRIPTS_END@@ -->
+</body>
+</html>
