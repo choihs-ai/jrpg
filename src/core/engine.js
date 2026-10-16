@@ -15,6 +15,9 @@ const Engine = (() => {
     shakeT: 0, shakeMag: 0, flashT: 0, flashDur: 0, flashColor: '#fff',
   };
   let errorCount = 0;
+  // 움직임 줄이기 설정을 존중 (흔들림·섬광 약화)
+  const rm = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+  const reducedMotion = () => !!(rm && rm.matches);
   let lastError = null;
 
   function init(canvasEl) {
@@ -114,22 +117,29 @@ const Engine = (() => {
       try { l.draw(ctx); } catch (err) { errorCount++; lastError = err; if (errorCount < 20) console.error('[Engine] draw error:', err); }
       ctx.restore();
     };
-    for (const l of layers) if (l.draw && !l.overFade) drawLayer(l);
-    ctx.setTransform(scale, 0, 0, scale, 0, 0);
-    if (fx.flashT > 0) {
-      ctx.globalAlpha = Math.max(0, fx.flashT / fx.flashDur) * 0.85;
-      ctx.fillStyle = fx.flashColor;
-      ctx.fillRect(0, 0, W, H);
-      ctx.globalAlpha = 1;
+    // 쌓인 순서대로 그리되, 페이드/섬광은 첫 번째 대화·선택창 바로 아래에 깐다
+    // (검은 화면 위 내레이션이 보이도록, 그리고 창 위에 띄운 패널은 순서를 지키도록)
+    let fxIndex = layers.findIndex((l) => l.overFade);
+    if (fxIndex < 0) fxIndex = layers.length;
+    for (let i = 0; i <= layers.length; i++) {
+      if (i === fxIndex) {
+        ctx.setTransform(scale, 0, 0, scale, 0, 0);
+        if (fx.flashT > 0) {
+          ctx.globalAlpha = Math.max(0, fx.flashT / fx.flashDur) * 0.85;
+          ctx.fillStyle = fx.flashColor;
+          ctx.fillRect(0, 0, W, H);
+          ctx.globalAlpha = 1;
+        }
+        if (fx.fade > 0) {
+          ctx.globalAlpha = Math.min(1, fx.fade);
+          ctx.fillStyle = fx.fadeColor;
+          ctx.fillRect(0, 0, W, H);
+          ctx.globalAlpha = 1;
+        }
+      }
+      const l = layers[i];
+      if (l && l.draw) { ctx.setTransform(scale, 0, 0, scale, i < fxIndex ? ox * scale : 0, i < fxIndex ? oy * scale : 0); drawLayer(l); }
     }
-    if (fx.fade > 0) {
-      ctx.globalAlpha = Math.min(1, fx.fade);
-      ctx.fillStyle = fx.fadeColor;
-      ctx.fillRect(0, 0, W, H);
-      ctx.globalAlpha = 1;
-    }
-    // 대화창·선택창은 페이드 위에 그린다 (검은 화면 위 내레이션)
-    for (const l of layers) if (l.draw && l.overFade) drawLayer(l);
   }
 
   // 픽셀 월드 버퍼를 화면에 확대 출력
@@ -173,8 +183,8 @@ const Engine = (() => {
     fadeIn: (ms, color) => fadeTo(0, ms, color),
     get fading() { return fx.fadeResolve !== null; },
     get fadeLevel() { return fx.fade; },
-    shake(mag = 4, sec = 0.3) { fx.shakeMag = mag; fx.shakeT = sec; },
-    flash(color = '#fff', sec = 0.25) { fx.flashColor = color; fx.flashT = sec; fx.flashDur = sec; },
+    shake(mag = 4, sec = 0.3) { fx.shakeMag = reducedMotion() ? mag * 0.25 : mag; fx.shakeT = sec; },
+    flash(color = '#fff', sec = 0.25) { fx.flashColor = color; fx.flashT = reducedMotion() ? sec * 0.4 : sec; fx.flashDur = sec; },
     wait(ms) { return new Promise((r) => setTimeout(r, ms)); },
     // 프레임 기반 대기 (탭 비활성 시에도 순서 보장)
     frames(n = 1) {

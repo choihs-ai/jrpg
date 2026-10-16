@@ -6,7 +6,7 @@ const Theme = {
   font: '"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic","NanumGothic","WenQuanYi Zen Hei",system-ui,sans-serif',
   text: '#f4f1e6', dim: '#a7adc6', disabled: '#6f768f', gold: '#ffd75e', red: '#ff7b7b', green: '#7cf08a',
   blue: '#7cc4ff', purple: '#d59bff', hp: '#63e07a', mp: '#5fb2ff', exp: '#ffcf5a',
-  winTop: 'rgba(30,40,88,0.95)', winBot: 'rgba(12,16,44,0.95)', border: '#ece8d8', border2: '#5c6bb0',
+  winTop: 'rgb(30,40,88)', winBot: 'rgb(12,16,44)', border: '#ece8d8', border2: '#5c6bb0',
   cursor: '#ffd75e', select: 'rgba(255,215,94,0.16)',
 };
 const MARK = { y: Theme.gold, r: Theme.red, g: Theme.green, b: Theme.blue, p: Theme.purple, d: Theme.dim };

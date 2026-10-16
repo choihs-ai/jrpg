@@ -1,0 +1,4 @@
+tests/screens/
+dist/play.html
+node_modules/
+.DS_Store

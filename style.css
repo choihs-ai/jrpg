@@ -40,7 +40,7 @@ body.touch-on #touch { display: block; }
 
 /* 세로 화면 + 터치: 게임 화면은 위, 컨트롤은 아래 */
 @media (orientation: portrait) {
-  body.touch-on #game-wrap { flex: 0 1 auto; height: calc(100% - 190px); align-items: flex-start; padding-top: 8px; }
+  body.touch-on #game-wrap { flex: 0 1 auto; height: calc(100% - 190px); align-items: center; }
   body.touch-on #touch { position: relative; height: 190px; }
 }
 

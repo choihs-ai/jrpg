@@ -18,7 +18,7 @@ const QUESTS = {
       { goal: '동쪽 숲에 사는 사냥꾼 고르도를 찾아간다', target: { map: 'field', x: 50, y: 30 } },
       { goal: '북쪽 고개를 넘어 유적으로 향한다 (고개의 주인 「철엄니」를 조심)', target: { map: 'field', x: 31, y: 14 } },
       { goal: '북쪽 고대 유적의 입구를 조사한다', target: { map: 'field', x: 31, y: 5 } },
-      { goal: '리벨 신전의 대신관 세나에게 별빛 방울에 대해 묻는다', target: { map: 'rivel', x: 28, y: 5 } },
+      { goal: '리벨 신전의 대신관 세나에게 별빛 방울에 대해 묻는다', target: { map: 'rivel', x: 29, y: 4 } },
       { goal: '별빛 방울로 유적의 봉인을 푼다', target: { map: 'field', x: 31, y: 5 } },
       { goal: '유적 깊은 곳, 종의 방을 조사한다', target: { map: 'ruins2', x: 15, y: 2 } },
       { goal: '리벨 마을로 돌아가 장로에게 보고한다', target: { map: 'rivel', x: 18, y: 5 } },
@@ -39,7 +39,7 @@ const QUESTS = {
     desc: '가시멧돼지들이 밭을 망쳐 놓는다. 평원의 가시멧돼지를 5마리 퇴치해 달라는 부탁.',
     stages: [
       { goal: '가시멧돼지를 퇴치한다', count: () => Math.min(5, (Quests.data('s_boar').kills || 0)), max: 5 },
-      { goal: '농부 오웬에게 보고한다', target: { map: 'rivel', x: 7, y: 24 } },
+      { goal: '농부 오웬에게 보고한다', target: { map: 'rivel', x: 6, y: 26 } },
     ],
     reward: { gold: 80, items: [['leather_shield', 1]] },
   },
@@ -48,8 +48,8 @@ const QUESTS = {
     desc: '요즘 마을에서 물건이 자꾸 사라진다. 로사의 결혼반지도 없어졌다. 범인을 찾아보자.',
     stages: [
       { goal: '물건을 잃어버린 사람들에게 이야기를 듣는다 (제랄드 할아버지, 신전의 세나)', count: () => (Quests.data('s_thief').heard || 0), max: 2 },
-      { goal: '마을 남서쪽 풍차 주변을 조사한다', target: { map: 'rivel', x: 13, y: 22 } },
-      { goal: '풍차 안으로 들어가 본다', target: { map: 'rivel', x: 13, y: 22 } },
+      { goal: '마을 남서쪽 풍차 주변을 조사한다', target: { map: 'rivel', x: 12, y: 22 } },
+      { goal: '풍차 안으로 들어가 본다', target: { map: 'rivel', x: 12, y: 22 } },
     ],
     reward: { text: '선택에 따라 결과가 달라진다' },
   },
@@ -57,9 +57,9 @@ const QUESTS = {
     name: '우물 속 목소리', type: 'sub', giver: '꼬마 티아',
     desc: '티아는 광장 우물에서 "짐은 배가 고프도다…" 하는 목소리를 들었다고 한다. 정말일까?',
     stages: [
-      { goal: '광장의 우물을 조사한다', target: { map: 'rivel', x: 19, y: 15 } },
-      { goal: '우물 아래 목소리의 주인을 찾는다', target: { map: 'cellar', x: 9, y: 3 } },
-      { goal: '티아에게 알려준다', target: { map: 'rivel', x: 31, y: 18 } },
+      { goal: '광장의 우물을 조사한다', target: { map: 'rivel', x: 19, y: 14 } },
+      { goal: '우물 아래 목소리의 주인을 찾는다', target: { map: 'cellar', x: 18, y: 8 } },
+      { goal: '티아에게 알려준다', target: { map: 'rivel', x: 30, y: 19 } },
     ],
     reward: { items: [['star', 1]] },
   },
@@ -67,7 +67,7 @@ const QUESTS = {
     name: '사냥개 바우', type: 'sub', giver: '사냥꾼 고르도',
     desc: '고르도의 사냥개 바우가 사흘째 돌아오지 않는다. "서쪽 숲, 늙은 나무 사이로 바람이 지나가는 길"을 좋아했다는데…',
     stages: [
-      { goal: '평원 서쪽 숲 어딘가에서 바우를 찾는다', target: { map: 'field', x: 8, y: 22 } },
+      { goal: '평원 서쪽 숲 어딘가에서 바우를 찾는다', target: { map: 'field', x: 7, y: 27 } },
       { goal: '사냥꾼 고르도에게 알린다', target: { map: 'field', x: 50, y: 30 } },
     ],
     reward: { items: [['swift_boots', 1]] },
@@ -153,7 +153,7 @@ const Quests = (() => {
     onItem(itemId) {
       if (itemId === 'moonherb' && this.isActive('s_herb') && this.stage('s_herb') === 0 && Game.count('moonherb') >= 3) {
         this.setStage('s_herb', 1);
-        return '[y]「달빛 풀 채집」 달빛 풀을 3개 모았다! 엘라 할머니에게 가져가자.[/][/]';
+        return '[y]「달빛 풀 채집」 달빛 풀을 3개 모았다! 엘라 할머니에게 가져가자.[/]';
       }
       return null;
     },

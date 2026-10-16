@@ -230,7 +230,7 @@ defMap('rivel', {
       },
     },
     { id: 'chick1', x: 8, y: 24, look: 'critter:chicken', move: 'wander', radius: 2, talk: async () => { await S.say(null, '꼬꼬댁! (닭이 당신을 노려본다.)'); } },
-    { id: 'chick2', x: 4, y: 24, look: 'critter:chicken', move: 'wander', radius: 2, talk: async () => { await S.say(null, '꼬끼오─! (어째서인지 의기양양하다.)'); } },
+    { id: 'chick2', x: 13, y: 26, look: 'critter:chicken', move: 'wander', radius: 2, talk: async () => { await S.say(null, '꼬끼오─! (어째서인지 의기양양하다.)'); } },
     { id: 'cat', x: 4, y: 11, look: 'critter:cat', move: 'wander', radius: 2, talk: async () => { await S.say(null, '냐아. (고양이가 다리에 몸을 비빈다.)'); } },
   ],
   objects: [
@@ -284,7 +284,7 @@ defMap('inn', {
     'IIIIIIIIIIIIII', // 0
     'IIIIIIIIIIIIII', // 1
     'IfwpwLLIbwbwbI', // 2
-    'IwwwwwwIwwwwwI', // 3
+    'IwwwwIwIwwwwwI', // 3
     'IkkkkwwwwwwwzI', // 4
     'IwwwwwwIwwwwwI', // 5
     'IIwIIIwIIwwIII', // 6
@@ -349,7 +349,6 @@ defMap('inn', {
   ],
   objects: [
     { type: 'search', id: 'inn_dresser', x: 12, y: 4, item: 'pot_lid', msg: '서랍장 안에… 냄비 뚜껑이 들어 있다. 왜 여기에?', empty: '서랍장 안은 비어 있다.' },
-    { type: 'event', x: 5, y: 2, solid: true, run: async () => { await S.say(null, '책장에 「아스텔 왕국 여행 안내서」가 꽂혀 있다.\n「…북쪽 변경 리벨 마을은 별이 잘 보이기로 유명하며…」'); } },
     { type: 'event', x: 6, y: 2, solid: true, run: async () => { await S.say(null, '책장에 「맛있는 감자 수프 100선」이 꽂혀 있다. 마르타의 손글씨 메모가 가득하다.'); } },
   ],
 });
@@ -361,7 +360,7 @@ defMap('smithy', {
     'IIIIIIIIIIII', // 0
     'IIIIIIIIIIII', // 1
     'IfaXwwiiwwXI', // 2
-    'IwwwwwwwwwwI', // 3
+    'IwwwwwwwIwwI', // 3
     'IkkkkkkkwwwI', // 4
     'IwwwwwwwwwxI', // 5
     'IwwwwwwwwwxI', // 6
@@ -406,7 +405,7 @@ defMap('shop', {
     'IIIIIIIIIIII', // 0
     'IIIIIIIIIIII', // 1
     'IiiipwwiiiiI', // 2
-    'IwwwwwwwwwwI', // 3
+    'IwwwwwwwIwwI', // 3
     'IkkkkkkkwwwI', // 4
     'IwwwwwwwwwjI', // 5
     'IwwwwwwwwwjI', // 6

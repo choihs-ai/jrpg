@@ -86,6 +86,7 @@ const MapView = (() => {
             if (tm !== v.map) {
               // 다른 지도 안의 목적지 → 입구 쪽으로 표시
               if (v.map === 'field' && (tm === 'rivel' || tm === 'cellar')) { tx = 31; ty = 38; }
+              else if (v.map === 'rivel' && tm === 'cellar') { tx = 19; ty = 14; }
               else if (v.map === 'field' && (tm.startsWith('ruins') || tm === 'bell')) { tx = 31; ty = 5; }
               else continue;
             }

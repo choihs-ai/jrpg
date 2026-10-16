@@ -85,6 +85,7 @@ const Battle = (() => {
         if (d.appear < 1) d.appear = Math.min(1, d.appear + dt * 3);
       }
       if (msgShown < msgTotal) msgShown = Math.min(msgTotal, msgShown + dt * [70, 120, 260][Settings.get('battleSpeed')]);
+      if (introText) introText.t += dt;
     },
     onAction(a) { if (a === 'confirm' || a === 'cancel') skipWait = true; },
     onPointer(ev) { if (ev.type === 'down') skipWait = true; return true; },
@@ -723,5 +724,5 @@ const Battle = (() => {
     return result;
   }
 
-  return { run, get core() { return core; }, layer };
+  return { run, get core() { return core; }, get active() { return active; }, layer };
 })();

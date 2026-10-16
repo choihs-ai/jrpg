@@ -573,6 +573,16 @@ const Field = (() => {
       else if (o.type === 'deco' && o.draw === 'windmill') ObjArt.windmill(g, sx + 8, sy + 6, T);
       else if (o.type === 'deco' && o.draw === 'bell') g.drawImage(ObjArt.bell(!!Game.flag('velgar_defeated')), sx - 24, sy - 30);
       else if (o.type === 'search' && o.hidden && hasNell() && !Game.flag('got:' + o.id)) g.drawImage(ObjArt.sparkle(T + o.x), sx, sy);
+      else if (o.art === 'circle') {
+        // 귀환의 마법진
+        g.save();
+        g.globalAlpha = 0.55 + 0.25 * Math.sin(T * 3);
+        g.strokeStyle = '#9fd3ff'; g.lineWidth = 1;
+        g.beginPath(); g.ellipse(sx + 8, sy + 9, 7, 4, 0, 0, Math.PI * 2); g.stroke();
+        g.beginPath(); g.ellipse(sx + 8, sy + 9, 4, 2, 0, 0, Math.PI * 2); g.stroke();
+        g.fillStyle = '#ffffff'; g.fillRect(sx + 7, sy + 1 + ((T * 12) % 8), 1, 2); g.fillRect(sx + 4, sy + 3 + ((T * 9) % 6), 1, 1); g.fillRect(sx + 11, sy + 2 + ((T * 10) % 7), 1, 1);
+        g.restore();
+      }
     }
     // 인물 (y 정렬)
     const sprites = [];

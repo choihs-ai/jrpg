@@ -27,6 +27,7 @@ export class Driver {
         inBattle: !!J.Battle.core, prompt: !!document.querySelector('.name-entry'),
         items: top instanceof J.UI.ListWindow ? top.items.map((i) => J.UI && (typeof i.label === 'string' ? i.label : '')) : null,
         cursor: top instanceof J.UI.ListWindow ? top.cursor : null,
+        cols: top instanceof J.UI.ListWindow ? top.o.cols : 1,
         listTitle: top instanceof J.UI.ListWindow ? top.o.title : null,
         msg: top instanceof J.UI.MessageLayer ? top.pagesRaw.join(' / ') : null,
         gold: st ? st.gold : 0,
@@ -39,13 +40,18 @@ export class Driver {
   // 리스트에서 원하는 항목 고르기
   async pickInList(want) {
     const s = await this.state();
+    if (!s.items) { await this.key('Enter'); return; }
     let idx = typeof want === 'number' ? want : s.items.findIndex((l) => l.includes(want));
     if (idx < 0) { this.log('  ! choice not found: ' + want + ' in ' + JSON.stringify(s.items)); idx = 0; }
+    const cols = s.cols || 1;
     let cur = s.cursor;
     let guard = 0;
-    while (cur !== idx && guard++ < 40) {
-      await this.key(idx > cur ? 'ArrowDown' : 'ArrowUp');
+    while (cur !== idx && guard++ < 60) {
+      const r0 = Math.floor(cur / cols), r1 = Math.floor(idx / cols);
+      if (r0 !== r1) await this.key(r1 > r0 ? 'ArrowDown' : 'ArrowUp');
+      else await this.key(idx % cols > cur % cols ? 'ArrowRight' : 'ArrowLeft');
       cur = (await this.state()).cursor;
+      if (cur === null) return;
     }
     await this.key('Enter');
   }
@@ -70,6 +76,7 @@ export class Driver {
       if (s.kind === 'list') {
         const want = this.choices.length ? this.choices.shift() : 0;
         this.log(`  [choice] ${s.listTitle || ''} → ${want} (${JSON.stringify(s.items)})`);
+        if (want === 'CANCEL') { await this.key('Escape'); await sleep(80); continue; }
         await this.pickInList(want);
         continue;
       }
@@ -131,6 +138,35 @@ export class Driver {
     // 막힌 방향이면 제자리에서 방향만 바뀐다
     await this.ev((d) => { window.__jr.Field.player.dir = d; }, dir);
     await sleep(30);
+  }
+  // 움직이는 NPC에게 다가가 말 걸기 (실시간 위치 추적)
+  async talkTo(id) {
+    for (let attempt = 0; attempt < 12; attempt++) {
+      const n = await this.ev((nid) => { const x = window.__jr.Field.npc(nid); return x && x.visible ? { x: x.x, y: x.y, moving: x.moving } : null; }, id);
+      if (!n) throw new Error('npc not found: ' + id);
+      const s = await this.state();
+      const adj = Math.abs(n.x - s.x) + Math.abs(n.y - s.y) === 1;
+      if (!adj) {
+        try { await this.walkTo(n.x, n.y, { adjacent: true }); } catch (e) { await sleep(300); }
+        continue;
+      }
+      if (n.moving) { await sleep(150); continue; }
+      const dir = n.x > s.x ? 'right' : n.x < s.x ? 'left' : n.y > s.y ? 'down' : 'up';
+      await this.face(dir);
+      await this.key('Enter');
+      await sleep(200);
+      const after = await this.state();
+      if (after.busy || after.kind !== 'field') return this.pump();
+    }
+    throw new Error('could not talk to ' + id);
+  }
+  // 카운터 너머 NPC와 대화 (NPC의 두 칸 아래에서 위를 보고)
+  async talkAcross(x, y) {
+    await this.walkTo(x, y + 2);
+    await this.face('up');
+    await this.key('Enter');
+    await sleep(150);
+    return this.pump();
   }
   // 대상(NPC/물체)에 다가가서 조사
   async interactAt(x, y) {

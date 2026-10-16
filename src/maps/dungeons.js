@@ -200,7 +200,7 @@ defMap('bell', {
   objects: [
     { type: 'deco', x: 9, y: 2, draw: 'bell' },
     {
-      type: 'event', x: 12, y: 12, show: () => Game.flag('velgar_defeated'),
+      type: 'event', x: 12, y: 12, art: 'circle', show: () => Game.flag('velgar_defeated'),
       run: async () => { if (await S.yesno(null, '벨가르가 남긴 귀환의 마법진이 빛나고 있다. 리벨 마을로 돌아갈까?')) await S.warp('rivel', 19, 27, 'up', { sfx: 'chime', slow: true }); },
     },
   ],

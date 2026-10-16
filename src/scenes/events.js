@@ -137,7 +137,7 @@ const S = {
     await Sound.jingle('inn');
     await Engine.wait(300);
     Field.refreshNpcs();
-    Sound.bgm(Field.map.bgm);
+    Sound.bgm(typeof Field.map.bgm === 'function' ? Field.map.bgm() : Field.map.bgm);
     await Engine.fadeIn(600);
     await S.say(keeper, '좋은 아침이에요! 오늘도 힘내요.');
     if (Events.afterInn) await Events.afterInn();

@@ -28,10 +28,10 @@ const Menu = (() => {
     UI.gauge(ctx, bx + 26, y + 41, bw - 26, 4, s.maxmp ? m.mp / s.maxmp : 0, Theme.mp);
     const tags = [];
     if (dead) tags.push(['전투불능', Theme.red]);
-    for (const k of ['poison']) if (m.status[k]) tags.push([STATUS_NAMES[k], '#c070ff']);
+    if (m.status.poison) tags.push(['독', '#c070ff']);
     if (opts.reserve) tags.push(['대기', Theme.dim]);
-    let tx = x + 42;
-    for (const [t, c] of tags) { Text.draw(ctx, `[${t}]`, tx + 100, y + 22, { size: 13, color: c }); tx += 50; }
+    let tx = x + 46 + Text.width(ctx, Game.name(id), 18, true);
+    for (const [t, c] of tags) { Text.draw(ctx, `[${t}]`, tx, y + 2, { size: 13, color: c }); tx += Text.width(ctx, `[${t}]`, 13) + 4; }
   }
 
   // 메뉴 배경 레이어 (파티 요약)
