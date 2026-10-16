@@ -101,8 +101,8 @@ const Sound = (() => {
     levelup: { bpm: 170, bar: 16, loop: false, bass: 'none', arp: 'none', drums: 'none', lead: 'p25', leadVol: 0.1, chords: 'C', mel: `C5.2 E5.2 G5.2 C6.4 r.2 G5.2 C6.8` },
     item: { bpm: 150, bar: 16, loop: false, bass: 'none', arp: 'none', drums: 'none', lead: 'p25', leadVol: 0.1, chords: 'G', mel: `G5.2 A5.2 B5.2 D6.6 r.4` },
     inn: {
-      bpm: 92, bar: 16, loop: false, bass: 'long', arp: 'none', drums: 'none', lead: 'p12', leadVol: 0.09,
-      chords: 'F C Bb F', mel: `A4.4 C5.4 F5.8 E5.4 G5.4 C5.8 D5.4 Bb4.4 G4.4 E4.4 F4.16`,
+      bpm: 132, bar: 16, loop: false, bass: 'long', arp: 'none', drums: 'none', lead: 'p12', leadVol: 0.09,
+      chords: 'F C', mel: `A4.4 C5.4 F5.8 E5.4 G5.4 C5.8`,
     },
     quest: { bpm: 140, bar: 16, loop: false, bass: 'hits', arp: 'none', drums: 'none', lead: 'p25', leadVol: 0.1, chords: 'D G A D', mel: `A4.2 D5.2 F#5.2 A5.6 B5.4 G5.4 A5.4 C#6.4 D6.12 r.4` },
     gameover: { bpm: 66, bar: 16, loop: false, bass: 'long', arp: 'none', drums: 'none', lead: 'p12', leadVol: 0.09, chords: 'Dm Bb Gm A', mel: `D5.8 C5.8 Bb4.8 A4.8 G4.8 E4.8 C#4.8 D4.8` },
