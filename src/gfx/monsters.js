@@ -1,0 +1,195 @@
+'use strict';
+// ─────────────────────────────────────────────────────────────
+// MonsterArt: 몬스터 그림을 캔버스 도형으로 그린 뒤 픽셀화 + 외곽선
+// ─────────────────────────────────────────────────────────────
+const MonsterArt = (() => {
+  // 도형 도우미 (g = 2D context)
+  const E = (g, x, y, rx, ry, col, rot = 0) => { g.fillStyle = col; g.beginPath(); g.ellipse(x, y, Math.max(0.5, rx), Math.max(0.5, ry), rot, 0, Math.PI * 2); g.fill(); };
+  const R = (g, x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
+  const Poly = (g, pts, col) => { g.fillStyle = col; g.beginPath(); g.moveTo(pts[0], pts[1]); for (let i = 2; i < pts.length; i += 2) g.lineTo(pts[i], pts[i + 1]); g.closePath(); g.fill(); };
+  const L = (g, x0, y0, x1, y1, col, w = 1) => { g.strokeStyle = col; g.lineWidth = w; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); };
+  const eye = (g, x, y, r = 2.2, pupil = '#140c1c', white = '#ffffff') => { E(g, x, y, r, r * 1.2, white); E(g, x + r * 0.25, y + r * 0.2, r * 0.6, r * 0.8, pupil); E(g, x - r * 0.3, y - r * 0.45, 0.6, 0.6, '#ffffff'); };
+
+  const ART = {
+    jelly: { w: 44, h: 40, draw(g, p) {
+      E(g, 22, 27, 18, 12, p.dark); E(g, 22, 25, 17, 11, p.body); E(g, 22, 17, 11, 9, p.body);
+      E(g, 15, 18, 4, 3, p.light); E(g, 13, 22, 2, 2, p.light);
+      eye(g, 17, 25, 2.4); eye(g, 27, 25, 2.4);
+      L(g, 19, 31, 22, 33, '#1a1226'); L(g, 22, 33, 25, 31, '#1a1226');
+      if (!p.shiny) { Poly(g, [22, 9, 17, 3, 21, 6], '#3f8a35'); Poly(g, [22, 9, 28, 2, 25, 7], '#5ab04a'); }
+      else { Poly(g, [34, 6, 35, 10, 39, 11, 35, 12, 34, 16, 33, 12, 29, 11, 33, 10], '#ffffff'); }
+    } },
+    rabbit: { w: 44, h: 40, draw(g, p) {
+      E(g, 26, 28, 13, 9, p.dark); E(g, 26, 27, 12, 8, p.body); E(g, 38, 25, 3, 3, p.light);
+      E(g, 15, 22, 8, 7, p.body); E(g, 13, 20, 4, 3, p.light);
+      E(g, 12, 9, 2.5, 7, p.body, -0.2); E(g, 18, 9, 2.5, 7, p.body, 0.2); E(g, 12, 9, 1, 5, '#f4a0b0', -0.2); E(g, 18, 9, 1, 5, '#f4a0b0', 0.2);
+      Poly(g, [14, 16, 17, 16, 15, 7], p.horn);
+      eye(g, 12, 22, 1.8, '#c02040'); E(g, 8, 25, 1.4, 1, '#f4a0b0');
+      R(g, 18, 33, 4, 4, p.dark); R(g, 30, 33, 5, 4, p.dark);
+    } },
+    shroom: { w: 44, h: 44, draw(g, p) {
+      R(g, 15, 22, 14, 16, p.stem); E(g, 22, 38, 8, 3, p.stem);
+      E(g, 22, 20, 19, 12, p.dark); E(g, 22, 18, 18, 11, p.cap); R(g, 3, 20, 38, 4, p.dark);
+      R(g, 2, 21, 40, 3, p.dark);
+      E(g, 12, 14, 3, 2.5, p.spot); E(g, 24, 10, 4, 3, p.spot); E(g, 33, 15, 3, 2.5, p.spot); E(g, 18, 18, 2, 1.5, p.spot);
+      E(g, 19, 28, 1.6, 2.2, '#140c1c'); E(g, 26, 28, 1.6, 2.2, '#140c1c'); L(g, 17, 25, 21, 27, '#140c1c'); L(g, 28, 25, 24, 27, '#140c1c');
+      L(g, 19, 33, 26, 33, '#140c1c'); R(g, 14, 39, 5, 3, p.dark); R(g, 25, 39, 5, 3, p.dark);
+    } },
+    crow: { w: 48, h: 40, draw(g, p) {
+      Poly(g, [22, 22, 2, 10, 6, 18, 1, 20, 8, 24, 4, 28, 16, 28], p.dark); Poly(g, [26, 22, 46, 10, 42, 18, 47, 20, 40, 24, 44, 28, 32, 28], p.dark);
+      Poly(g, [20, 22, 6, 14, 10, 22, 16, 26], p.light); Poly(g, [28, 22, 42, 14, 38, 22, 32, 26], p.light);
+      E(g, 24, 25, 8, 10, p.body); E(g, 24, 13, 6, 6, p.body);
+      Poly(g, [24, 15, 31, 17, 24, 19], '#e0a020'); E(g, 22, 12, 1.6, 1.6, p.eye); E(g, 26, 12, 1.6, 1.6, p.eye);
+      Poly(g, [20, 34, 24, 39, 28, 34], p.dark); L(g, 21, 34, 20, 38, '#e0a020'); L(g, 27, 34, 28, 38, '#e0a020');
+    } },
+    boar: { w: 52, h: 40, draw(g, p) {
+      E(g, 30, 23, 17, 11, p.dark); E(g, 29, 22, 16, 10, p.body); E(g, 26, 18, 9, 4, p.light);
+      for (let i = 0; i < 6; i++) Poly(g, [18 + i * 5, 14 - (i % 2), 21 + i * 5, 6 + (i % 2) * 2, 24 + i * 5, 14], p.thorn);
+      E(g, 12, 25, 9, 8, p.body); E(g, 5, 27, 4, 4, p.light); E(g, 4, 26, 1, 1, '#140c1c'); E(g, 4, 28, 1, 1, '#140c1c');
+      L(g, 8, 30, 3, 22, p.tusk, 2); L(g, 12, 31, 9, 24, p.tusk, 2);
+      E(g, 12, 21, 1.6, 1.8, '#140c1c'); Poly(g, [14, 15, 18, 12, 17, 18], p.dark);
+      R(g, 17, 30, 5, 8, p.dark); R(g, 26, 31, 5, 7, p.dark); R(g, 36, 30, 5, 8, p.dark); R(g, 42, 29, 4, 7, p.dark);
+      L(g, 45, 20, 49, 17, p.dark, 2);
+    } },
+    vine: { w: 48, h: 48, draw(g, p) {
+      for (let k = 0; k < 3; k++) for (let i = 0; i < 26; i++) { const t = i / 25; E(g, 10 + k * 14 + Math.sin(t * 6 + k) * 4, 46 - t * 26, 3.2 - t, 3.2 - t, k === 1 ? p.body : p.dark); }
+      Poly(g, [8, 32, 2, 28, 9, 26], p.light); Poly(g, [40, 30, 47, 26, 41, 24], p.light);
+      for (let i = 0; i < 7; i++) { const a = (i / 7) * Math.PI * 2; E(g, 24 + Math.cos(a) * 9, 16 + Math.sin(a) * 9, 5, 5, p.flower); }
+      E(g, 24, 16, 7, 7, '#5a1020'); for (let i = 0; i < 5; i++) Poly(g, [19 + i * 2.4, 11, 21 + i * 2.4, 11, 20 + i * 2.4, 14], '#ffffff');
+      for (let i = 0; i < 5; i++) Poly(g, [19 + i * 2.4, 21, 21 + i * 2.4, 21, 20 + i * 2.4, 18], '#ffffff');
+      E(g, 21, 16, 1, 1, '#ffe040'); E(g, 27, 16, 1, 1, '#ffe040');
+    } },
+    goblin: { w: 44, h: 48, draw(g, p) {
+      R(g, 15, 36, 5, 10, p.dark); R(g, 24, 36, 5, 10, p.dark);
+      E(g, 22, 30, 10, 9, p.cloth); R(g, 14, 33, 16, 4, '#5a3418');
+      Poly(g, [10, 14, 1, 8, 10, 20], p.skin); Poly(g, [34, 14, 43, 8, 34, 20], p.skin);
+      E(g, 22, 16, 11, 10, p.skin); E(g, 18, 12, 4, 2, p.dark);
+      E(g, 17, 16, 2.2, 2.4, '#ffe040'); E(g, 27, 16, 2.2, 2.4, '#ffe040'); E(g, 17, 16, 0.8, 1.6, '#140c1c'); E(g, 27, 16, 0.8, 1.6, '#140c1c');
+      L(g, 16, 22, 28, 22, '#140c1c', 1.5); Poly(g, [18, 22, 19, 25, 20, 22], '#ffffff'); Poly(g, [24, 22, 25, 25, 26, 22], '#ffffff');
+      E(g, 35, 30, 3, 3, p.skin); Poly(g, [36, 30, 42, 18, 44, 19, 38, 31], p.blade); R(g, 34, 30, 4, 2, '#5a3418');
+      E(g, 9, 31, 3, 3, p.skin);
+    } },
+    bloom: { w: 44, h: 48, draw(g, p) {
+      R(g, 21, 26, 3, 20, p.stem); Poly(g, [22, 38, 10, 32, 14, 40], p.stem); Poly(g, [23, 34, 35, 28, 31, 37], p.stem);
+      for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2 + 0.3; E(g, 22 + Math.cos(a) * 10, 18 + Math.sin(a) * 10, 6.5, 6.5, i % 2 ? p.petal : p.dark); }
+      E(g, 22, 18, 8, 8, p.center);
+      L(g, 17, 17, 20, 18, '#140c1c', 1.2); L(g, 24, 18, 27, 17, '#140c1c', 1.2); E(g, 22, 22, 1.5, 1, '#c84040');
+      E(g, 17, 20, 1.5, 1, '#ff9a9a'); E(g, 27, 20, 1.5, 1, '#ff9a9a');
+    } },
+    skeleton: { w: 44, h: 52, draw(g, p) {
+      R(g, 17, 38, 3, 12, p.bone); R(g, 25, 38, 3, 12, p.bone); R(g, 15, 49, 6, 2, p.bone); R(g, 24, 49, 6, 2, p.bone);
+      R(g, 21, 20, 3, 18, p.dark);
+      for (let i = 0; i < 4; i++) { E(g, 22.5, 23 + i * 4, 8 - i, 1.4, p.bone); }
+      E(g, 22.5, 37, 6, 2.5, p.bone);
+      E(g, 22, 11, 9, 9, p.bone); R(g, 17, 16, 10, 6, p.bone); E(g, 18, 11, 2.6, 3, '#1a1020'); E(g, 26, 11, 2.6, 3, '#1a1020');
+      E(g, 18, 11, 1, 1, p.eye); E(g, 26, 11, 1, 1, p.eye); for (let i = 0; i < 4; i++) R(g, 18 + i * 2.4, 19, 1, 3, '#1a1020');
+      L(g, 14, 22, 9, 32, p.bone, 2.5); L(g, 31, 22, 36, 30, p.bone, 2.5);
+      Poly(g, [36, 30, 40, 6, 42, 7, 38, 31], p.rust); R(g, 33, 29, 8, 2, '#5a3418');
+      E(g, 8, 32, 6, 8, '#6a5a4a'); E(g, 8, 32, 4, 6, '#8a7a5a');
+    } },
+    bat: { w: 52, h: 36, draw(g, p) {
+      Poly(g, [26, 16, 2, 6, 4, 14, 1, 22, 8, 20, 10, 26, 16, 22, 20, 26], p.dark); Poly(g, [26, 16, 50, 6, 48, 14, 51, 22, 44, 20, 42, 26, 36, 22, 32, 26], p.dark);
+      Poly(g, [24, 16, 8, 10, 10, 18, 16, 20], p.wing); Poly(g, [28, 16, 44, 10, 42, 18, 36, 20], p.wing);
+      E(g, 26, 18, 7, 8, p.body); Poly(g, [21, 12, 20, 4, 25, 11], p.body); Poly(g, [31, 12, 32, 4, 27, 11], p.body);
+      E(g, 23, 16, 1.8, 1.8, p.eye); E(g, 29, 16, 1.8, 1.8, p.eye); Poly(g, [24, 22, 25, 25, 26, 22], '#ffffff'); Poly(g, [27, 22, 28, 25, 29, 22], '#ffffff');
+    } },
+    sentry: { w: 48, h: 56, draw(g, p) {
+      R(g, 13, 40, 8, 14, p.dark); R(g, 27, 40, 8, 14, p.dark);
+      R(g, 10, 20, 28, 22, p.stone); R(g, 10, 20, 28, 3, p.light); R(g, 34, 20, 4, 22, p.dark);
+      L(g, 16, 28, 32, 28, p.eye, 1); L(g, 24, 24, 24, 38, p.eye, 1); E(g, 24, 31, 3, 3, p.eye);
+      R(g, 2, 22, 8, 18, p.stone); R(g, 38, 22, 8, 18, p.stone); R(g, 1, 38, 10, 7, p.dark); R(g, 37, 38, 10, 7, p.dark);
+      R(g, 14, 5, 20, 15, p.stone); R(g, 14, 5, 20, 3, p.light); R(g, 18, 11, 12, 4, '#1a1a28'); E(g, 24, 13, 2.5, 1.6, p.eye);
+    } },
+    echo: { w: 44, h: 48, draw(g, p) {
+      Poly(g, [8, 22, 6, 40, 12, 34, 16, 44, 22, 36, 28, 44, 32, 34, 38, 40, 36, 22], p.dark);
+      E(g, 22, 20, 14, 14, p.body); E(g, 18, 14, 6, 4, p.light);
+      E(g, 17, 21, 2.5, 3.5, p.eye); E(g, 27, 21, 2.5, 3.5, p.eye); E(g, 17, 21, 1, 1.5, '#ffffff'); E(g, 27, 21, 1, 1.5, '#ffffff');
+      E(g, 22, 29, 3, 2, '#140c1c');
+      E(g, 5, 12, 2, 2, p.light); E(g, 40, 8, 1.5, 1.5, p.light); E(g, 38, 30, 1.5, 1.5, p.light);
+    } },
+    lizard: { w: 56, h: 40, draw(g, p) {
+      for (let i = 0; i < 14; i++) E(g, 40 + i * 0.9, 26 - i * 1.3, 3.5 - i * 0.15, 3.5 - i * 0.15, p.body);
+      E(g, 53, 7, 3, 4, p.flame); E(g, 53, 8, 1.5, 2, '#ffffff');
+      E(g, 26, 26, 15, 8, p.dark); E(g, 25, 25, 14, 7, p.body); E(g, 22, 22, 8, 3, p.light);
+      for (let i = 0; i < 5; i++) Poly(g, [16 + i * 5, 19, 18 + i * 5, 14, 20 + i * 5, 19], p.dark);
+      E(g, 9, 24, 9, 6, p.body); E(g, 4, 26, 4, 3, p.body); eye(g, 9, 21, 2, '#140c1c', '#ffe060');
+      L(g, 1, 27, 7, 28, '#5a1010', 1.2); Poly(g, [1, 26, -3, 24, -2, 29], p.flame);
+      R(g, 13, 30, 4, 7, p.dark); R(g, 22, 31, 4, 6, p.dark); R(g, 31, 30, 4, 7, p.dark);
+    } },
+    mimic: { w: 48, h: 44, draw(g, p) {
+      R(g, 6, 22, 36, 18, p.wood); R(g, 6, 22, 36, 3, p.gold); R(g, 6, 37, 36, 3, p.dark); R(g, 22, 26, 4, 6, p.gold);
+      R(g, 6, 22, 3, 18, p.dark); R(g, 39, 22, 3, 18, p.dark);
+      Poly(g, [6, 22, 10, 4, 38, 4, 42, 22], p.mouth);
+      Poly(g, [4, 20, 8, 2, 40, 2, 44, 20, 40, 8, 8, 8], p.wood); R(g, 8, 2, 32, 3, p.gold);
+      for (let i = 0; i < 7; i++) Poly(g, [9 + i * 4.4, 21, 11 + i * 4.4, 15, 13 + i * 4.4, 21], '#ffffff');
+      for (let i = 0; i < 6; i++) Poly(g, [11 + i * 4.4, 9, 13 + i * 4.4, 14, 15 + i * 4.4, 9], '#ffffff');
+      Poly(g, [22, 18, 30, 30, 34, 26, 26, 17], p.tongue);
+      E(g, 16, 12, 2, 2, '#ffe040'); E(g, 32, 12, 2, 2, '#ffe040');
+    } },
+    kingmush: { w: 56, h: 60, draw(g, p) {
+      R(g, 17, 30, 22, 22, p.stem); E(g, 28, 52, 12, 4, p.stem); R(g, 14, 51, 8, 6, '#6b4426'); R(g, 34, 51, 8, 6, '#6b4426');
+      E(g, 28, 26, 25, 14, p.dark); E(g, 28, 24, 24, 13, p.cap); R(g, 3, 27, 50, 4, p.dark);
+      E(g, 15, 18, 4, 3, p.spot); E(g, 30, 14, 5, 3.5, p.spot); E(g, 43, 20, 4, 3, p.spot); E(g, 22, 25, 2.5, 2, p.spot); E(g, 38, 26, 2.5, 2, p.spot);
+      Poly(g, [18, 12, 18, 2, 23, 7, 28, 0, 33, 7, 38, 2, 38, 12], p.crown); E(g, 28, 7, 2, 2, '#e04040');
+      eye(g, 23, 37, 2.2); eye(g, 33, 37, 2.2);
+      Poly(g, [28, 42, 18, 46, 20, 42, 28, 40, 36, 42, 38, 46], '#5a3418');
+      L(g, 40, 36, 50, 20, '#8a5a2c', 2.5); E(g, 50, 19, 3, 3, p.crown);
+    } },
+    ironboar: { w: 88, h: 64, draw(g, p) {
+      E(g, 50, 36, 30, 20, p.dark); E(g, 49, 34, 29, 18, p.body); E(g, 44, 26, 16, 6, p.light);
+      for (let i = 0; i < 9; i++) Poly(g, [28 + i * 6, 20 - (i % 2) * 2, 32 + i * 6, 6 + (i % 3) * 3, 36 + i * 6, 20], p.thorn);
+      E(g, 20, 38, 15, 14, p.body); E(g, 8, 42, 7, 7, p.light); E(g, 6, 40, 1.5, 1.5, '#140c1c'); E(g, 6, 45, 1.5, 1.5, '#140c1c');
+      L(g, 14, 48, 3, 30, p.tusk, 4); L(g, 22, 50, 15, 34, p.tusk, 4); L(g, 14, 48, 3, 30, '#ffffff', 1);
+      E(g, 21, 32, 3, 3.5, p.eye); E(g, 21, 32, 1, 1.5, '#ffffff'); L(g, 16, 27, 26, 30, '#140c1c', 2);
+      L(g, 30, 30, 38, 42, '#c8a0a0', 1.5); L(g, 58, 26, 64, 36, '#c8a0a0', 1.5);
+      R(g, 28, 48, 9, 14, p.dark); R(g, 44, 50, 9, 12, p.dark); R(g, 60, 48, 9, 14, p.dark); R(g, 72, 46, 7, 12, p.dark);
+      Poly(g, [24, 26, 30, 14, 32, 28], p.dark);
+    } },
+    golem: { w: 112, h: 112, draw(g, p) {
+      // 다리
+      R(g, 30, 80, 20, 28, p.dark); R(g, 62, 80, 20, 28, p.dark); R(g, 26, 102, 28, 8, p.stone); R(g, 58, 102, 28, 8, p.stone);
+      // 몸통
+      Poly(g, [18, 40, 94, 40, 86, 86, 26, 86], p.stone); Poly(g, [18, 40, 94, 40, 92, 46, 20, 46], p.light); Poly(g, [80, 46, 94, 40, 86, 86, 78, 86], p.dark);
+      L(g, 30, 60, 44, 70, p.dark, 2); L(g, 70, 74, 82, 62, p.dark, 2);
+      if (p.phase2) {
+        E(g, 56, 62, 16, 14, '#140818'); E(g, 56, 62, 12, 11, p.crystal); E(g, 56, 62, 7, 7, p.glow); E(g, 53, 58, 2, 3, '#ffffff');
+        L(g, 40, 50, 48, 58, '#140818', 2); L(g, 72, 52, 64, 60, '#140818', 2); L(g, 44, 76, 50, 70, '#140818', 2);
+      } else {
+        R(g, 44, 52, 24, 22, p.dark); R(g, 46, 54, 20, 18, p.stone); E(g, 56, 63, 5, 5, p.crystal); E(g, 56, 63, 2, 2, p.glow);
+      }
+      // 팔 + 철퇴
+      Poly(g, [18, 42, 4, 48, 2, 78, 14, 80, 18, 56], p.stone); E(g, 8, 82, 8, 7, p.dark);
+      Poly(g, [94, 42, 106, 46, 108, 70, 100, 72, 94, 56], p.stone); R(g, 100, 18, 4, 56, '#5e3818');
+      E(g, 102, 16, 10, 10, '#4a4a58'); for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2; Poly(g, [102 + Math.cos(a) * 9, 16 + Math.sin(a) * 9, 102 + Math.cos(a) * 15, 16 + Math.sin(a) * 15, 102 + Math.cos(a + 0.3) * 9, 16 + Math.sin(a + 0.3) * 9], '#7a7a88'); }
+      // 종 모양 머리
+      Poly(g, [40, 40, 44, 14, 56, 6, 68, 14, 72, 40], p.bell); R(g, 36, 36, 40, 6, Pix.shade(p.bell, -0.3)); E(g, 56, 6, 4, 3, Pix.shade(p.bell, -0.2));
+      L(g, 46, 18, 48, 34, Pix.shade(p.bell, 0.3), 2);
+      R(g, 46, 24, 20, 7, '#140818'); E(g, 51, 27, 3, 2, p.phase2 ? p.glow : '#7cc4ff'); E(g, 61, 27, 3, 2, p.phase2 ? p.glow : '#7cc4ff');
+    } },
+  };
+
+  const cache = new Map();
+  function render(artId, pal, opts = {}) {
+    const key = artId + JSON.stringify(pal) + (opts.scale || 1);
+    if (cache.has(key)) return cache.get(key);
+    const a = ART[artId] || ART.jelly;
+    const scale = opts.scale || 1;
+    const { c, g } = Pix.canvas(Math.ceil(a.w * scale) + 2, Math.ceil(a.h * scale) + 2);
+    g.save();
+    g.translate(1, 1);
+    g.scale(scale, scale);
+    a.draw(g, pal);
+    g.restore();
+    Pix.crisp(c, 100);
+    Pix.outline(c, '#120a1a');
+    cache.set(key, c);
+    return c;
+  }
+  // 몬스터 ID로 그리기 (전투용)
+  function forMonster(id, variant) {
+    const m = MONSTERS[id];
+    const pal = Object.assign({}, m.pal, m.shiny ? { shiny: true } : {}, variant === 2 ? { phase2: true } : {});
+    return render(m.art, pal);
+  }
+  return { render, forMonster, ART };
+})();
