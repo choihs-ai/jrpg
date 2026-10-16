@@ -20,6 +20,13 @@ const Field = (() => {
   let pathInteract = null;
   let bumpT = 0;
   let lastMapId = null;
+  let poisonWarned = false;
+  const tintCache = new WeakMap();
+  function poisonTint(img) {
+    let t = tintCache.get(img);
+    if (!t) { t = Pix.silhouette(img, '#a040c0'); tintCache.set(img, t); }
+    return t;
+  }
   let mapTime = 0;
   const cam = { x: 0, y: 0 };
   const layer = { modal: true, update: (dt) => update(dt), draw: (c) => draw(c), onAction: (a) => onAction(a), onPointer: (e) => onPointer(e) };
@@ -215,13 +222,18 @@ const Field = (() => {
     markVisited();
     if (grace > 0) grace--;
     // 독: 4걸음마다 HP 감소 (1 미만으로는 떨어지지 않음)
+    if (!st.party.some((id) => st.members[id].status.poison)) poisonWarned = false;
     if (st.steps % 4 === 0) {
       let hurt = false;
       for (const id of st.party) {
         const m = st.members[id];
         if (m.hp > 0 && m.status.poison) { const loss = Math.max(1, Math.floor(Game.stats(id).maxhp * 0.03)); if (m.hp > 1) { m.hp = Math.max(1, m.hp - loss); hurt = true; } }
       }
-      if (hurt) { Engine.flash('#a040c0', 0.15); Sound.sfx('poison'); }
+      if (hurt) {
+        Sound.sfx('poison');
+        // 화면 전체 섬광 대신 캐릭터 색조로 표시하고, 처음 한 번만 치료 방법을 알려 준다
+        if (!poisonWarned) { poisonWarned = true; showToast('독 피해! 해독초·정화 주문·신전에서 치료할 수 있다.', 3.5); }
+      }
     }
     if (st.ward > 0) {
       st.ward--;
@@ -588,12 +600,12 @@ const Field = (() => {
     const sprites = [];
     const party = Game.state.party;
     const lead = party[0];
-    sprites.push({ y: Util.lerp(pl.fromY, pl.y, pl.t), x: Util.lerp(pl.fromX, pl.x, pl.t), frames: Chars.build(LOOKS[CHARACTERS[lead].look]), dir: pl.dir, moving: pl.moving, phase: pl.phase, t: pl.t, alpha: 1, order: 2 });
+    sprites.push({ y: Util.lerp(pl.fromY, pl.y, pl.t), x: Util.lerp(pl.fromX, pl.x, pl.t), frames: Chars.build(LOOKS[CHARACTERS[lead].look]), dir: pl.dir, moving: pl.moving, phase: pl.phase, t: pl.t, alpha: 1, order: 2, poison: !!Game.state.members[lead].status.poison });
     followers.forEach((f, i) => {
       const m = Game.state.members[f.id];
       if (!m) return;
       const t = pl.t;
-      sprites.push({ y: Util.lerp(f.fromY, f.y, t), x: Util.lerp(f.fromX, f.x, t), frames: Chars.build(LOOKS[CHARACTERS[f.id].look]), dir: f.dir, moving: pl.moving, phase: pl.phase + i + 1, t: pl.t, alpha: m.hp > 0 ? 1 : 0.45, order: 1 });
+      sprites.push({ y: Util.lerp(f.fromY, f.y, t), x: Util.lerp(f.fromX, f.x, t), frames: Chars.build(LOOKS[CHARACTERS[f.id].look]), dir: f.dir, moving: pl.moving, phase: pl.phase + i + 1, t: pl.t, alpha: m.hp > 0 ? 1 : 0.45, order: 1, poison: !!m.status.poison });
     });
     for (const n of npcs) {
       if (!n.visible) continue;
@@ -611,6 +623,7 @@ const Field = (() => {
       } else {
         const img = s.frames.critter ? (s.moving ? s.frames[s.dir][s.phase % 2] : s.frames[s.dir][0]) : Chars.frameFor(s.frames, s.dir, s.moving ? s.phase * 2 + (s.t < 0.5 ? 1 : 0) : 0);
         g.drawImage(img, sx, sy - 4);
+        if (s.poison) { g.globalAlpha = s.alpha * (0.3 + 0.1 * Math.sin(T * 6)); g.drawImage(poisonTint(img), sx, sy - 4); }
       }
       g.globalAlpha = 1;
       if (s.npc && s.npc.def.mark && s.npc.def.mark()) {
