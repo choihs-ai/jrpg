@@ -6,8 +6,8 @@ const Tiles = (() => {
   const S = 16;
   const cache = new Map();
   // 바닥 위에 올려 그리는 물체 타일
-  const OBJ = new Set(['T', 'Y', 'Z', 'r', 'F', 'e', 'l', 'S', 'o', 'x', 'X', 'j', 'P', 'g', 'b', 't', 'h', 'p', 'a', 'z', '*', 'A', 'V', 'U', 'K', '|', 'O']);
-  const ANIM = new Set(['~', '&', 'f', '*', 'V']);
+  const OBJ = new Set(['T', 'Y', 'Z', 'r', 'F', 'e', 'l', 'S', 'o', 'x', 'X', 'j', 'P', 'g', 'b', 't', 'h', 'p', 'a', 'z', '*', 'A', 'V', 'U', 'K', 'C', '|', 'O', '@', 'J', 'd']);
+  const ANIM = new Set(['~', '&', 'f', '*', 'V', 'C', '@', 'v', '1']);
 
   const C = {
     g0: '#5fae4c', g1: '#4f9b3f', g2: '#76c45e', g3: '#3f8a35',
@@ -257,6 +257,60 @@ const Tiles = (() => {
       for (let i = 0; i < 5; i++) p.rect(2 + i, 7 - i, 12 - i * 2, 1, '#6b4426');
       p.rect(11, 1, 2, 4, '#5d5c6a'); p.px(12, 0, '#ddd');
     },
+    'C': (p, v, f) => {
+      grass(p, 0);
+      // 왕도: 성벽 + 탑 두 개 + 깃발
+      p.rect(1, 8, 14, 7, C.stone); p.rect(1, 8, 14, 1, C.stoneL); p.rect(6, 11, 4, 4, '#3d2410');
+      for (let x = 1; x < 15; x += 3) p.rect(x, 6, 2, 2, C.stone);
+      p.rect(2, 3, 4, 6, C.stoneD); p.rect(10, 3, 4, 6, C.stoneD);
+      for (let i = 0; i < 3; i++) { p.rect(2 + i, 3 - i, 4 - i * 2, 1, C.roofB); p.rect(10 + i, 3 - i, 4 - i * 2, 1, C.roofB); }
+      p.rect(7, 0, 1, 7, '#5b3b1e'); p.rect(8, 0 + f, 3, 2, '#ffd75e');
+    },
+    'M': (p, v) => {
+      p.fill('#d8d4cc');
+      p.rect(0, 0, 16, 1, '#b8b4ac'); p.rect(0, 0, 1, 16, '#b8b4ac'); p.rect(8, 8, 8, 1, '#c4c0b8'); p.rect(8, 8, 1, 8, '#c4c0b8');
+      p.noise(['#e8e4dc', '#c8c4bc'], 0.06, 111 + v);
+    },
+    '@': (p, v, f) => {
+      p.fill('#d8d4cc');
+      p.ellipse(8, 9, 7, 6, '#9d9cab'); p.ellipse(8, 9, 6, 5, '#3c7fd6'); p.ellipse(8, 9, 3, 2, f ? '#78b0f2' : '#5a98e8');
+      p.rect(7, 2, 2, 7, '#bcbcca'); p.rect(6, 1, 4, 2, '#bcbcca');
+      p.px(5 + f, 3, '#d8ecff'); p.px(10 - f, 4, '#d8ecff'); p.px(8, 0 + f, '#d8ecff');
+    },
+    'J': (p) => {
+      p.rect(3, 12, 10, 4, C.stoneD); p.rect(4, 11, 8, 2, C.stone);
+      p.rect(6, 4, 4, 8, C.stoneL); p.rect(5, 6, 6, 3, C.stoneL); p.circle(8, 3, 2, C.stoneL);
+      p.rect(11, 1, 1, 9, C.stone); p.px(11, 0, '#ffd75e'); p.rect(6, 9, 1, 2, C.stone);
+    },
+    'd': (p, v) => {
+      p.rect(1, 8, 14, 7, '#9a6234'); p.rect(1, 8, 14, 1, '#c08050');
+      const cols = [['#c4473a', '#f4f4f4'], ['#3f63b8', '#f4f4f4'], ['#4b8a4c', '#ffd75e']][v % 3];
+      for (let x = 0; x < 16; x += 4) { p.rect(x, 2, 2, 5, cols[0]); p.rect(x + 2, 2, 2, 5, cols[1]); }
+      p.rect(0, 6, 16, 1, '#5e3818'); p.rect(1, 7, 1, 8, '#5e3818'); p.rect(14, 7, 1, 8, '#5e3818');
+      p.rect(4, 9, 3, 2, ['#ff6b8a', '#ffd75e', '#7cc4ff'][v % 3]); p.rect(9, 9, 3, 2, '#e8dcc0');
+    },
+    'v': (p, v, f, nb) => {
+      p.fill('#4a5a2a');
+      for (let i = 0; i < 3; i++) { const y = (i * 5 + f * 2 + v) % 16, x = (i * 6 + v * 3 + f * 3) % 12; p.rect(x, y, 4, 1, '#6a7a3a'); p.rect(x + 1, y + 1, 2, 1, '#3a4a1e'); }
+      if (nb) {
+        const land = (c) => c !== undefined && c !== 'v' && c !== '+';
+        if (land(nb.u)) { p.rect(0, 0, 16, 2, '#5a5a62'); p.rect(0, 2, 16, 1, '#8a9a5a'); }
+        if (land(nb.d)) { p.rect(0, 14, 16, 2, '#5a5a62'); }
+        if (land(nb.l)) p.rect(0, 0, 2, 16, '#5a5a62');
+        if (land(nb.r)) p.rect(14, 0, 2, 16, '#5a5a62');
+      }
+    },
+    '+': (p) => {
+      p.fill('#4a5a2a');
+      p.rect(0, 1, 16, 14, '#5a5a66'); for (let x = 1; x < 16; x += 3) p.rect(x, 1, 1, 14, '#2a2a32'); p.rect(0, 1, 16, 1, '#8a8a96'); p.rect(0, 14, 16, 1, '#3a3a44');
+    },
+    '1': (p, v, f, nb) => {
+      D['#'](p, v, f, { ...nb, d: '_' });
+      const cx = 8, cy = 8, r = 5;
+      p.circle(cx, cy, r, '#8a6a2a'); p.circle(cx, cy, r - 1, '#c4a050');
+      for (let i = 0; i < 8; i++) { const a = (i / 8) * Math.PI * 2 + (f ? Math.PI / 8 : 0); p.rect(Math.round(cx + Math.cos(a) * r) - 1, Math.round(cy + Math.sin(a) * r) - 1, 2, 2, '#c4a050'); }
+      p.circle(cx, cy, 2, '#5a4418'); p.px(cx, cy, '#e8d080');
+    },
     // 실내
     'I': (p, v, f, nb) => {
       const face = nb && nb.d !== undefined && nb.d !== 'I';
@@ -346,14 +400,14 @@ const Tiles = (() => {
     },
     // 던전
     '#': (p, v, f, nb) => {
-      const face = nb && nb.d !== undefined && !'#&%0'.includes(nb.d);
+      const face = nb && nb.d !== undefined && !'#&%01'.includes(nb.d);
       if (face) {
         bricks(p, C.dWall, C.dWallD, C.dWallL, 4);
         p.rect(0, 0, 16, 2, C.dTop); p.rect(0, 15, 16, 1, '#1e1b28');
       } else {
         p.fill(C.dTop); p.noise(['#2f2c3a', '#1d1a26'], 0.18, 91 + v);
         if (nb) {
-          const open = (c) => c !== undefined && !'#&%0 '.includes(c);
+          const open = (c) => c !== undefined && !'#&%01 '.includes(c);
           if (open(nb.l)) p.rect(0, 0, 1, 16, '#3a3648');
           if (open(nb.r)) p.rect(15, 0, 1, 16, '#3a3648');
           if (open(nb.u)) p.rect(0, 0, 16, 1, '#3a3648');
@@ -414,7 +468,7 @@ const Tiles = (() => {
     }
   }
 
-  const NB_TILES = new Set(['~', 'I', '#', '&', '%', 'R', 'Q', 'G', 'c']);
+  const NB_TILES = new Set(['~', 'I', '#', '&', '%', 'R', 'Q', 'G', 'c', 'v', '1']);
 
   function get(ch, v, f, nbKey, nb) {
     const key = ch + v + '|' + f + '|' + (nbKey || '');
@@ -442,11 +496,12 @@ const Tiles = (() => {
     if (NB_TILES.has(ch)) {
       const at = (x, y) => (y < 0 || y >= rows.length || x < 0 || x >= rows[0].length ? undefined : rows[y][x]);
       nb = { u: at(tx, ty - 1), d: at(tx, ty + 1), l: at(tx - 1, ty), r: at(tx + 1, ty) };
-      if (ch === '~') nbKey = ['u', 'd', 'l', 'r'].map((k) => (nb[k] === undefined || '~=H$'.includes(nb[k]) ? 0 : 1)).join('');
+      if (ch === 'v') nbKey = ['u', 'd', 'l', 'r'].map((k) => (nb[k] === undefined || 'v+'.includes(nb[k]) ? 0 : 1)).join('');
+      else if (ch === '~') nbKey = ['u', 'd', 'l', 'r'].map((k) => (nb[k] === undefined || '~=H$'.includes(nb[k]) ? 0 : 1)).join('');
       else if (ch === 'R' || ch === 'Q' || ch === 'G') nbKey = ['u', 'd', 'l', 'r'].map((k) => (nb[k] === ch ? 1 : 0)).join('');
       else if (ch === 'c') nbKey = ['u', 'd', 'l', 'r'].map((k) => (nb[k] === undefined || nb[k] === 'c' ? 0 : 1)).join('');
       else if (ch === 'I') nbKey = nb.d !== undefined && nb.d !== 'I' ? 'F' : 'T';
-      else nbKey = (nb.d !== undefined && !'#&%0'.includes(nb.d) ? 'F' : 'T') + ['u', 'l', 'r'].map((k) => (nb[k] !== undefined && !'#&%0 '.includes(nb[k]) ? 1 : 0)).join('');
+      else nbKey = (nb.d !== undefined && !'#&%01'.includes(nb.d) ? 'F' : 'T') + ['u', 'l', 'r'].map((k) => (nb[k] !== undefined && !'#&%01 '.includes(nb[k]) ? 1 : 0)).join('');
     }
     g.drawImage(get(ch, OBJ.has(ch) ? 0 : v, f, nbKey, nb), sx, sy);
   }
@@ -459,6 +514,8 @@ const Tiles = (() => {
     'W': '#b4783f', 'B': '#9d9cab', 'n': '#b4783f', 'N': '#9d9cab', 'R': '#c4473a', 'Q': '#3f63b8', 'G': '#4b8a4c', 'D': '#5e3818',
     'I': '#3b2b22', 'w': '#b98852', 'c': '#a8304a', '#': '#25222f', '_': '#4b4759', '-': '#4b4759', '>': '#ffd75e', '<': '#ffd75e',
     '$': '#07050c', 'y': '#5a4a3a', '*': '#7cc4ff', ' ': '#000',
+    'C': '#ffd75e', 'M': '#d8d4cc', '@': '#3c7fd6', 'J': '#bcbcca', 'd': '#c4473a', 'v': '#4a5a2a', '+': '#5a5a66', '1': '#c4a050',
+    'O': '#6a6680', 'P': '#9d9cab', '|': '#55556a', '0': '#6a6680', '&': '#25222f', '%': '#25222f', 'k': '#c8925a', 'L': '#5e3818',
   };
 
   return { get, drawAt, OBJ, MINI, S };

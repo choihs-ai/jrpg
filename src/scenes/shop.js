@@ -19,6 +19,21 @@ const SHOPS = {
     ],
     bye: '몸조심하렴. 약은 아끼지 말고 쓰고.',
   },
+  waystation: {
+    name: '역참 매점', keeper: '역참 상인',
+    stock: ['herb', 'potion', 'antidote', 'smelling', 'panacea', 'feather', 'return_wing', 'incense', 'ether'],
+    bye: '살펴 가시오! 가도엔 늑대가 많으니까.',
+  },
+  cap_smithy: {
+    name: '「강철 사자」', keeper: '레온',
+    stock: ['steel_sword', 'iron_axe', 'chain_mail', 'iron_shield', 'iron_helm', 'mythril_sword', 'war_axe', 'silver_dagger', 'rune_staff', 'mythril_mail', 'mystic_robe', 'night_garb', 'buckler', 'knight_shield', 'silver_helm', 'feather_hat'],
+    bye: '무기를 아껴 써라. 그게 대장장이에 대한 예의다.',
+  },
+  cap_shop: {
+    name: '약방 「백합」', keeper: '릴리',
+    stock: ['herb', 'potion', 'hi_potion', 'ether', 'antidote', 'smelling', 'panacea', 'feather', 'thunder_flask', 'firebomb', 'return_wing', 'incense', 'antidote_bangle'],
+    bye: '다치지 마세요! 다쳤으면 또 오시고요.',
+  },
 };
 
 const Shop = (() => {

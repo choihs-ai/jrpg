@@ -87,7 +87,7 @@ const Main = (() => {
     }, 1000);
     Engine.setScene(Title.layer);
     // 테스트·디버그용 훅
-    window.__jr = { Game, Field, Engine, Battle, Save, Quests, Settings, Sound, Input, Menu, Story, MAPS, ITEMS, SKILLS, MONSTERS, Events, S, UI, Main, BattleCore, Util };
+    window.__jr = { expForLevel, Dials, Game, Field, Engine, Battle, Save, Quests, Settings, Sound, Input, Menu, Story, MAPS, ITEMS, SKILLS, MONSTERS, Events, S, UI, Main, BattleCore, Util };
   }
 
   return { boot, newGame, loadSlot, toTitle, applyTouchSetting };

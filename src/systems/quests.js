@@ -81,6 +81,50 @@ const QUESTS = {
     ],
     reward: { items: [['guard_pendant', 1]], text: '여관 숙박 무료' },
   },
+  main3: {
+    name: '왕도로 가는 길', type: 'main', giver: '하르도 장로',
+    desc: '잿빛 성가대는 두 번째 종을 노리고 있다. 은빛 가도를 따라 왕도 아스테리온으로 가서, 마도학원과 수호기사단에 이 일을 알리자.',
+    stages: [
+      { goal: '은빛 가도를 따라 동쪽으로 향한다 (리벨 평원 동쪽 끝 → 은빛 가도)', target: { map: 'highway', x: 24, y: 16 } },
+      { goal: '은빛 가도를 따라 왕도 아스테리온에 들어간다', target: { map: 'highway', x: 52, y: 16 } },
+      { goal: '왕립 마도학원의 학장을 만난다', target: { map: 'capital', x: 7, y: 10 } },
+      { goal: '수호기사단 본부의 기사단장을 만난다', target: { map: 'capital', x: 40, y: 10 } },
+      { goal: '훈련장의 시험관 가웨인에게 도전한다 (브란 혼자 싸운다)', target: { map: 'knights', x: 10, y: 11 } },
+      { goal: '마도학원 안쪽, 시계탑의 문을 조사한다', target: { map: 'academy', x: 19, y: 3 } },
+      { goal: '뒷골목의 수로 관리인 오토를 찾아간다', target: { map: 'capital', x: 11, y: 36 } },
+      { goal: '지하수로를 지나 시계탑 아래로 향한다', target: { map: 'sewer2', x: 16, y: 2 } },
+      { goal: '시계탑 꼭대기, 시간의 종으로 향한다', target: { map: 'tower2', x: 3, y: 2 } },
+      { goal: '마도학원의 오필리아 학장에게 보고한다', target: { map: 'capital', x: 7, y: 10 } },
+    ],
+    reward: { gold: 1500, items: [['warden_badge', 1]] },
+  },
+  s_bounty: {
+    name: '회색갈기 현상수배', type: 'sub', giver: '수호기사단 게시판',
+    desc: '은빛 가도 북동쪽 숲에 늑대 우두머리 「회색갈기」가 나타나 상인 마차를 습격하고 있다. 토벌하면 상금 600G.',
+    stages: [
+      { goal: '은빛 가도 북동쪽 숲의 굴에서 회색갈기를 토벌한다', target: { map: 'highway', x: 46, y: 6 } },
+      { goal: '수호기사단 본부의 라인하르트 단장에게 보고한다', target: { map: 'capital', x: 40, y: 10 } },
+    ],
+    reward: { gold: 600, items: [['wolf_fang', 1]] },
+  },
+  s_candy: {
+    name: '축제의 별사탕', type: 'sub', giver: '축제 광장의 소녀 루나',
+    desc: '루나는 할머니께 드릴 별사탕 세 개를 잃어버렸다. 고양이가 물어 갔을지도 모른다는데… 왕도와 그 주변을 찾아보자.',
+    stages: [
+      { goal: '잃어버린 별사탕을 찾는다 (왕도 안팎 어딘가)', count: () => Math.min(3, Game.count('star_candy')), max: 3 },
+      { goal: '광장의 루나에게 별사탕을 돌려준다', target: { map: 'capital', x: 26, y: 22 } },
+    ],
+    reward: { items: [['festival_mask', 1], ['hi_potion', 3]] },
+  },
+  s_book: {
+    name: '사라진 금서', type: 'sub', giver: '학원 사서 펠릭스',
+    desc: '마도학원 금서고에서 「장막 너머의 기록」이 사라졌다. 지하수로에서 학원 표식이 찍힌 책을 봤다는 이야기가 있다.',
+    stages: [
+      { goal: '왕도 지하수로에서 금서를 찾는다', target: { map: 'sewer1', x: 2, y: 18 } },
+      { goal: '학원의 사서 펠릭스에게 금서를 돌려준다', target: { map: 'capital', x: 7, y: 10 } },
+    ],
+    reward: { items: [['veil_tome', 1]] },
+  },
   s_star: {
     name: '별을 모으는 사람', type: 'sub', giver: '괴짜 수집가 피포',
     desc: '피포는 세계 곳곳에 떨어진 「별조각」을 모으고 있다. 모아 갈수록 멋진 보물과 바꿔 준다고 한다. (총 8개)',
@@ -133,8 +177,9 @@ const Quests = (() => {
     },
     // 현재 화면에 띄울 대표 목표 (메인 우선)
     currentGoal() {
-      for (const id of ['main1', 'main2']) if (this.isActive(id)) return { id, text: this.goal(id), target: this.target(id) };
-      if (Game.flag('chapter1_done')) return { id: null, text: '자유 탐험 — 남은 의뢰를 해결하거나 별조각을 모아 보자', target: null };
+      for (const id of ['main1', 'main2', 'main3']) if (this.isActive(id)) return { id, text: this.goal(id), target: this.target(id) };
+      if (Game.flag('chapter2_done')) return { id: null, text: '자유 탐험 — 제3장을 기다리며 남은 의뢰를 해결해 보자', target: null };
+      if (Game.flag('chapter1_done')) return { id: null, text: '리벨의 하르도 장로에게 작별 인사를 하고 왕도로 떠나자', target: { map: 'rivel', x: 18, y: 5 } };
       return null;
     },
     list(type) {
@@ -151,6 +196,14 @@ const Quests = (() => {
     },
     // 아이템 획득 연동
     onItem(itemId) {
+      if (itemId === 'star_candy' && this.isActive('s_candy') && this.stage('s_candy') === 0 && Game.count('star_candy') >= 3) {
+        this.setStage('s_candy', 1);
+        return '[y]「축제의 별사탕」 별사탕을 3개 모두 찾았다! 광장의 루나에게 가져가자.[/]';
+      }
+      if (itemId === 'veil_book' && this.isActive('s_book') && this.stage('s_book') === 0) {
+        this.setStage('s_book', 1);
+        return '[y]「사라진 금서」 학원의 사서 펠릭스에게 돌려주자.[/]';
+      }
       if (itemId === 'moonherb' && this.isActive('s_herb') && this.stage('s_herb') === 0 && Game.count('moonherb') >= 3) {
         this.setStage('s_herb', 1);
         return '[y]「달빛 풀 채집」 달빛 풀을 3개 모았다! 엘라 할머니에게 가져가자.[/]';

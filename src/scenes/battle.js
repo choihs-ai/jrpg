@@ -43,6 +43,38 @@ const BattleBG = (() => {
       for (const x of [30, 280]) { p.rect(x, 10, 16, 102, '#3a3650'); p.rect(x, 10, 3, 102, '#4a465c'); }
       p.rect(0, 112, 320, 128, '#2a2438'); p.rect(120, 112, 80, 128, '#5a1a2a'); p.rect(120, 112, 3, 128, '#c4a050'); p.rect(197, 112, 3, 128, '#c4a050');
     },
+    sewer(p, g) {
+      p.rect(0, 0, 320, 240, '#141a16');
+      for (let y = 0; y < 100; y += 8) for (let x = (y / 8) % 2 ? 0 : 10; x < 320; x += 20) { p.rect(x, y, 19, 7, '#2a3428'); p.rect(x, y, 19, 1, '#3a4636'); }
+      g.fillStyle = '#0c100c'; g.beginPath(); g.ellipse(160, 60, 70, 46, 0, Math.PI, 0); g.fill(); p.rect(90, 60, 140, 40, '#0c100c');
+      for (let x = 96; x < 226; x += 10) p.rect(x, 44, 2, 56, '#3a3a40');
+      p.rect(0, 100, 320, 30, '#3a4a2a'); p.noise(['#2a3a1e', '#4a5a34'], 0.2, 17, [0, 100, 320, 30]);
+      p.rect(0, 130, 320, 110, '#3a3a40'); for (let x = 0; x < 320; x += 24) p.rect(x, 130, 1, 110, '#2a2a30'); for (let y = 130; y < 240; y += 14) p.rect(0, y, 320, 1, '#2a2a30');
+      g.fillStyle = 'rgba(140,200,90,0.08)'; g.beginPath(); g.ellipse(160, 165, 130, 22, 0, 0, Math.PI * 2); g.fill();
+    },
+    tower(p, g) {
+      sky(p, '#1a1430', '#3a2a50', 112);
+      g.strokeStyle = 'rgba(232,208,128,0.35)'; g.lineWidth = 3;
+      for (const [x, y, r] of [[60, 50, 34], [250, 40, 28], [160, 70, 18]]) { g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.stroke(); for (let i = 0; i < 10; i++) { const a = (i / 10) * Math.PI * 2; g.fillStyle = 'rgba(232,208,128,0.35)'; g.fillRect(x + Math.cos(a) * (r + 3) - 2, y + Math.sin(a) * (r + 3) - 2, 4, 4); } }
+      for (const x of [20, 290]) { p.rect(x, 0, 14, 112, '#4a3a2a'); p.rect(x, 0, 3, 112, '#6a5a3a'); }
+      p.rect(0, 112, 320, 128, '#5a4430'); for (let x = 0; x < 320; x += 20) p.rect(x, 112, 1, 128, '#4a3424'); p.noise(['#6a5038', '#4a3424'], 0.05, 23, [0, 112, 320, 128]);
+    },
+    arena(p, g) {
+      sky(p, '#6ab0f0', '#d0ecff', 90);
+      p.rect(0, 50, 320, 62, '#9d9cab'); for (let x = 0; x < 320; x += 16) { p.rect(x, 50, 15, 6, '#bcbcca'); p.rect(x, 56, 1, 56, '#727185'); }
+      for (const x of [40, 120, 200, 280]) { p.rect(x, 20, 2, 32, '#5e3818'); p.rect(x + 2, 20, 16, 10, x % 80 ? '#3f63b8' : '#c4473a'); p.rect(x + 2, 24, 16, 2, '#f2c84b'); }
+      p.rect(0, 112, 320, 128, '#c9a56a'); p.noise(['#b08c54', '#dcbd86'], 0.1, 29, [0, 112, 320, 128]);
+      g.strokeStyle = 'rgba(255,255,255,0.35)'; g.lineWidth = 2; g.beginPath(); g.ellipse(160, 168, 120, 30, 0, 0, Math.PI * 2); g.stroke();
+    },
+    clock(p, g) {
+      sky(p, '#0c0a1e', '#2a1e44', 112);
+      g.fillStyle = 'rgba(232,208,128,0.18)'; g.beginPath(); g.arc(160, 50, 46, 0, Math.PI * 2); g.fill();
+      g.strokeStyle = '#e8d080'; g.lineWidth = 2; g.beginPath(); g.arc(160, 50, 46, 0, Math.PI * 2); g.stroke();
+      for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2; g.fillStyle = '#e8d080'; g.fillRect(160 + Math.cos(a) * 40 - 1, 50 + Math.sin(a) * 40 - 1, 3, 3); }
+      g.beginPath(); g.moveTo(160, 50); g.lineTo(160, 16); g.moveTo(160, 50); g.lineTo(184, 62); g.stroke();
+      for (const x of [24, 282]) { p.rect(x, 0, 14, 112, '#3a3650'); p.rect(x, 0, 3, 112, '#4a465c'); }
+      p.rect(0, 112, 320, 128, '#2a2438'); p.rect(110, 112, 100, 128, '#3a2a5a'); p.rect(110, 112, 3, 128, '#e8d080'); p.rect(207, 112, 3, 128, '#e8d080');
+    },
   };
   function get(name) {
     if (!cache[name]) cache[name] = Pix.make(320, 240, (p, g) => (DEFS[name] || DEFS.plains)(p, g));
@@ -728,5 +760,5 @@ const Battle = (() => {
     return result;
   }
 
-  return { run, get core() { return core; }, get active() { return active; }, layer };
+  return { run, get core() { return core; }, get active() { return active; }, get targeting() { return targeting; }, layer };
 })();

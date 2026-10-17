@@ -251,8 +251,17 @@ const Game = (() => {
 
   // 메인 스토리 진행도 (NPC 대사 분기 기준)
   //  0 깨어남 · 1 장로 만남 · 2 사냥꾼 방문 · 3 철엄니 격파 · 4 봉인 확인 · 5 미오 합류 · 6 봉인 해제 · 7 벨가르 격파 · 8 1장 완료
+  //  9 2장 출발 · 10 베인 격파 · 11 왕도 도착 · 12 학장 면담 · 13 브란 입단 · 14 늙은 이빨 격파 · 15 카산드라 격파 · 16 2장 완료
   function progress() {
     const f = state.flags;
+    if (f.chapter2_done) return 16;
+    if (f.cassandra_defeated) return 15;
+    if (f.croc_defeated) return 14;
+    if (f.bran_knight) return 13;
+    if (f.met_dean) return 12;
+    if (f.reached_capital) return 11;
+    if (f.vane_defeated) return 10;
+    if (f.ch2_started) return 9;
     if (f.chapter1_done) return 8;
     if (f.velgar_defeated) return 7;
     if (f.seal_opened) return 6;

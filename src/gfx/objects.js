@@ -81,5 +81,56 @@ const ObjArt = (() => {
       g.beginPath(); for (let i = 0; i < 10; i++) { const r = i % 2 ? 2.5 : 6, a = -Math.PI / 2 + (i * Math.PI) / 5; g.lineTo(24 + Math.cos(a) * r, 18 + Math.sin(a) * r); } g.fill();
     });
   }
-  return { chest, lever, herb, note, rope, sparkle, windmill, bell };
+  // 수로의 수문 밸브
+  function valve(on) {
+    return once('valve' + on, 16, 16, (p) => {
+      p.rect(7, 8, 2, 7, '#4a4a58'); p.rect(4, 13, 8, 2, '#3a3a48');
+      p.circle(8, 6, 5, on ? '#4b8a4c' : '#a8304a'); p.circle(8, 6, 3, '#1a1724'); p.circle(8, 6, 1, '#bcbcca');
+      if (on) { p.line(8, 6, 12, 2, '#bcbcca'); p.line(8, 6, 4, 10, '#bcbcca'); } else { p.line(8, 1, 8, 11, '#bcbcca'); p.line(3, 6, 13, 6, '#bcbcca'); }
+    });
+  }
+  // 시계판 (pos: 0=12시 · 1=3시 · 2=6시 · 3=9시)
+  function dial(pos) {
+    return once('dial' + pos, 16, 16, (p, g) => {
+      p.ellipse(8, 14, 7, 2, 'rgba(0,0,0,0.3)');
+      p.rect(7, 12, 2, 3, '#7a5a2a');
+      p.circle(8, 7, 7, '#7a5a2a'); p.circle(8, 7, 6, '#f0e8d0');
+      for (let i = 0; i < 4; i++) { const a = -Math.PI / 2 + (i * Math.PI) / 2; p.px(Math.round(8 + Math.cos(a) * 5), Math.round(7 + Math.sin(a) * 5), '#7a5a2a'); }
+      const a = -Math.PI / 2 + (pos * Math.PI) / 2;
+      g.strokeStyle = pos === 0 ? '#c4473a' : '#1a1424'; g.lineWidth = 1.4;
+      g.beginPath(); g.moveTo(8, 7); g.lineTo(8 + Math.cos(a) * 4.5, 7 + Math.sin(a) * 4.5); g.stroke();
+      p.px(8, 7, '#c4a050');
+    });
+  }
+  function manhole() {
+    return once('manhole', 16, 16, (p) => {
+      p.ellipse(8, 9, 7, 5, '#3a3a44'); p.ellipse(8, 8, 6, 4, '#5a5a66');
+      for (let x = 4; x <= 12; x += 2) p.rect(x, 6, 1, 5, '#3a3a44');
+      p.px(8, 4, '#8a8a96');
+    });
+  }
+  function plaque() {
+    return once('plaque', 16, 16, (p) => {
+      p.rect(7, 10, 2, 5, '#5a4418'); p.rect(2, 2, 12, 9, '#8a6a2a'); p.rect(3, 3, 10, 7, '#c4a050');
+      p.rect(4, 4, 8, 1, '#7a5a2a'); p.rect(4, 6, 6, 1, '#7a5a2a'); p.rect(4, 8, 7, 1, '#7a5a2a');
+    });
+  }
+  // 시간의 종 (시계판이 박힌 금빛 종)
+  function timebell(rung, t) {
+    const f = rung ? Math.floor(t * 2) % 12 : 0;
+    return once('tbell' + rung + f, 48, 48, (p, g) => {
+      const body = rung ? '#e8d080' : '#a89060', dark = '#6a5428', light = '#fff0b0';
+      g.fillStyle = dark; g.fillRect(22, 0, 4, 6);
+      g.fillStyle = body;
+      g.beginPath(); g.moveTo(14, 8); g.quadraticCurveTo(24, 0, 34, 8); g.lineTo(38, 34); g.lineTo(44, 40); g.lineTo(4, 40); g.lineTo(10, 34); g.closePath(); g.fill();
+      g.fillStyle = dark; g.fillRect(4, 38, 40, 4);
+      g.fillStyle = light; g.fillRect(14, 10, 2, 24);
+      g.fillStyle = '#f8f0dc'; g.beginPath(); g.arc(24, 22, 8, 0, Math.PI * 2); g.fill();
+      g.strokeStyle = dark; g.lineWidth = 1; g.beginPath(); g.arc(24, 22, 8, 0, Math.PI * 2); g.stroke();
+      const a = -Math.PI / 2 + (f * Math.PI) / 6;
+      g.strokeStyle = '#1a1424'; g.beginPath(); g.moveTo(24, 22); g.lineTo(24, 16); g.moveTo(24, 22); g.lineTo(24 + Math.cos(a) * 6, 22 + Math.sin(a) * 6); g.stroke();
+      g.fillStyle = '#5a4818'; g.beginPath(); g.ellipse(24, 43, 4, 3, 0, 0, Math.PI * 2); g.fill();
+    });
+  }
+  return { chest, lever, herb, note, rope, sparkle, windmill, bell, valve, dial, manhole, plaque, timebell };
 })();

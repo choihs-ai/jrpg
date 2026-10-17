@@ -220,7 +220,7 @@ const Menu = (() => {
   function statText(it) {
     const s = it.stats || {};
     const n = { atk: '공', def: '방', mag: '마', spd: '민', hp: 'HP', mp: 'MP' };
-    const parts = Object.keys(s).filter((k) => s[k]).map((k) => `${n[k]}+${s[k]}`);
+    const parts = Object.keys(s).filter((k) => s[k]).map((k) => `${n[k]}${s[k] > 0 ? '+' : ''}${s[k]}`);
     const who = (it.who || ALL).map((w) => (w === 'hero' ? Game.heroName() : CHARACTERS[w].name)).join('·');
     return `[b]${parts.join(' ')}[/] [d](${who})[/]`;
   }
@@ -231,10 +231,19 @@ const Menu = (() => {
     if (u.type === 'return') {
       const k = Field.map.kind;
       if (k !== 'field' && k !== 'dungeon') { await notice('여기서는 쓸 수 없다. (필드나 던전에서 사용)'); return; }
+      // 가 본 마을 중 하나를 고른다
+      const towns = [{ label: '리벨 마을', value: ['rivel', 19, 27, 'up'] }];
+      if (Game.flag('reached_capital')) towns.push({ label: '왕도 아스테리온', value: ['capital', 23, 37, 'up'] });
+      let dest = towns[0].value;
+      if (towns.length > 1) {
+        const r = await UI.list({ x: 220, y: 160, w: 220, items: towns, title: '어디로 돌아갈까?', cancel: true });
+        if (!r) return;
+        dest = r.value;
+      }
       Game.removeItem(id);
       await notice(`${Game.heroName()}${Util.josa(Game.heroName(), '은')} 귀환의 날개를 하늘 높이 던졌다!`);
       for (const l of Engine.layers.slice()) if (l !== Field.layer) { if (l.close) l.close(); else Engine.remove(l); }
-      await Field.warp('rivel', 19, 27, 'up', { sfx: 'escape', slow: true });
+      await Field.warp(dest[0], dest[1], dest[2], dest[3], { sfx: 'escape', slow: true });
       throw new AbortSignalError('warped');
     }
     if (u.type === 'ward') {
@@ -388,9 +397,11 @@ const Menu = (() => {
             Text.draw(ctx, m.equip[sl] ? ITEMS[m.equip[sl]].name : '──', 270, 168 + i * 26, { size: 15 });
           });
           Text.draw(ctx, '주문·특기', 440, 150, { size: 15, color: Theme.gold });
-          m.skills.slice(0, 10).forEach((sk, i) => Text.draw(ctx, `${SKILLS[sk].kind === 'spell' ? '◆' : '◇'} ${SKILLS[sk].name}`, 440, 174 + i * 22, { size: 14 }));
+          // 기술이 많으면 두 줄로 나눠 적는다
+          const two = m.skills.length > 6;
+          m.skills.slice(0, 14).forEach((sk, i) => Text.draw(ctx, `${SKILLS[sk].kind === 'spell' ? '◆' : '◇'} ${SKILLS[sk].name}`, 440 + (two ? Math.floor(i / 7) * 92 : 0), 174 + (two ? i % 7 : i) * 21, { size: two ? 13 : 14, maxW: two ? 88 : 180 }));
           const nextLearn = Object.keys(def.learn).map(Number).filter((l) => l > m.level).sort((a, b) => a - b)[0];
-          if (nextLearn) Text.draw(ctx, `Lv ${nextLearn}: ???`, 440, 174 + Math.min(10, m.skills.length) * 22, { size: 13, color: Theme.dim });
+          if (nextLearn) Text.draw(ctx, `Lv ${nextLearn}: ???`, 440, two ? 322 : 174 + m.skills.length * 21, { size: 13, color: Theme.dim });
           const lines = Text.layout(ctx, def.bio.replace('주인공', Game.heroName()), 570, 15);
           Text.drawLines(ctx, lines.slice(0, 4), 36, 332, 22, 15, Infinity, { shadow: false });
           Text.draw(ctx, '◀ 이전', 36, 438, { size: 14, color: Theme.dim });

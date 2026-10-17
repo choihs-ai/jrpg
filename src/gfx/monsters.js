@@ -166,6 +166,96 @@ const MonsterArt = (() => {
       L(g, 46, 18, 48, 34, Pix.shade(p.bell, 0.3), 2);
       R(g, 46, 24, 20, 7, '#140818'); E(g, 51, 27, 3, 2, p.phase2 ? p.glow : '#7cc4ff'); E(g, 61, 27, 3, 2, p.phase2 ? p.glow : '#7cc4ff');
     } },
+
+    // ── 제2장 ──
+    wolf: { w: 56, h: 44, draw(g, p) {
+      Poly(g, [44, 18, 54, 8, 52, 20, 48, 24], p.dark); // 꼬리
+      E(g, 30, 26, 16, 9, p.dark); E(g, 29, 24, 15, 8, p.body); E(g, 30, 19, 10, 3, p.light);
+      for (let i = 0; i < 5; i++) Poly(g, [20 + i * 4, 18, 22 + i * 4, 12 - (i % 2) * 2, 25 + i * 4, 18], p.mane);
+      E(g, 13, 20, 9, 7, p.body); Poly(g, [4, 22, 10, 18, 12, 26, 4, 26], p.body); E(g, 3, 23, 2, 2, '#140c1c');
+      Poly(g, [10, 14, 12, 4, 16, 13], p.body); Poly(g, [15, 13, 19, 4, 20, 14], p.dark);
+      E(g, 12, 18, 1.8, 1.4, p.eye); L(g, 5, 26, 11, 27, '#140c1c', 1);
+      Poly(g, [6, 26, 7, 29, 8, 26], '#ffffff'); Poly(g, [9, 26, 10, 29, 11, 26], '#ffffff');
+      R(g, 17, 30, 5, 11, p.dark); R(g, 25, 31, 5, 10, p.body); R(g, 35, 30, 5, 11, p.dark); R(g, 41, 29, 5, 11, p.body);
+    } },
+    beetle: { w: 52, h: 40, draw(g, p) {
+      for (let i = 0; i < 3; i++) { L(g, 16 + i * 9, 30, 10 + i * 9, 38, p.dark, 2); L(g, 22 + i * 9, 30, 28 + i * 9, 38, p.dark, 2); }
+      E(g, 28, 24, 20, 12, p.dark); E(g, 28, 22, 19, 11, p.shell); L(g, 28, 11, 28, 33, p.dark, 1.5);
+      E(g, 21, 17, 6, 3, p.light); E(g, 36, 17, 5, 2.5, p.light);
+      E(g, 9, 26, 7, 6, p.dark); Poly(g, [6, 22, 1, 6, 8, 14, 10, 21], p.horn); Poly(g, [3, 10, 0, 4, 5, 8], p.horn);
+      E(g, 8, 25, 1.6, 1.6, p.eye);
+    } },
+    cultist: { w: 44, h: 56, draw(g, p) {
+      Poly(g, [10, 54, 14, 24, 30, 24, 34, 54], p.robe); Poly(g, [22, 26, 30, 24, 34, 54, 24, 54], p.dark);
+      R(g, 14, 40, 16, 2, p.trim); Poly(g, [19, 26, 25, 26, 23, 54, 21, 54], p.trim);
+      E(g, 22, 16, 9, 10, p.robe); E(g, 22, 18, 6, 7, '#0c0814'); E(g, 19, 18, 1.4, 1.2, p.eye); E(g, 25, 18, 1.4, 1.2, p.eye);
+      Poly(g, [13, 14, 22, 3, 31, 14, 22, 9], p.dark);
+      if (p.scythe) {
+        L(g, 38, 6, 36, 54, '#5e3818', 2.5);
+        Poly(g, [37, 6, 20, 2, 8, 10, 22, 6, 36, 10], p.blade);
+      } else {
+        L(g, 36, 12, 36, 52, '#6b4426', 2); E(g, 36, 10, 4, 4, p.trim); E(g, 36, 10, 2, 2, p.eye);
+      }
+      E(g, 12, 34, 3, 3, p.skin); E(g, 33, 32, 3, 3, p.skin);
+    } },
+    rat: { w: 48, h: 32, draw(g, p) {
+      for (let i = 0; i < 14; i++) E(g, 38 + i * 0.7, 24 - i * 1.1 + Math.sin(i * 0.6) * 1.5, 1.2, 1.2, p.tail);
+      E(g, 24, 22, 13, 8, p.dark); E(g, 23, 21, 12, 7, p.body); E(g, 22, 17, 7, 2, p.light);
+      E(g, 10, 22, 7, 5, p.body); Poly(g, [2, 23, 8, 19, 9, 26], p.body); E(g, 2, 23, 1.5, 1.5, '#e07a9a');
+      E(g, 12, 15, 4, 4, p.dark); E(g, 12, 15, 2.5, 2.5, '#e07a9a');
+      E(g, 8, 20, 1.5, 1.5, p.eye); L(g, 3, 24, 0, 22, '#d8d8d8', 0.6); L(g, 3, 24, 0, 26, '#d8d8d8', 0.6);
+      R(g, 4, 26, 2, 3, '#ffffff'); R(g, 14, 27, 4, 4, p.dark); R(g, 27, 27, 4, 4, p.dark);
+    } },
+    toad: { w: 52, h: 40, draw(g, p) {
+      E(g, 26, 30, 22, 10, p.dark); E(g, 26, 28, 21, 10, p.body); E(g, 26, 32, 14, 6, p.belly);
+      for (const [x, y] of [[14, 24], [36, 22], [22, 20], [40, 30], [10, 30]]) E(g, x, y, 2.5, 2, p.spot);
+      E(g, 15, 16, 7, 6, p.body); E(g, 37, 16, 7, 6, p.body); eye(g, 15, 15, 3.4, '#140c1c', p.eye); eye(g, 37, 15, 3.4, '#140c1c', p.eye);
+      L(g, 12, 28, 40, 28, '#140c1c', 1.4); Poly(g, [24, 28, 28, 28, 27, 36, 25, 36], '#e05a7a');
+      R(g, 4, 34, 10, 4, p.dark); R(g, 38, 34, 10, 4, p.dark);
+    } },
+    croc: { w: 104, h: 56, draw(g, p) {
+      E(g, 52, 50, 50, 6, 'rgba(60,90,60,0.6)');
+      for (let i = 0; i < 18; i++) E(g, 78 + i * 1.4, 40 - i * 0.6, 7 - i * 0.3, 5 - i * 0.2, i % 2 ? p.body : p.dark);
+      E(g, 58, 38, 26, 12, p.dark); E(g, 57, 36, 25, 11, p.body); E(g, 57, 42, 18, 5, p.belly);
+      for (let i = 0; i < 8; i++) Poly(g, [38 + i * 6, 27, 41 + i * 6, 21, 44 + i * 6, 27], p.ridge);
+      Poly(g, [34, 30, 2, 34, 2, 40, 34, 44], p.body); Poly(g, [34, 40, 4, 40, 6, 47, 34, 48], p.dark);
+      for (let i = 0; i < 7; i++) { Poly(g, [6 + i * 4, 40, 8 + i * 4, 43, 10 + i * 4, 40], '#f0ecd8'); Poly(g, [8 + i * 4, 41, 10 + i * 4, 38, 12 + i * 4, 41], '#f0ecd8'); }
+      E(g, 30, 28, 5, 4, p.body); eye(g, 30, 27, 2.6, '#140c1c', p.eye); E(g, 5, 33, 1.4, 1, '#140c1c');
+      R(g, 40, 44, 8, 9, p.dark); R(g, 64, 45, 8, 8, p.dark); L(g, 70, 20, 74, 34, '#8a6a4a', 1.5); E(g, 69, 19, 2.5, 2.5, '#c84040');
+    } },
+    knight: { w: 52, h: 60, draw(g, p) {
+      R(g, 17, 42, 7, 16, p.dark); R(g, 28, 42, 7, 16, p.dark); R(g, 15, 55, 10, 4, p.metal); R(g, 27, 55, 10, 4, p.metal);
+      Poly(g, [14, 22, 38, 22, 36, 44, 16, 44], p.metal); Poly(g, [30, 22, 38, 22, 36, 44, 30, 44], p.dark); R(g, 16, 30, 20, 3, p.trim);
+      Poly(g, [16, 44, 36, 44, 38, 50, 14, 50], p.cloth);
+      E(g, 26, 14, 9, 10, p.metal); R(g, 18, 13, 16, 4, '#140c1c'); E(g, 22, 15, 1.2, 1, p.eye); E(g, 30, 15, 1.2, 1, p.eye);
+      Poly(g, [24, 4, 26, 0, 30, 2, 28, 6], p.plume); Poly(g, [26, 4, 32, -1, 36, 4, 30, 7], p.plume);
+      R(g, 2, 24, 13, 18, p.shield); R(g, 2, 24, 13, 2, p.trim); R(g, 7, 28, 3, 10, p.trim); R(g, 4, 31, 9, 3, p.trim);
+      L(g, 40, 30, 50, 6, p.blade, 3); R(g, 37, 29, 8, 3, p.trim); E(g, 40, 32, 3, 3, p.metal);
+    } },
+    sorceress: { w: 64, h: 76, draw(g, p) {
+      E(g, 32, 72, 22, 4, 'rgba(255,215,94,0.25)');
+      // 등 뒤 시계 고리
+      g.strokeStyle = p.clock; g.lineWidth = 2; g.beginPath(); g.arc(32, 24, 22, 0, Math.PI * 2); g.stroke();
+      for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2; R(g, 32 + Math.cos(a) * 22 - 1, 24 + Math.sin(a) * 22 - 1, 2, 2, p.clock); }
+      L(g, 32, 24, 32, 6, p.clock, 2); L(g, 32, 24, 44, 30, p.clock, 2);
+      Poly(g, [14, 72, 22, 36, 42, 36, 50, 72], p.dress); Poly(g, [34, 38, 42, 36, 50, 72, 36, 72], p.dark);
+      for (let i = 0; i < 4; i++) R(g, 18 + i * 8, 66, 4, 6, p.trim);
+      Poly(g, [22, 36, 42, 36, 38, 44, 26, 44], p.trim);
+      E(g, 32, 24, 9, 10, p.hair); E(g, 32, 26, 6.5, 7, p.skin); Poly(g, [22, 22, 24, 44, 28, 30], p.hair); Poly(g, [42, 22, 40, 44, 36, 30], p.hair);
+      E(g, 29, 26, 1.4, 1.6, p.eye); E(g, 35, 26, 1.4, 1.6, p.eye); L(g, 30, 31, 34, 31, '#8a3a4a', 1);
+      Poly(g, [24, 17, 32, 12, 40, 17, 32, 15], p.trim);
+      L(g, 18, 40, 8, 50, p.skin, 2.5); L(g, 46, 40, 56, 32, p.skin, 2.5);
+      L(g, 56, 32, 60, 4, p.clock, 3); Poly(g, [60, 0, 63, 8, 57, 8], p.clock);
+    } },
+    gearguard: { w: 64, h: 68, draw(g, p) {
+      const gear = (x, y, r, col) => { E(g, x, y, r, r, col); for (let i = 0; i < 8; i++) { const a = (i / 8) * Math.PI * 2; R(g, x + Math.cos(a) * r - 2, y + Math.sin(a) * r - 2, 4, 4, col); } E(g, x, y, r * 0.4, r * 0.4, p.dark); };
+      R(g, 18, 48, 9, 18, p.dark); R(g, 37, 48, 9, 18, p.dark); R(g, 15, 62, 14, 5, p.brass); R(g, 35, 62, 14, 5, p.brass);
+      R(g, 12, 18, 40, 32, p.brass); R(g, 12, 18, 40, 3, p.light); R(g, 46, 18, 6, 32, p.dark);
+      gear(32, 34, 9, p.copper); E(g, 32, 34, 3, 3, p.eye);
+      R(g, 0, 20, 12, 8, p.brass); gear(6, 36, 6, p.copper); R(g, 52, 20, 12, 8, p.brass); gear(58, 36, 6, p.copper);
+      R(g, 20, 4, 24, 14, p.brass); R(g, 20, 4, 24, 2, p.light); E(g, 32, 11, 7, 4, '#140c1c'); E(g, 32, 11, 3, 2, p.eye);
+      L(g, 32, 4, 32, 0, p.dark, 2); E(g, 32, 0, 2, 2, p.eye);
+    } },
   };
 
   const cache = new Map();
@@ -189,7 +279,7 @@ const MonsterArt = (() => {
   function forMonster(id, variant) {
     const m = MONSTERS[id];
     const pal = Object.assign({}, m.pal, m.shiny ? { shiny: true } : {}, variant === 2 ? { phase2: true } : {});
-    return render(m.art, pal);
+    return render(m.art, pal, { scale: m.artScale || 1 });
   }
   return { render, forMonster, ART };
 })();

@@ -49,7 +49,7 @@ class Actor {
   get defense() { return this.base('def') * this.buff('def') * (this.defMod || 1); }
   get mag() { return this.base('mag') * this.buff('mag'); }
   get spd() { return this.base('spd') * this.buff('spd'); }
-  get evade() { return this.isParty ? 0.02 : this.def.evade || 0; }
+  get evade() { return (this.isParty ? 0.02 : this.def.evade || 0) + Math.max(0, this.buff('eva') - 1); }
   resist(statusName) {
     if (this.isParty) return (this.st.resist || {})[statusName] || 0;
     return (this.def.resist || {})[statusName] || 0;
@@ -73,7 +73,8 @@ class BattleCore {
     this.opts = opts;
     this.boss = !!opts.boss;
     this.canEscape = opts.canEscape !== false && !opts.boss;
-    this.party = Game.state.party.map((id) => new Actor('party', id));
+    // opts.party: 일부 동료만 싸우는 전투 (예: 브란의 입단 시험)
+    this.party = (opts.party || Game.state.party).map((id) => new Actor('party', id));
     this.enemies = [];
     for (const id of opts.enemies) this.addEnemy(id);
     this.round = 0;
@@ -338,17 +339,14 @@ class BattleCore {
       case 'analyze':
         ev.push(...this.analyze(targets[0]));
         break;
-      case 'steal': {
-        const t = targets[0];
-        const st = t.def.steal;
-        if (!st || t.stolen) { ev.push({ type: 'msg', text: `${t.name}${Util.josa(t.name, '은')} 훔칠 만한 것을 갖고 있지 않다.` }); break; }
-        const chance = Util.clamp(0.45 + (a.spd - t.spd) * 0.012, 0.2, 0.9) * (st.p >= 0.3 ? 1 : 0.7);
-        if (Util.chance(chance)) {
-          t.stolen = true;
-          Game.addItem(st.item, 1);
-          ev.push({ type: 'sfx', name: 'steal' });
-          ev.push({ type: 'msg', text: `[y]${ITEMS[st.item].name}[/]${Util.josa(ITEMS[st.item].name, '을')} 훔쳐 냈다!` });
-        } else ev.push({ type: 'msg', text: '그러나 훔치지 못했다!' });
+      case 'steal':
+        ev.push(...this.trySteal(a, targets[0]));
+        break;
+      case 'coverAll': {
+        for (const t of this.friends(a)) if (t !== a) t.coveredBy = a;
+        a.buffs.def = { mult: 1.5, turns: 1 };
+        ev.push({ type: 'buff', target: a, up: true });
+        ev.push({ type: 'msg', text: `${a.name}${Util.josa(a.name, '은')} 방패를 세우고 동료들 앞을 가로막았다!` });
         break;
       }
       case 'cover': {
@@ -372,6 +370,7 @@ class BattleCore {
       case 'charge': {
         a.charging = sk.next;
         ev.push({ type: 'sfx', name: 'charge' });
+        if (sk.buffSelf) { for (const k in sk.buffSelf) a.buffs[k] = { mult: sk.buffSelf[k], turns: 2 }; ev.push({ type: 'buff', target: a, up: true }); }
         if (sk.hint) ev.push({ type: 'msg', text: sk.hint });
         break;
       }
@@ -426,11 +425,14 @@ class BattleCore {
     const em = t.elemMult(element);
     if (!(t.def && t.def.shiny && !crit)) dmg *= (sk.mult || 1) * Util.randRange(0.88, 1.12) * em;
     if (t.defending) dmg *= 0.5;
+    const bm = this.barrierMult(t);
+    dmg *= bm;
     dmg = Math.max(t.def && t.def.shiny && !crit ? 0 : 1, Math.round(dmg));
     ev.push({ type: 'anim', name: sk.anim || 'slash', targets: [t], user: a, crit });
     if (crit) ev.push({ type: 'msg', text: a.isParty ? '[y]회심의 일격![/]' : '[r]통한의 일격![/]' });
     ev.push(...this.discover(t, element, em));
-    ev.push(...this.damage(t, dmg, { crit, em, physical: true, from: a }));
+    ev.push(...this.damage(t, dmg, { crit, em, physical: true, from: a, barrier: bm < 1 }));
+    if (sk.steal && a.isParty && t.def.steal && !t.stolen) ev.push(...this.trySteal(a, t));
     if (sk.type === 'drain' && dmg > 0) {
       const before = a.hp; a.hp = Math.min(a.mhp, a.hp + Math.round(dmg * 0.6));
       if (a.hp > before) { ev.push({ type: 'heal', target: a, amount: a.hp - before, hpAfter: a.hp }); ev.push({ type: 'msg', text: `${a.name}${Util.josa(a.name, '은')} HP를 ${a.hp - before} 빨아들였다!` }); }
@@ -448,16 +450,37 @@ class BattleCore {
     return ev;
   }
 
+  trySteal(a, t) {
+    const ev = [];
+    const st = t.def.steal;
+    if (!st || t.stolen) { ev.push({ type: 'msg', text: `${t.name}${Util.josa(t.name, '은')} 훔칠 만한 것을 갖고 있지 않다.` }); return ev; }
+    const chance = Util.clamp(0.45 + (a.spd - t.spd) * 0.012, 0.2, 0.9) * (st.p >= 0.3 ? 1 : 0.7);
+    if (Util.chance(chance)) {
+      t.stolen = true;
+      Game.addItem(st.item, 1);
+      ev.push({ type: 'sfx', name: 'steal' });
+      ev.push({ type: 'msg', text: `[y]${ITEMS[st.item].name}[/]${Util.josa(ITEMS[st.item].name, '을')} 훔쳐 냈다!` });
+    } else ev.push({ type: 'msg', text: '그러나 훔치지 못했다!' });
+    return ev;
+  }
+
+  // 수호 결계: 보스를 지키는 하수인이 살아 있으면 받는 피해가 줄어든다
+  barrierMult(t) {
+    if (t.isParty || !t.def.barrier) return 1;
+    return t.def.barrier(t, this) ? 0.5 : 1;
+  }
+
   magicHit(a, t, sk) {
     const ev = [];
     const em = t.elemMult(sk.element);
-    let dmg = (sk.power + (sk.type === 'damage' ? 0 : a.mag * (sk.scale || 0))) * Util.randRange(0.92, 1.08) * em;
+    const bm = this.barrierMult(t);
+    let dmg = (sk.power + (sk.type === 'damage' ? 0 : a.mag * (sk.scale || 0))) * Util.randRange(0.92, 1.08) * em * bm;
     if (t.defending) dmg *= 0.5;
     dmg = Math.round(dmg);
     ev.push(...this.discover(t, sk.element, em));
     if (em === 0) { ev.push({ type: 'msg', text: `${t.name}에게는 ${ELEMENTS[sk.element] || ''} 속성이 전혀 통하지 않는다!` }); ev.push({ type: 'miss', target: t }); return ev; }
     dmg = Math.max(1, dmg);
-    ev.push(...this.damage(t, dmg, { em, from: a }));
+    ev.push(...this.damage(t, dmg, { em, from: a, barrier: bm < 1 }));
     if (t.alive && sk.status) ev.push(...this.inflict(t, sk.status, false));
     return ev;
   }
@@ -469,6 +492,7 @@ class BattleCore {
     let txt = t.isParty ? `${t.name}${Util.josa(t.name, '은')} [r]${dmg}[/]의 피해를 입었다!` : `${t.name}에게 [y]${dmg}[/]의 피해!`;
     if (info.em > 1) txt += ' [y]약점을 찔렀다![/]';
     else if (info.em < 1 && info.em > 0) txt += ' [d](잘 통하지 않는다)[/]';
+    if (info.barrier) txt += ' [b](결계가 피해를 줄였다)[/]';
     ev.push({ type: 'msg', text: txt });
     if (t.hp <= 0) ev.push(...this.kill(t));
     else if (!t.isParty && t.def.phases) ev.push(...this.checkPhases(t));
@@ -613,8 +637,10 @@ class BattleCore {
     Game.addGold(gold);
     for (const it of drops) Game.addItem(it, 1);
     const ups = [];
-    for (const id of Game.state.party) if (Game.state.members[id].hp > 0) ups.push(...Game.addExp(id, exp));
-    for (const id of Game.state.reserve) ups.push(...Game.addExp(id, Math.floor(exp / 2)));
+    // 싸운 동료는 전부, 싸우지 않은 동료(대기·일대일 승부의 관전자)는 절반
+    const fighters = this.party.map((a) => a.id);
+    for (const id of fighters) if (Game.state.members[id].hp > 0) ups.push(...Game.addExp(id, exp));
+    for (const id of Game.state.party.concat(Game.state.reserve)) if (!fighters.includes(id)) ups.push(...Game.addExp(id, Math.floor(exp / 2)));
     const questMsgs = [];
     for (const e of this.killed) { const m = Quests.onKill(e.defId); if (m) questMsgs.push(m); }
     return { exp, gold, drops, ups, questMsgs };
