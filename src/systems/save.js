@@ -51,7 +51,9 @@ const Save = (() => {
     if (!s || typeof s !== 'object') return null;
     const base = (() => { const keep = Game.state; const fresh = Game.newState(s.heroName || '하루'); Game.state = keep; return fresh; })();
     const out = Object.assign({}, base, s);
-    for (const k of ['members', 'inv', 'flags', 'quests', 'kills', 'seen', 'visited']) if (!out[k] || typeof out[k] !== 'object') out[k] = {};
+    for (const k of ['members', 'inv', 'flags', 'quests', 'kills', 'seen', 'known', 'visited']) if (!out[k] || typeof out[k] !== 'object') out[k] = {};
+    // 구버전: 「분석」했던 마물은 속성 상성을 모두 아는 것으로 옮겨 적는다
+    for (const id in out.seen) if (MONSTERS[id] && !out.known[id]) { out.known[id] = {}; for (const el in ELEMENTS) out.known[id][el] = MONSTERS[id].elem && MONSTERS[id].elem[el] !== undefined ? MONSTERS[id].elem[el] : 1; }
     if (!Array.isArray(out.party)) out.party = ['hero'];
     if (!Array.isArray(out.reserve)) out.reserve = [];
     out.party = out.party.filter((id) => CHARACTERS[id] && out.members[id]);

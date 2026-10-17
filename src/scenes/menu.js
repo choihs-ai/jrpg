@@ -103,10 +103,10 @@ const Menu = (() => {
     const ids = (opts.ids || Game.state.party.concat(Game.state.reserve));
     const items = ids.map((id) => {
       const m = Game.state.members[id], s = Game.stats(id);
-      return { label: Game.name(id), right: `HP ${m.hp}/${s.maxhp}  MP ${m.mp}/${s.maxmp}`, value: id, disabled: opts.filter ? !opts.filter(id) : false, color: m.hp <= 0 ? Theme.red : undefined };
+      return { label: Game.name(id), right: opts.right ? opts.right(id) : `HP ${m.hp}/${s.maxhp}  MP ${m.mp}/${s.maxmp}`, value: id, disabled: opts.filter ? !opts.filter(id) : false, color: m.hp <= 0 ? Theme.red : undefined };
     });
     if (opts.all) items.unshift({ label: '전원', right: '', value: '__all' });
-    const r = await UI.list({ x: opts.x || 200, y: opts.y || 120, w: 400, items, title: opts.title || '누구에게?', rowH: 32, cancel: true });
+    const r = await UI.list({ x: opts.x || (opts.right ? 120 : 200), y: opts.y || 120, w: opts.right ? 480 : 400, items, title: opts.title || '누구에게?', rowH: 32, cancel: true });
     return r ? r.value : null;
   }
 
@@ -175,6 +175,11 @@ const Menu = (() => {
     };
     const build = () => Game.itemList(TABS[tab][1]).map((id) => {
       const it = ITEMS[id];
+      if (EQUIP_SLOTS.includes(it.kind)) {
+        // 장비품: 동료별로 바꿔 끼면 능력치가 어떻게 변하는지 함께 보여준다
+        const diffs = Game.state.party.concat(Game.state.reserve).filter((mid) => Game.canEquip(mid, id)).map((mid) => `${Game.name(mid)} ${Game.equipDiffText(mid, id)}`);
+        return { label: it.name, right: '×' + Game.count(id), value: id, desc: `[d]${KIND_NAMES[it.kind]}[/] ${diffs.join('  ·  ') || '[d]장비할 수 있는 동료가 없다[/]'}\n[d]${it.desc}[/]` };
+      }
       return { label: it.name, right: '×' + Game.count(id), value: id, desc: `[d]${KIND_NAMES[it.kind]}[/] ${it.desc}${it.stats ? '  ' + statText(it) : ''}` };
     });
     const lw = new UI.ListWindow({
@@ -200,7 +205,7 @@ const Menu = (() => {
         if (!a) continue;
         if (a.value === 'use') await useItem(id);
         else if (a.value === 'equip') {
-          const who = await pickMember({ title: `${it.name} — 누가 장비할까?`, filter: (mid) => Game.canEquip(mid, id) });
+          const who = await pickMember({ title: `${it.name} — 누가 장비할까?`, filter: (mid) => Game.canEquip(mid, id), right: (mid) => Game.equipDiffText(mid, id) });
           if (who) { Game.equip(who, it.kind, id); Sound.sfx('confirm'); await notice(`${Game.name(who)}${Util.josa(Game.name(who), '은')} ${it.name}${Util.josa(it.name, '을')} 장비했다.`); }
         } else if (a.value === 'drop') {
           if (await confirm(`${it.name}${Util.josa(it.name, '을')} 하나 버릴까요?`)) { Game.removeItem(id); Sound.sfx('cancel'); }

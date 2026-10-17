@@ -49,13 +49,10 @@ const Shop = (() => {
           const y = 124 + i * 40;
           Menu.charIcon(ctx, mid, 404, y - 6, 1.5);
           Text.draw(ctx, Game.name(mid), 434, y, { size: 14, color: CHARACTERS[mid].color });
-          if (!Game.canEquip(mid, id)) { Text.draw(ctx, '장비 불가', 612, y + 2, { size: 13, align: 'right', color: Theme.disabled }); return; }
-          const eq = Object.assign({}, Game.state.members[mid].equip);
-          if (eq[it.kind] === id) { Text.draw(ctx, '장비 중', 612, y + 2, { size: 13, align: 'right', color: Theme.gold }); return; }
-          eq[it.kind] = id;
-          const cur = Game.stats(mid), nxt = Game.stats(mid, eq);
-          const diffs = [['atk', '공'], ['def', '방'], ['mag', '마'], ['spd', '민']].map(([k, n]) => [n, nxt[k] - cur[k]]).filter(([, d]) => d !== 0);
-          const txt = diffs.length ? diffs.map(([n, d]) => `${n}${d > 0 ? '[g]+' + d : '[r]' + d}[/]`).join(' ') : '[d]변화 없음[/]';
+          const r = Game.equipDiff(mid, id);
+          if (r.state === 'cant') { Text.draw(ctx, '장비 불가', 612, y + 2, { size: 13, align: 'right', color: Theme.disabled }); return; }
+          if (r.state === 'equipped') { Text.draw(ctx, '장비 중', 612, y + 2, { size: 13, align: 'right', color: Theme.gold }); return; }
+          const txt = Game.equipDiffText(mid, id);
           Text.draw(ctx, txt, 612, y + 18, { size: 13, align: 'right' });
         });
       },
@@ -99,7 +96,7 @@ const Shop = (() => {
         if (isEquip) {
           const can = Game.state.party.concat(Game.state.reserve).filter((mid) => Game.canEquip(mid, id));
           if (can.length && (await Menu.confirm('지금 장비할까?'))) {
-            const who = can.length === 1 ? can[0] : await Menu.pickMember({ title: `${it.name} — 누가 장비할까?`, filter: (mid) => Game.canEquip(mid, id) });
+            const who = can.length === 1 ? can[0] : await Menu.pickMember({ title: `${it.name} — 누가 장비할까?`, filter: (mid) => Game.canEquip(mid, id), right: (mid) => Game.equipDiffText(mid, id) });
             if (who) {
               const old = Game.state.members[who].equip[it.kind];
               Game.equip(who, it.kind, id);

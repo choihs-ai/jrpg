@@ -474,13 +474,17 @@ const Battle = (() => {
           const label = all ? (side === 'enemy' ? '적 전체' : '아군 전체') : list[targeting.index].name;
           let extra = '';
           const t0 = list[targeting.index];
-          if (!all && !t0.isParty && skill && skill.element && Game.state.seen[t0.defId]) {
-            const m = t0.elemMult(skill.element);
-            extra = m > 1 ? ' [y]약점![/]' : m === 0 ? ' [r]무효[/]' : m < 1 ? ' [d]내성[/]' : '';
+          // 이번에 쓸 속성 (기술 속성 > 무기 속성)
+          const el = skill ? skill.element || (skill.id === 'attack' && user.isParty ? user.st.element : null) : null;
+          if (!all && !t0.isParty && el) {
+            const m = Game.knownElem(t0.defId, el);
+            extra = m === undefined ? ' [d](상성 ?)[/]' : m > 1 ? ' [y]약점![/]' : m === 0 ? ' [r]무효[/]' : m < 1 ? ' [b]내성[/]' : '';
           }
-          const w = Text.width(ctx, label + Text.strip(extra), 18, true) + 40;
-          UI.drawWindow(ctx, Engine.W / 2 - w / 2, 100, w, 38);
+          const sum = !all && !t0.isParty ? Game.knownSummary(t0.defId) : '';
+          const w = Math.max(Text.width(ctx, label + Text.strip(extra), 18, true), sum ? Text.width(ctx, Text.strip(sum), 14) : 0) + 40;
+          UI.drawWindow(ctx, Engine.W / 2 - w / 2, 100, w, sum ? 60 : 38);
           Text.draw(ctx, label + extra, Engine.W / 2, 109, { size: 18, bold: true, align: 'center' });
+          if (sum) Text.draw(ctx, sum, Engine.W / 2, 134, { size: 14, align: 'center' });
         },
       };
       function done(v) { Engine.remove(tl); targeting = null; resolve(v); }

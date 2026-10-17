@@ -429,6 +429,7 @@ class BattleCore {
     dmg = Math.max(t.def && t.def.shiny && !crit ? 0 : 1, Math.round(dmg));
     ev.push({ type: 'anim', name: sk.anim || 'slash', targets: [t], user: a, crit });
     if (crit) ev.push({ type: 'msg', text: a.isParty ? '[y]회심의 일격![/]' : '[r]통한의 일격![/]' });
+    ev.push(...this.discover(t, element, em));
     ev.push(...this.damage(t, dmg, { crit, em, physical: true, from: a }));
     if (sk.type === 'drain' && dmg > 0) {
       const before = a.hp; a.hp = Math.min(a.mhp, a.hp + Math.round(dmg * 0.6));
@@ -453,6 +454,7 @@ class BattleCore {
     let dmg = (sk.power + (sk.type === 'damage' ? 0 : a.mag * (sk.scale || 0))) * Util.randRange(0.92, 1.08) * em;
     if (t.defending) dmg *= 0.5;
     dmg = Math.round(dmg);
+    ev.push(...this.discover(t, sk.element, em));
     if (em === 0) { ev.push({ type: 'msg', text: `${t.name}에게는 ${ELEMENTS[sk.element] || ''} 속성이 전혀 통하지 않는다!` }); ev.push({ type: 'miss', target: t }); return ev; }
     dmg = Math.max(1, dmg);
     ev.push(...this.damage(t, dmg, { em, from: a }));
@@ -519,10 +521,19 @@ class BattleCore {
     return ev;
   }
 
+  // 속성 상성이 드러나면 도감에 영구 기록 (다음에 만나도 표시된다)
+  discover(t, el, em) {
+    if (t.isParty || !el || !ELEMENTS[el]) return [];
+    if (!Game.learnElem(t.defId, el, em) || em === 1) return [];
+    const kind = em > 1 ? '약점' : em === 0 ? '무효' : '내성';
+    return [{ type: 'msg', text: `[g]〈기억〉 ${t.def.name}의 ${kind}: ${ELEMENTS[el]}[/]`, quick: true }];
+  }
+
   analyze(t) {
     const ev = [];
     const d = t.def;
     Game.state.seen[t.defId] = true;
+    for (const k in ELEMENTS) Game.learnElem(t.defId, k, t.elemMult(k));
     const weak = [], res = [], immune = [];
     for (const k in ELEMENTS) {
       const m = t.elemMult(k);

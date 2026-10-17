@@ -304,5 +304,47 @@ t('알 수 없는 아이템/맵이 섞인 저장 데이터 보정', () => {
   eq(s.pos.map, 'rivel');
 });
 
+console.log('도감 · 장비 비교');
+t('속성 공격으로 드러난 약점/내성은 영구 기록된다', () => {
+  Util.setSeed(3); party();
+  const core = new BattleCore({ enemies: ['moss_jelly'] });
+  const e = core.enemies[0];
+  eq(Game.knownElem('moss_jelly', 'fire'), undefined);
+  const ev = core.magicHit(core.party[2], e, SKILLS.fire);
+  eq(Game.knownElem('moss_jelly', 'fire'), 1.5);
+  ok(ev.some((x) => x.type === 'msg' && x.text.includes('〈기억〉')), 'first discovery message');
+  const ev2 = new BattleCore({ enemies: ['moss_jelly'] }).magicHit(core.party[2], new BattleCore({ enemies: ['moss_jelly'] }).enemies[0], SKILLS.fire);
+  ok(!ev2.some((x) => x.type === 'msg' && x.text.includes('〈기억〉')), 'no repeat message');
+  ok(Game.knownSummary('moss_jelly').includes('약점 불'));
+});
+t('분석은 모든 속성 상성을 기록한다', () => {
+  party();
+  const core = new BattleCore({ enemies: ['skeleton'] });
+  core.analyze(core.enemies[0]);
+  for (const el in G.ELEMENTS) ok(Game.knownElem('skeleton', el) !== undefined, el);
+  ok(Game.knownSummary('skeleton').includes('약점 빛'));
+});
+t('도감 기록은 저장·불러오기 후에도 유지되고 구버전 seen 은 옮겨진다', () => {
+  party();
+  Game.learnElem('vampire_bat', 'thunder', 1.5);
+  Save.write(1);
+  Game.newState('x');
+  ok(Save.load(1));
+  eq(Game.knownElem('vampire_bat', 'thunder'), 1.5);
+  const s = Save.validate({ heroName: 'X', members: { hero: { level: 3 } }, seen: { skeleton: true } });
+  eq(s.known.skeleton.light, G.MONSTERS.skeleton.elem.light);
+});
+t('장비 비교: 상승·하락·장비 불가·장비 중', () => {
+  party(['hero', 'mio']);
+  Game.addItem('steel_sword');
+  const txt = Game.equipDiffText('hero', 'steel_sword');
+  ok(txt.includes('공[g]+'), txt);
+  eq(Game.equipDiff('mio', 'steel_sword').state, 'cant');
+  Game.equip('hero', 'weapon', 'steel_sword');
+  eq(Game.equipDiff('hero', 'steel_sword').state, 'equipped');
+  Game.addItem('umbrella');
+  ok(Game.equipDiffText('hero', 'umbrella').includes('[r]-'));
+});
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
