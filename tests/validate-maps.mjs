@@ -53,7 +53,7 @@ addEntry('shrine', 6, 6, 'respawn');
 addEntry('cellar', 1, 2, 'well');
 addEntry('rivel', 19, 27, 'returnwing');
 addEntry('capital', 23, 37, 'returnwing');
-addEntry('cap_inn', 7, 7, 'respawn');
+addEntry('cap_inn', 9, 7, 'respawn');
 
 const usedIds = new Set();
 for (const id in MAPS) {

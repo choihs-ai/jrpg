@@ -10,6 +10,7 @@ const NELL_JAIL = process.env.NELL === 'jail';
 const { browser, page, errors } = await launch();
 const log = (...a) => console.log(...a);
 const d = new Driver(page, process.env.VERBOSE ? log : () => {});
+d.defaultTimeout = 1800000; // 보스전은 실시간으로 길다
 let n = 0;
 const shot = async (name) => { await page.screenshot({ path: `${SHOTS}/${String(++n).padStart(2, '0')}_${name}.png` }); };
 let failures = 0;
@@ -117,8 +118,8 @@ d.pump = async (o) => {
 const train = (lv) => J((L) => { const G = __jr.Game; for (const id in G.state.members) { const m = G.state.members[id]; if (m.level < L) G.addExp(id, __jr.expForLevel ? __jr.expForLevel(L) - m.exp : 0); } G.healAll(); }, lv);
 
 if (process.env.TRACE) setInterval(async () => {
-  try { log('   [trace] ' + await J(() => { const c = __jr.Battle.core; if (!c) return '-'; return `R${c.round} ` + c.party.map((a) => a.name[0] + a.hp + '/' + a.mp).join(' ') + ' | ' + c.enemies.filter((e) => e.alive).map((e) => e.defId + e.hp + (e.charging ? '!' + e.charging : '') + (e.status.silence ? '(침묵)' : '')).join(' ') + ' | top=' + (__jr.Engine.top().constructor.name); })); } catch (e) {}
-}, 15000);
+  try { log('   [trace] ' + await J(() => { const c = __jr.Battle.core; if (!c) return '-'; return `R${c.round} ` + c.party.map((a) => a.name[0] + a.hp + '/' + a.mp).join(' ') + ' | ' + c.enemies.filter((e) => e.alive).map((e) => e.defId + e.hp + (e.charging ? '!' + e.charging : '') + (e.status.silence ? '(침묵)' : '')).join(' ') + ' | top=' + (__jr.Engine.top().constructor.name); })); } catch (e) { log('   [trace-err] ' + e.message); }
+}, 8000);
 try {
   await J(() => { __jr.Settings.set('textSpeed', 3); __jr.Settings.set('battleSpeed', 2); __jr.Settings.set('showGoal', 1); });
   step('0. 제1장 완료 상태 준비');
@@ -150,7 +151,7 @@ try {
       const { Game, Quests, Field } = __jr;
       Quests.start('main3'); for (let i = 0; i < 9; i++) Quests.setStage('main3', i);
       for (const f of ['ch2_started', 'highway_first', 'vane_defeated', 'reached_capital', 'met_dean', 'bran_knight', 'croc_defeated', 'valve_1', 'valve_w', 'valve_e', 'tower_first', 'tower2_first', 'nell_home']) Game.setFlag(f);
-      Game.state.respawn = { map: 'cap_inn', x: 7, y: 7, dir: 'up', who: '여관 주인 볼프' };
+      Game.state.respawn = { map: 'cap_inn', x: 9, y: 7, dir: 'up', who: '여관 주인 볼프' };
       for (const id of ['dial_a', 'dial_b', 'dial_c']) Game.setFlag(id, 4);
       Field.enter('tower2', 3, 3, 'up');
     });
@@ -283,11 +284,16 @@ try {
 
   }
   step('12. 제2성부 카산드라');
-  await train(17);
+  await train(18);
   // 왕도 대장간에서 살 만한 장비로 갈아입는다 (실제 플레이어처럼)
   await J(() => {
     const G = __jr.Game;
-    const eq = { hero: { weapon: 'mythril_sword', armor: 'mythril_mail', helm: 'silver_helm' }, bran: { weapon: 'war_axe', armor: 'mythril_mail', helm: 'silver_helm' }, linette: { weapon: 'rune_staff', armor: 'mystic_robe' }, mio: { weapon: 'rune_staff', armor: 'mystic_robe' }, nell: { weapon: 'silver_dagger', armor: 'night_garb' } };
+    const eq = {
+      hero: { weapon: 'mythril_sword', armor: 'mythril_mail', shield: 'knight_shield', helm: 'silver_helm' },
+      bran: { weapon: 'war_axe', armor: 'mythril_mail', shield: 'squire_shield', helm: 'silver_helm' },
+      linette: { weapon: 'rune_staff', armor: 'mystic_robe', helm: 'feather_hat' },
+      mio: { weapon: 'rune_staff', armor: 'mystic_robe' }, nell: { weapon: 'silver_dagger', armor: 'night_garb', helm: 'feather_hat' },
+    };
     for (const id in eq) if (G.state.members[id]) for (const sl in eq[id]) { G.addItem(eq[id][sl]); G.equip(id, sl, eq[id][sl]); }
     G.addItem('ether', 5); G.healAll();
   });

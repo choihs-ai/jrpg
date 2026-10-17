@@ -62,7 +62,7 @@ Object.assign(Story, {
   // ── 왕도 도착 ──
   async arriveCapital() {
     Game.setFlag('reached_capital');
-    Game.state.respawn = { map: 'cap_inn', x: 7, y: 7, dir: 'up', who: '여관 주인 볼프' };
+    Game.state.respawn = { map: 'cap_inn', x: 9, y: 7, dir: 'up', who: '여관 주인 볼프' };
     Sound.sfx('chime');
     await S.say(null, ['(성문을 지나자 형형색색의 깃발과 별 모양 등불이 거리를 가득 메우고 있다.)', '(어디선가 음악 소리와 아이들의 웃음소리. 하늘에서는 축포 대신 반짝이는 가루가 흩날린다.)']);
     await Story.line('bran', '우와아아…! 이게 왕도…! 저기 봐, 성이야! 진짜 성이라고!');

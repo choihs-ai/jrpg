@@ -59,7 +59,7 @@ export class Driver {
   // 대화·선택지·전투를 끝까지 넘긴다 (필드 조작 가능 상태가 될 때까지)
   async pump(opts = {}) {
     const t0 = Date.now();
-    const timeout = opts.timeout || 90000;
+    const timeout = opts.timeout || this.defaultTimeout || 90000;
     let idle = 0;
     for (;;) {
       if (Date.now() - t0 > timeout) throw new Error('pump timeout: ' + JSON.stringify(await this.state()));
