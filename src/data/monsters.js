@@ -385,7 +385,7 @@ const MONSTERS = {
       m.turn = (m.turn || 0) + 1;
       if (m.next) { const n = m.next; m.next = null; return { skill: n }; }
       if ((m.phase || 1) === 1) {
-        if (m.turn % 4 === 0 && self.hp < self.maxhp * 0.9) { m.next = 'rewind'; return { skill: 'rewind_charge' }; }
+        if (m.turn % 4 === 0 && self.hp < self.maxhp * 0.9 && (m.rewinds || 0) < 3) { m.rewinds = (m.rewinds || 0) + 1; m.next = 'rewind'; return { skill: 'rewind_charge' }; }
         if (m.turn % 4 === 2) return { skill: 'shatter_hour' };
         return { skill: Util.chance(0.6) ? 'hour_hand' : 'attack', target: B.pickTarget('party', Util.chance(0.4) ? 'fragile' : 'random') };
       }
@@ -393,7 +393,7 @@ const MONSTERS = {
       const wisps = B.enemies.filter((e) => e.alive && e.defId === 'time_wisp').length;
       if (m.turn === 2 && !wisps) return { skill: 'call_wisps' };
       const c = m.turn % 5;
-      if (c === 0 && (m.rewinds || 0) < 2) { m.rewinds = (m.rewinds || 0) + 1; m.next = 'rewind'; return { skill: 'rewind_charge' }; }
+      if (c === 0 && (m.rewinds || 0) < 3) { m.rewinds = (m.rewinds || 0) + 1; m.next = 'rewind'; return { skill: 'rewind_charge' }; }
       if (c === 3) return { skill: 'stop_toll' };
       if (c === 1) return { skill: 'shatter_hour' };
       return { skill: 'hour_hand', target: B.pickTarget('party', Util.chance(0.5) ? 'fragile' : 'random') };

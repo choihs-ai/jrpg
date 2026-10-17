@@ -46,6 +46,7 @@ d.battlePolicy = async (d, s) => {
     };
   });
   if (!info) return false;
+  if (process.env.TRACE) log('   [policy] ' + JSON.stringify(info));
   // 원하는 대상까지 커서를 옮긴 뒤 결정
   const aimAndConfirm = async () => {
     for (let i = 0; i < 6; i++) {
@@ -115,6 +116,9 @@ d.pump = async (o) => {
 // 레벨 보정 (수련 대신)
 const train = (lv) => J((L) => { const G = __jr.Game; for (const id in G.state.members) { const m = G.state.members[id]; if (m.level < L) G.addExp(id, __jr.expForLevel ? __jr.expForLevel(L) - m.exp : 0); } G.healAll(); }, lv);
 
+if (process.env.TRACE) setInterval(async () => {
+  try { log('   [trace] ' + await J(() => { const c = __jr.Battle.core; if (!c) return '-'; return `R${c.round} ` + c.party.map((a) => a.name[0] + a.hp + '/' + a.mp).join(' ') + ' | ' + c.enemies.filter((e) => e.alive).map((e) => e.defId + e.hp + (e.charging ? '!' + e.charging : '') + (e.status.silence ? '(침묵)' : '')).join(' ') + ' | top=' + (__jr.Engine.top().constructor.name); })); } catch (e) {}
+}, 15000);
 try {
   await J(() => { __jr.Settings.set('textSpeed', 3); __jr.Settings.set('battleSpeed', 2); __jr.Settings.set('showGoal', 1); });
   step('0. 제1장 완료 상태 준비');
@@ -140,6 +144,20 @@ try {
   await d.pump();
   await check('레벨 확인 (Lv 10 이상)', () => __jr.Game.state.members.hero.level >= 10 || __jr.Game.state.members.hero.level);
 
+  // FROM=boss: 탑 꼭대기 직전부터 (마지막 구간만 빠르게 재검증)
+  if (process.env.FROM === 'boss') {
+    await J(() => {
+      const { Game, Quests, Field } = __jr;
+      Quests.start('main3'); for (let i = 0; i < 9; i++) Quests.setStage('main3', i);
+      for (const f of ['ch2_started', 'highway_first', 'vane_defeated', 'reached_capital', 'met_dean', 'bran_knight', 'croc_defeated', 'valve_1', 'valve_w', 'valve_e', 'tower_first', 'tower2_first', 'nell_home']) Game.setFlag(f);
+      Game.state.respawn = { map: 'cap_inn', x: 7, y: 7, dir: 'up', who: '여관 주인 볼프' };
+      for (const id of ['dial_a', 'dial_b', 'dial_c']) Game.setFlag(id, 4);
+      Field.enter('tower2', 3, 3, 'up');
+    });
+    await d.pump();
+    await d.stepOn(3, 2);
+  }
+  if (process.env.FROM !== 'boss') {
   step('1. 장로에게 인사 → 제3 메인 퀘스트 시작');
   await d.walkTo(18, 5);
   await d.ev(() => { __jr.Field.warp('elder', 5, 6, 'up'); });
@@ -263,10 +281,18 @@ try {
   await d.stepOn(3, 2);
   await check('시간의 종', () => __jr.Field.map.id === 'tower3' || __jr.Field.map.id);
 
+  }
   step('12. 제2성부 카산드라');
   await train(17);
+  // 왕도 대장간에서 살 만한 장비로 갈아입는다 (실제 플레이어처럼)
+  await J(() => {
+    const G = __jr.Game;
+    const eq = { hero: { weapon: 'mythril_sword', armor: 'mythril_mail', helm: 'silver_helm' }, bran: { weapon: 'war_axe', armor: 'mythril_mail', helm: 'silver_helm' }, linette: { weapon: 'rune_staff', armor: 'mystic_robe' }, mio: { weapon: 'rune_staff', armor: 'mystic_robe' }, nell: { weapon: 'silver_dagger', armor: 'night_garb' } };
+    for (const id in eq) if (G.state.members[id]) for (const sl in eq[id]) { G.addItem(eq[id][sl]); G.equip(id, sl, eq[id][sl]); }
+    G.addItem('ether', 5); G.healAll();
+  });
   await d.walkTo(9, 9);
-  await d.pump({ timeout: 400000 });
+  await d.pump({ timeout: 2400000 });
   await check('카산드라 격파', () => __jr.Game.flag('cassandra_defeated') === true);
   await check('시간의 심장', () => __jr.Game.count('time_heart') === 1);
   await shot('timebell');
