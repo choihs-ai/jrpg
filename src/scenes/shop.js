@@ -19,6 +19,21 @@ const SHOPS = {
     ],
     bye: '몸조심하렴. 약은 아끼지 말고 쓰고.',
   },
+  waystation: {
+    name: '역참 매점', keeper: '역참 상인',
+    stock: ['herb', 'potion', 'antidote', 'smelling', 'panacea', 'feather', 'return_wing', 'incense', 'ether'],
+    bye: '살펴 가시오! 가도엔 늑대가 많으니까.',
+  },
+  cap_smithy: {
+    name: '「강철 사자」', keeper: '레온',
+    stock: ['steel_sword', 'iron_axe', 'chain_mail', 'iron_shield', 'iron_helm', 'mythril_sword', 'war_axe', 'silver_dagger', 'rune_staff', 'mythril_mail', 'mystic_robe', 'night_garb', 'buckler', 'knight_shield', 'silver_helm', 'feather_hat'],
+    bye: '무기를 아껴 써라. 그게 대장장이에 대한 예의다.',
+  },
+  cap_shop: {
+    name: '약방 「백합」', keeper: '릴리',
+    stock: ['herb', 'potion', 'hi_potion', 'ether', 'antidote', 'smelling', 'panacea', 'feather', 'thunder_flask', 'firebomb', 'return_wing', 'incense', 'antidote_bangle'],
+    bye: '다치지 마세요! 다쳤으면 또 오시고요.',
+  },
 };
 
 const Shop = (() => {
@@ -49,13 +64,10 @@ const Shop = (() => {
           const y = 124 + i * 40;
           Menu.charIcon(ctx, mid, 404, y - 6, 1.5);
           Text.draw(ctx, Game.name(mid), 434, y, { size: 14, color: CHARACTERS[mid].color });
-          if (!Game.canEquip(mid, id)) { Text.draw(ctx, '장비 불가', 612, y + 2, { size: 13, align: 'right', color: Theme.disabled }); return; }
-          const eq = Object.assign({}, Game.state.members[mid].equip);
-          if (eq[it.kind] === id) { Text.draw(ctx, '장비 중', 612, y + 2, { size: 13, align: 'right', color: Theme.gold }); return; }
-          eq[it.kind] = id;
-          const cur = Game.stats(mid), nxt = Game.stats(mid, eq);
-          const diffs = [['atk', '공'], ['def', '방'], ['mag', '마'], ['spd', '민']].map(([k, n]) => [n, nxt[k] - cur[k]]).filter(([, d]) => d !== 0);
-          const txt = diffs.length ? diffs.map(([n, d]) => `${n}${d > 0 ? '[g]+' + d : '[r]' + d}[/]`).join(' ') : '[d]변화 없음[/]';
+          const r = Game.equipDiff(mid, id);
+          if (r.state === 'cant') { Text.draw(ctx, '장비 불가', 612, y + 2, { size: 13, align: 'right', color: Theme.disabled }); return; }
+          if (r.state === 'equipped') { Text.draw(ctx, '장비 중', 612, y + 2, { size: 13, align: 'right', color: Theme.gold }); return; }
+          const txt = Game.equipDiffText(mid, id);
           Text.draw(ctx, txt, 612, y + 18, { size: 13, align: 'right' });
         });
       },
@@ -99,7 +111,7 @@ const Shop = (() => {
         if (isEquip) {
           const can = Game.state.party.concat(Game.state.reserve).filter((mid) => Game.canEquip(mid, id));
           if (can.length && (await Menu.confirm('지금 장비할까?'))) {
-            const who = can.length === 1 ? can[0] : await Menu.pickMember({ title: `${it.name} — 누가 장비할까?`, filter: (mid) => Game.canEquip(mid, id) });
+            const who = can.length === 1 ? can[0] : await Menu.pickMember({ title: `${it.name} — 누가 장비할까?`, filter: (mid) => Game.canEquip(mid, id), right: (mid) => Game.equipDiffText(mid, id) });
             if (who) {
               const old = Game.state.members[who].equip[it.kind];
               Game.equip(who, it.kind, id);

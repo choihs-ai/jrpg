@@ -35,7 +35,7 @@ defMap('field', {
       'TYTT.."..".ZZZZZ...,..",.....,.:........T...TT.........Y,.T~Y.YT', // 27
       'T.TT.".."..TTTTY.T.."..........:........YY..Y...........Y..."Y.T', // 28
       'TTTT"..".."TTTT.T.Y.,".........:...,....YTT.....,...,,.T......YT', // 29
-      'T.TTTTTTTTTTTTY"T.T...."..,....:::::::::::::::::::K.,,.T..YT..YT', // 30
+      'T.TTTTTTTTTTTTY"T.T...."..,....:::::::::::::::::::K:::::::::::::', // 30
       'TTTTTTTTTTTTTT.Y..............S:............"..,......,.......YT', // 31
       'T.Y..T..TT..,TYT"TT............:.....,..T.T...,.,......T..YTY..T', // 32
       'T"YT.T.YY.T,TT...T.........."..:............YT....,....YY..TYY.T', // 33
@@ -69,6 +69,10 @@ defMap('field', {
     { x: 31, y: 38, to: 'rivel', tx: 19, ty: 27, dir: 'up' },
     { x: 50, y: 30, to: 'cabin', tx: 4, ty: 5, dir: 'up', sfx: 'door' },
     { x: 31, y: 5, to: 'ruins1', tx: 15, ty: 21, dir: 'up', sfx: 'stairs' },
+    {
+      x: 63, y: 30, to: 'highway', tx: 1, ty: 16, dir: 'right', cond: () => Game.flag('chapter1_done'),
+      blocked: async () => { await S.say(null, '동쪽 가도로 이어지는 길이다. 리벨 경비대의 통제 표지판이 서 있다.\n「마물 출몰로 통행 금지 ─ 마을의 일이 정리될 때까지」'); },
+    },
   ],
   triggers: [
     { x: 30, y: 15, w: 3, h: 2, when: () => !Game.flag('linette_joined'), run: () => Story.passEvent() },
@@ -86,7 +90,7 @@ defMap('field', {
     { id: 'bau', x: 7, y: 27, look: 'critter:dog', dir: 'left', move: 'turn', show: () => Quests.isActive('s_dog') && Quests.stage('s_dog') === 0, talk: async () => { await Story.bau(); } },
   ],
   objects: [
-    { type: 'sign', x: 30, y: 31, text: '↑ 북쪽 고개 · 고대 유적\n→ 동쪽 숲 · 사냥꾼의 오두막\n↓ 리벨 마을' },
+    { type: 'sign', x: 30, y: 31, text: '↑ 북쪽 고개 · 고대 유적\n→ 동쪽 숲 · 사냥꾼의 오두막 · 은빛 가도(왕도 방면)\n↓ 리벨 마을' },
     { type: 'sign', x: 30, y: 19, text: '경고! 이 앞 북쪽 고개에 거대 멧돼지 「철엄니」 출몰.\n충분히 준비하지 않은 여행자는 돌아갈 것. ─ 리벨 경비대' },
     { type: 'sign', x: 33, y: 36, text: '↓ 리벨 마을\n「별이 노래하는 마을에 오신 것을 환영합니다」' },
     { type: 'gather', id: 'mh1', x: 22, y: 35, item: 'moonherb', msg: '은은하게 빛나는 풀을 발견했다.' },

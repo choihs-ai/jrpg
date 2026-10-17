@@ -13,7 +13,7 @@ function grid(map, allFlags) {
   return rt;
 }
 function solidObj(map, x, y, allFlags) {
-  return map.objects.some((o) => o.x === x && o.y === y && (o.type === 'chest' || o.type === 'lever' || o.solid === true) && !(allFlags && o.show));
+  return map.objects.some((o) => o.x === x && o.y === y && (o.type === 'chest' || o.type === 'lever' || o.type === 'dial' || o.solid === true) && !(allFlags && o.show));
 }
 function walkable(map, rt, x, y, allFlags) {
   if (x < 0 || y < 0 || x >= map.w || y >= map.h) return false;
@@ -52,6 +52,8 @@ addEntry('inn', 8, 3, 'newgame');
 addEntry('shrine', 6, 6, 'respawn');
 addEntry('cellar', 1, 2, 'well');
 addEntry('rivel', 19, 27, 'returnwing');
+addEntry('capital', 23, 37, 'returnwing');
+addEntry('cap_inn', 9, 7, 'respawn');
 
 const usedIds = new Set();
 for (const id in MAPS) {
@@ -76,7 +78,7 @@ for (const id in MAPS) {
   for (const w of m.warps) if (!adjReach(w.x, w.y)) err(`${id} warp (${w.x},${w.y}) unreachable`);
   for (const n of m.npcs) {
     if (n.x < 0 || n.y < 0 || n.x >= m.w || n.y >= m.h) { err(`${id} npc ${n.id} out of bounds`); continue; }
-    if (TILES[m.tiles[n.y][n.x]].solid) err(`${id} npc ${n.id} on solid tile '${m.tiles[n.y][n.x]}'`);
+    if (TILES[rtAll[n.y][n.x]].solid) err(`${id} npc ${n.id} on solid tile '${rtAll[n.y][n.x]}'`);
     // 카운터 너머 대화 허용
     const counterAdj = D4.some(([dx, dy]) => { const cx = n.x + dx, cy = n.y + dy; return TILES[m.tiles[cy] && m.tiles[cy][cx]] && TILES[m.tiles[cy][cx]].counter && reach.has((cx + dx) + ',' + (cy + dy)); });
     if (n.talk && !adjReach(n.x, n.y) && !counterAdj && n.show !== undefined && n.id !== 'bran_burst') warn(`${id} npc ${n.id} may be unreachable`);
@@ -120,6 +122,20 @@ for (const qid in QUESTS) for (const st of QUESTS[qid].stages) {
   const rf2 = (() => { const save = f.objects; f.objects = save.concat([{ type: 'block', x: ironNpc.x, y: ironNpc.y, solid: true }]); const r2 = bfs(f, [[31, 39]], false); f.objects = save; return r2; })();
   if (rf2.has('31,6')) err('field: ruins reachable while Ironfang blocks the pass');
   if (!rf.has('31,6')) err('field: ruins not reachable even after Ironfang');
+}
+// 제2장 관문
+{
+  const withBlock = (m, blocks, start) => { const save = m.objects; m.objects = save.concat(blocks.map(([x, y]) => ({ type: 'block', x, y, solid: true }))); const r = bfs(m, [start], false); m.objects = save; return r; };
+  const hw = MAPS.highway;
+  const v = hw.npcs.find((n) => n.id === 'vane_hw');
+  if (withBlock(hw, [[v.x, v.y]], [1, 16]).has('51,16')) err('highway: capital reachable while Vane blocks the bridge');
+  if (!bfs(hw, [[1, 16]], false).has('51,16')) err('highway: capital not reachable after Vane');
+  if (bfs(MAPS.sewer1, [[2, 3]], false).has('30,17')) err('sewer1: stairs reachable without valve');
+  if (!bfs(MAPS.sewer1, [[2, 3]], true).has('30,17')) err('sewer1: stairs unreachable even with valve');
+  if (bfs(MAPS.sewer2, [[3, 18]], false).has('16,3')) err('sewer2: ladder reachable without valves');
+  if (!bfs(MAPS.sewer2, [[3, 18]], true).has('16,3')) err('sewer2: ladder unreachable with valves');
+  if (bfs(MAPS.tower2, [[20, 17]], false).has('3,3')) err('tower2: stairs reachable without dials');
+  if (!bfs(MAPS.tower2, [[20, 17]], true).has('3,3')) err('tower2: stairs unreachable with dials');
 }
 // 별조각 8개
 const stars = [];

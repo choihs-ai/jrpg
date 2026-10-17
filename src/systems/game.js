@@ -26,6 +26,7 @@ const Game = (() => {
       ward: 0,
       kills: {},
       seen: {},
+      known: {},
       visited: {},
       starsGiven: 0,
       created: Date.now(),
@@ -152,6 +153,52 @@ const Game = (() => {
     return true;
   }
 
+  // 장비를 바꿨을 때의 능력치 변화 (상점·도구창 공용)
+  //  → { state: 'cant' | 'equipped' | 'diff', diffs: [['공', +3], ...] }
+  function equipDiff(id, itemId) {
+    const it = ITEMS[itemId];
+    if (!canEquip(id, itemId)) return { state: 'cant', diffs: [] };
+    const eq = Object.assign({}, state.members[id].equip);
+    if (eq[it.kind] === itemId) return { state: 'equipped', diffs: [] };
+    eq[it.kind] = itemId;
+    const cur = stats(id), nxt = stats(id, eq);
+    const diffs = [['maxhp', 'HP'], ['maxmp', 'MP'], ['atk', '공'], ['def', '방'], ['mag', '마'], ['spd', '민']].map(([k, n]) => [n, nxt[k] - cur[k]]).filter(([, d]) => d !== 0);
+    return { state: 'diff', diffs };
+  }
+  function equipDiffText(id, itemId) {
+    const r = equipDiff(id, itemId);
+    if (r.state === 'cant') return '[d]장비 불가[/]';
+    if (r.state === 'equipped') return '[y]장비 중[/]';
+    return r.diffs.length ? r.diffs.map(([n, d]) => `${n}${d > 0 ? '[g]+' + d : '[r]' + d}[/]`).join(' ') : '[d]변화 없음[/]';
+  }
+
+  // ── 마물 도감: 전투에서 드러난 속성 상성을 영구히 기억 ──
+  //  known[monsterId][element] = 배율  (돌려주는 값: 새로 알게 됐는가)
+  function learnElem(defId, el, mult) {
+    if (!defId || !el) return false;
+    const k = state.known || (state.known = {});
+    const e = k[defId] || (k[defId] = {});
+    const isNew = e[el] !== mult;
+    e[el] = mult;
+    return isNew;
+  }
+  const knownElem = (defId, el) => { const e = state.known && state.known[defId]; return e && e[el] !== undefined ? e[el] : undefined; };
+  // '약점: 불 · 내성: 얼음' 같은 요약 (모르면 빈 문자열)
+  function knownSummary(defId) {
+    const e = (state.known && state.known[defId]) || {};
+    const weak = [], res = [], immune = [];
+    for (const el in ELEMENTS) {
+      const m = e[el];
+      if (m === undefined) continue;
+      if (m > 1) weak.push(ELEMENTS[el]); else if (m === 0) immune.push(ELEMENTS[el]); else if (m < 1) res.push(ELEMENTS[el]);
+    }
+    const parts = [];
+    if (weak.length) parts.push(`[y]약점 ${weak.join('·')}[/]`);
+    if (res.length) parts.push(`[b]내성 ${res.join('·')}[/]`);
+    if (immune.length) parts.push(`[r]무효 ${immune.join('·')}[/]`);
+    return parts.join('  ');
+  }
+
   // ── 인벤토리 ──
   function count(itemId) { return state.inv[itemId] || 0; }
   function addItem(itemId, n = 1, force = false) {
@@ -204,8 +251,17 @@ const Game = (() => {
 
   // 메인 스토리 진행도 (NPC 대사 분기 기준)
   //  0 깨어남 · 1 장로 만남 · 2 사냥꾼 방문 · 3 철엄니 격파 · 4 봉인 확인 · 5 미오 합류 · 6 봉인 해제 · 7 벨가르 격파 · 8 1장 완료
+  //  9 2장 출발 · 10 베인 격파 · 11 왕도 도착 · 12 학장 면담 · 13 브란 입단 · 14 늙은 이빨 격파 · 15 카산드라 격파 · 16 2장 완료
   function progress() {
     const f = state.flags;
+    if (f.chapter2_done) return 16;
+    if (f.cassandra_defeated) return 15;
+    if (f.croc_defeated) return 14;
+    if (f.bran_knight) return 13;
+    if (f.met_dean) return 12;
+    if (f.reached_capital) return 11;
+    if (f.vane_defeated) return 10;
+    if (f.ch2_started) return 9;
     if (f.chapter1_done) return 8;
     if (f.velgar_defeated) return 7;
     if (f.seal_opened) return 6;
@@ -222,7 +278,7 @@ const Game = (() => {
     get state() { return state; },
     set state(s) { state = s; },
     newState, join, leave, member, name, stats, baseStats, clampMember, addExp,
-    canEquip, equip, count, addItem, removeItem, itemList, ownedTotal,
+    canEquip, equip, equipDiff, equipDiffText, learnElem, knownElem, knownSummary, count, addItem, removeItem, itemList, ownedTotal,
     flag, setFlag, activeIds, aliveIds, healAll, partyAvgLevel, progress,
     heroName: () => (state ? state.heroName : '하루'),
     get gold() { return state.gold; },

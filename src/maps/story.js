@@ -104,6 +104,7 @@ const Story = {
       3: '철엄니를 쫓아냈다고? …흥, 풋내기는 취소다.',
       6: '유적 안은 빛이 들지 않아. 해골들은 빛을 싫어한다는 얘기가 있지.',
       8: '왕도에 가는 길도 험할 거다. 바우랑 나는 여기서 숲을 지키마.',
+      11: '왕도에 다녀왔다고? 사람 많은 데는 질색이다. 바우도 그렇고.',
     }));
   },
 
@@ -371,10 +372,12 @@ const Story = {
     await S.completeQuest('main2');
     Game.setFlag('chapter1_done');
     await Story.chapterCard();
-    await S.say('하르도 장로', '왕도로 떠나기 전에 마을 사람들에게 인사라도 하고 가게. 다들 자네들 이야기를 듣고 싶어 할 걸세.');
+    await S.say('하르도 장로', ['왕도로 떠나기 전에 마을 사람들에게 인사라도 하고 가게. 다들 자네들 이야기를 듣고 싶어 할 걸세.', '왕도는 평원 동쪽 끝, 은빛 가도를 따라가면 된다네.']);
+    await Story.beginChapter2(true);
     if (await S.yesno(null, '여기까지의 모험을 기록할까요?')) await Menu.saveScreen();
   },
-  async chapterCard() {
+  async chapterCard(opts = {}) {
+    const o = Object.assign({ num: '제1장', title: '잠든 종의 유적', next: 'To be continued ─ 제2장 「왕도로 가는 길」' }, opts);
     Sound.bgm('title');
     await Engine.fadeOut(800);
     const card = {
@@ -387,12 +390,12 @@ const Story = {
         for (let i = 0; i < 60; i++) { const x = (i * 97) % Engine.W, y = (i * 53) % 300; ctx.fillStyle = `rgba(255,255,255,${0.3 + 0.7 * Math.abs(Math.sin(Engine.time + i))})`; ctx.fillRect(x, y, 2, 2); }
         const a = Math.min(1, this.t / 1.2);
         ctx.globalAlpha = a;
-        Text.draw(ctx, '제1장', Engine.W / 2, 120, { size: 22, align: 'center', color: Theme.dim });
-        Text.draw(ctx, '잠든 종의 유적', Engine.W / 2, 152, { size: 38, bold: true, align: 'center', color: Theme.gold });
+        Text.draw(ctx, o.num, Engine.W / 2, 120, { size: 22, align: 'center', color: Theme.dim });
+        Text.draw(ctx, o.title, Engine.W / 2, 152, { size: 38, bold: true, align: 'center', color: Theme.gold });
         Text.draw(ctx, '── 완 ──', Engine.W / 2, 208, { size: 20, align: 'center' });
         const s = Game.state;
         Text.draw(ctx, `플레이 시간 ${Util.fmtTime(s.playTime)}   ·   ${s.heroName} Lv ${s.members.hero.level}   ·   별조각 ${s.starsGiven + Game.count('star')}/8`, Engine.W / 2, 268, { size: 16, align: 'center', color: Theme.dim });
-        Text.draw(ctx, 'To be continued ─ 제2장 「왕도로 가는 길」', Engine.W / 2, 330, { size: 18, align: 'center', color: '#bcd8ff' });
+        Text.draw(ctx, o.next, Engine.W / 2, 330, { size: 18, align: 'center', color: '#bcd8ff' });
         Text.draw(ctx, '이후에도 자유롭게 탐험하며 남은 의뢰를 해결할 수 있습니다.', Engine.W / 2, 372, { size: 15, align: 'center', color: Theme.dim });
         if (this.t > 1.2 && Math.floor(Engine.time * 2) % 2 === 0) Text.draw(ctx, '▼', Engine.W / 2, 420, { size: 18, align: 'center', color: Theme.gold });
         ctx.globalAlpha = 1;

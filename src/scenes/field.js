@@ -42,7 +42,7 @@ const Field = (() => {
     return true;
   }
   function objSolid(o) {
-    return ['chest', 'lever', 'note-solid', 'block'].includes(o.type) || o.solid === true;
+    return ['chest', 'lever', 'dial', 'note-solid', 'block'].includes(o.type) || o.solid === true;
   }
   const npcAt = (x, y) => npcs.find((n) => n.visible && ((n.x === x && n.y === y) || (n.moving && n.fromX === x && n.fromY === y)));
   function blocked(x, y, who) {
@@ -358,6 +358,16 @@ const Field = (() => {
         break;
       }
       case 'lever': {
+        // 수문 밸브는 한 번 열면 그대로 둔다 (되돌려서 길이 막히는 일이 없도록)
+        if (o.art === 'valve' && Game.flag(o.flag)) { await S.say(null, '수문 밸브는 이미 활짝 열려 있다.'); break; }
+        if (o.art === 'valve') {
+          Game.setFlag(o.flag, true);
+          Sound.sfx('door'); Engine.shake(2, 0.3);
+          await S.say(null, '녹슨 밸브를 힘껏 돌렸다… 끼기긱, 쿠르르르──');
+          if (o.after) await o.after(true);
+          refreshTiles();
+          break;
+        }
         const on = !Game.flag(o.flag);
         Game.setFlag(o.flag, on);
         Sound.sfx('door');
@@ -367,6 +377,9 @@ const Field = (() => {
         refreshTiles();
         break;
       }
+      case 'dial':
+        await Dials.turn(o);
+        break;
       case 'event':
       case 'block':
         if (o.run) await o.run(o);
@@ -578,7 +591,11 @@ const Field = (() => {
       const sx = o.x * TS - cam.x, sy = o.y * TS - cam.y;
       if (sx < -48 || sy < -48 || sx > Engine.LW + 48 || sy > Engine.LH + 48) continue;
       if (o.type === 'chest') g.drawImage(ObjArt.chest(Game.flag('chest:' + o.id), o.color), sx, sy);
-      else if (o.type === 'lever') g.drawImage(ObjArt.lever(!!Game.flag(o.flag)), sx, sy);
+      else if (o.type === 'lever') g.drawImage(o.art === 'valve' ? ObjArt.valve(!!Game.flag(o.flag)) : ObjArt.lever(!!Game.flag(o.flag)), sx, sy);
+      else if (o.type === 'dial') g.drawImage(ObjArt.dial(Dials.pos(o.id) % 4), sx, sy);
+      else if (o.art === 'manhole') g.drawImage(ObjArt.manhole(), sx, sy);
+      else if (o.art === 'plaque') g.drawImage(ObjArt.plaque(), sx, sy);
+      else if (o.type === 'deco' && o.draw === 'timebell') g.drawImage(ObjArt.timebell(!!Game.flag('cassandra_defeated'), T), sx - 24, sy - 30);
       else if (o.type === 'gather') g.drawImage(ObjArt.herb(Math.floor(T * 2) % 2), sx, sy);
       else if (o.type === 'note') g.drawImage(ObjArt.note(), sx, sy);
       else if (o.type === 'rope') g.drawImage(ObjArt.rope(), sx, sy);

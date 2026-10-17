@@ -4,7 +4,9 @@
 // ─────────────────────────────────────────────────────────────
 const MapView = (() => {
   const LABELS = {
-    field: [[31, 38, '리벨 마을'], [50, 30, '사냥꾼의 오두막'], [31, 13, '북쪽 고개'], [31, 4, '잠든 종의 유적'], [8, 26, '서쪽 숲'], [8, 42, '은빛 호수'], [54, 36, '동쪽 숲']],
+    field: [[31, 38, '리벨 마을'], [50, 30, '사냥꾼의 오두막'], [31, 13, '북쪽 고개'], [31, 4, '잠든 종의 유적'], [8, 26, '서쪽 숲'], [8, 42, '은빛 호수'], [54, 36, '동쪽 숲'], [60, 30, '은빛 가도 →']],
+    highway: [[3, 16, '← 평원'], [14, 11, '역참'], [27, 15, '은빛 다리'], [46, 4, '늑대 굴'], [51, 16, '왕도']],
+    capital: [[7, 8, '마도학원'], [23, 3, '왕성'], [40, 8, '기사단'], [6, 19, '여관'], [40, 19, '강철 사자'], [40, 32, '약방'], [6, 32, '보육원'], [16, 31, '음유시인'], [23, 18, '분수 광장'], [9, 37, '맨홀']],
     rivel: [[18, 3, '장로의 집'], [29, 3, '신전'], [6, 8, '여관'], [6, 15, '대장간'], [32, 9, '도구점'], [31, 15, '빵집'], [5, 21, '오웬의 집'], [12, 21, '풍차'], [32, 22, '피포의 집'], [19, 14, '우물']],
   };
   // 실내 → 바깥 지도와 위치
@@ -13,6 +15,23 @@ const MapView = (() => {
     if (!m || m.kind !== 'interior') return null;
     const w = m.warps[0];
     return w ? { map: w.to, x: w.tx, y: w.ty } : null;
+  }
+  // 던전·마을 → 그곳으로 들어가는 바깥 지도의 입구
+  const ENTRY = {
+    rivel: ['field', 31, 38], cellar: ['rivel', 19, 14], ruins1: ['field', 31, 5], ruins2: ['field', 31, 5], bell: ['field', 31, 5],
+    capital: ['highway', 52, 16], sewer1: ['capital', 9, 37], sewer2: ['capital', 9, 37], tower1: ['capital', 7, 9], tower2: ['capital', 7, 9], tower3: ['capital', 7, 9],
+  };
+  // [지도, x, y] 를 바깥쪽으로 따라간 사슬
+  function chain(mapId, x, y) {
+    const out = [[mapId, x, y]];
+    for (let i = 0; i < 6; i++) {
+      const [m] = out[out.length - 1];
+      const o = outerOf(m);
+      if (o) { out.push([o.map, o.x, o.y]); continue; }
+      if (ENTRY[m]) { out.push(ENTRY[m].slice()); continue; }
+      break;
+    }
+    return out;
   }
   const cache = {};
   function mini(mapId, fog) {
@@ -32,14 +51,11 @@ const MapView = (() => {
 
   async function open() {
     const cur = Field.map.id;
-    const outer = outerOf(cur);
-    const views = [];
-    if (Field.map.kind === 'interior') { if (outer) views.push({ map: outer.map, at: [outer.x, outer.y] }); }
-    else views.push({ map: cur, at: [Field.player.x, Field.player.y] });
-    if (!views.length || views[0].map !== 'field') {
-      const fieldAt = views[0] && views[0].map === 'rivel' ? [31, 38] : cur.startsWith('ruins') || cur === 'bell' ? [31, 5] : cur === 'cellar' ? [31, 38] : cur === 'cabin' ? [50, 30] : [31, 38];
-      views.push({ map: 'field', at: fieldAt });
-    }
+    const views = chain(cur, Field.player.x, Field.player.y).filter(([m]) => MAPS[m].kind !== 'interior').map(([m, x, y]) => ({ map: m, at: [x, y] }));
+    // 다른 쪽 대지도도 볼 수 있게 (평원 ↔ 은빛 가도)
+    if (!views.some((v) => v.map === 'field')) views.push({ map: 'field', at: [62, 30] });
+    if (Game.flag('highway_first') && !views.some((v) => v.map === 'highway')) views.push({ map: 'highway', at: [1, 16] });
+
     let vi = 0;
     Sound.sfx('menu');
     await new Promise((resolve) => {
@@ -80,16 +96,12 @@ const MapView = (() => {
           if (goal && goal.target) marks.push([goal.target, Theme.gold, '★']);
           for (const id of Object.keys(QUESTS)) if (QUESTS[id].type === 'sub' && Quests.isActive(id)) { const t = Quests.target(id); if (t) marks.push([t, Theme.green, '◆']); }
           for (const [t, col, ch] of marks) {
-            let tm = t.map, tx = t.x, ty = t.y;
-            const o = outerOf(tm);
-            if (o) { tm = o.map; tx = o.x; ty = o.y; }
-            if (tm !== v.map) {
-              // 다른 지도 안의 목적지 → 입구 쪽으로 표시
-              if (v.map === 'field' && (tm === 'rivel' || tm === 'cellar')) { tx = 31; ty = 38; }
-              else if (v.map === 'rivel' && tm === 'cellar') { tx = 19; ty = 14; }
-              else if (v.map === 'field' && (tm.startsWith('ruins') || tm === 'bell')) { tx = 31; ty = 5; }
-              else continue;
-            }
+            // 다른 지도 안의 목적지 → 이 지도의 입구 쪽으로 표시
+            let hit = chain(t.map, t.x, t.y).find(([m]) => m === v.map);
+            if (!hit && v.map === 'field' && chain(t.map, t.x, t.y).some(([m]) => m === 'highway')) hit = ['field', 62, 30];
+            if (!hit && v.map === 'highway' && chain(t.map, t.x, t.y).some(([m]) => m === 'field')) hit = ['highway', 1, 16];
+            if (!hit) continue;
+            const [, tx, ty] = hit;
             const px = ox + (tx + 0.5) * s, py = oy + (ty + 0.5) * s;
             const pulse = 1 + Math.sin(Engine.time * 5) * 0.2;
             Text.draw(ctx, ch, px, py - 10 * pulse, { size: Math.round(18 * pulse), align: 'center', color: col, outline: 3, shadow: false });

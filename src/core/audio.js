@@ -98,6 +98,20 @@ const Sound = (() => {
       chords: 'C F G C',
       mel: `G4.2 C5.2 E5.2 G5.6 E5.2 G5.2 A5.2 G5.2 F5.2 E5.2 D5.4 G5.4 F5.2 E5.2 C6.12 r.4`,
     },
+    capital: {
+      bpm: 132, bar: 16, loop: true, bass: 'pump', arp: 'none', drums: 'march', lead: 'p25', leadVol: 0.085, harmony: true,
+      chords: 'C G Am F C F G C Am Em F C Dm G F G',
+      mel: `E5.4 G5.4 C6.4 G5.4 D5.4 G5.4 B5.6 A5.2 C6.4 B5.2 A5.2 E5.4 A5.4 F5.4 A5.4 C6.4 A5.4
+            G5.4 E5.4 C5.4 E5.4 F5.2 G5.2 A5.4 C6.4 A5.4 G5.4 F5.2 E5.2 D5.4 B4.4 C5.12 r.4
+            A5.4 C6.4 E6.6 D6.2 B5.4 G5.4 E5.8 A5.4 C6.4 F6.6 E6.2 E6.4 D6.2 C6.2 G5.8
+            F5.4 A5.4 D6.4 C6.4 B5.4 D6.4 G5.8 A5.2 B5.2 C6.4 A5.4 F5.4 G5.4 A5.2 B5.2 D6.8`,
+    },
+    tower: {
+      bpm: 100, bar: 16, loop: true, bass: 'long', arp: 'up8', drums: 'pulse', lead: 'p12', leadVol: 0.08,
+      chords: 'Dm A Bb A Dm Gm A A',
+      mel: `D5.4 F5.4 A5.4 F5.4 E5.4 C#5.4 A4.8 D5.4 F5.4 Bb5.6 A5.2 G5.4 E5.4 C#5.8
+            F5.4 A5.4 D6.6 C6.2 Bb5.4 A5.2 G5.2 D5.8 E5.4 G5.4 A5.4 C#6.4 A5.12 r.4`,
+    },
     levelup: { bpm: 170, bar: 16, loop: false, bass: 'none', arp: 'none', drums: 'none', lead: 'p25', leadVol: 0.1, chords: 'C', mel: `C5.2 E5.2 G5.2 C6.4 r.2 G5.2 C6.8` },
     item: { bpm: 150, bar: 16, loop: false, bass: 'none', arp: 'none', drums: 'none', lead: 'p25', leadVol: 0.1, chords: 'G', mel: `G5.2 A5.2 B5.2 D6.6 r.4` },
     inn: {

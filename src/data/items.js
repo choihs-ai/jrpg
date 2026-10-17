@@ -16,7 +16,9 @@ const ITEMS = {
   feather: { name: '되살림 깃털', kind: 'consumable', price: 150, desc: '불사조의 깃털이라 불리는 물건. 쓰러진 동료를 HP 절반으로 되살린다.', use: { type: 'revive', pct: 0.5, target: 'deadAlly' }, battle: true, field: true },
   starwater: { name: '별의 물', kind: 'consumable', price: 400, desc: '별빛을 머금은 물. 아군 한 명의 HP와 MP를 모두 회복한다.', use: { type: 'full', target: 'ally' }, battle: true, field: true },
   firebomb: { name: '화염병', kind: 'consumable', price: 45, desc: '던지면 터지는 기름병. 적 전체에 불 속성 피해(약 30).', use: { type: 'damage', power: 30, element: 'fire', target: 'enemies', anim: 'fire' }, battle: true, field: false },
-  return_wing: { name: '귀환의 날개', kind: 'consumable', price: 20, desc: '던지면 리벨 마을로 돌아간다. (필드·던전에서 사용)', use: { type: 'return', target: 'none' }, battle: false, field: true },
+  return_wing: { name: '귀환의 날개', kind: 'consumable', price: 20, desc: '던지면 가 본 적 있는 마을(리벨·왕도)로 돌아간다. (필드·던전에서 사용)', use: { type: 'return', target: 'none' }, battle: false, field: true },
+  hi_potion: { name: '고급 상처약', kind: 'consumable', price: 90, desc: '왕도 약방의 고급 상처약. HP를 약 200 회복한다.', use: { type: 'heal', amount: 200, target: 'ally' }, battle: true, field: true },
+  thunder_flask: { name: '번개병', kind: 'consumable', price: 80, desc: '마도학원 실험실에서 나온 번개를 가둔 병. 적 전체에 번개 속성 피해(약 60).', use: { type: 'damage', power: 60, element: 'thunder', target: 'enemies', anim: 'thunder' }, battle: true, field: false },
   incense: { name: '정령의 향', kind: 'consumable', price: 25, desc: '마물이 싫어하는 향. 한동안(약 120걸음) 마물과 마주치지 않는다.', use: { type: 'ward', steps: 120, target: 'none' }, battle: false, field: true },
 
   // ── 무기 ──
@@ -31,6 +33,11 @@ const ITEMS = {
   blessed_staff: { name: '축복의 지팡이', kind: 'weapon', price: 500, stats: { atk: 6, mag: 10 }, who: ['mio', 'linette'], healBonus: 0.15, desc: '고대 신관의 지팡이. 마력 +10, 회복 주문 효과 +15%.' },
   venom_dagger: { name: '독니 단검', kind: 'weapon', price: 480, stats: { atk: 16, spd: 3 }, who: ['nell', 'hero'], onHit: { poison: 0.25 }, desc: '칼날에 독이 스민 단검. 공격 시 가끔 독을 입힌다.' },
   star_blade: { name: '별빛 검', kind: 'weapon', price: 0, stats: { atk: 26, mag: 4 }, who: ['hero'], element: 'light', desc: '별조각을 녹여 만든 검. 공격에 빛 속성이 깃든다.' },
+  mythril_sword: { name: '미스릴 검', kind: 'weapon', price: 1150, stats: { atk: 32 }, who: ['hero', 'bran'], desc: '가볍고 단단한 미스릴로 벼린 검. 왕도 기사들이 동경하는 한 자루.' },
+  war_axe: { name: '전투 도끼', kind: 'weapon', price: 1300, stats: { atk: 36, spd: -2 }, who: ['bran'], desc: '양날의 거대한 도끼. 묵직해서 조금 느려진다. 민첩 -2.' },
+  silver_dagger: { name: '은빛 단검', kind: 'weapon', price: 980, stats: { atk: 26, spd: 5 }, who: ['nell', 'hero', 'linette'], element: 'light', desc: '은으로 도금한 단검. 공격에 빛 속성이 깃든다. 민첩 +5.' },
+  rune_staff: { name: '룬 지팡이', kind: 'weapon', price: 1100, stats: { atk: 8, mag: 16 }, who: ['linette', 'mio'], desc: '마도학원 교수들이 쓰는 룬 지팡이. 마력 +16.' },
+  veil_tome: { name: '장막의 마도서', kind: 'weapon', price: 0, stats: { atk: 4, mag: 22, mp: 15 }, who: ['linette'], desc: '금서를 되찾아 준 답례로 받은 마도서. 마력 +22, 최대 MP +15.' },
   dorn_axe: { name: '드른의 도끼', kind: 'weapon', price: 0, stats: { atk: 28, def: 3 }, who: ['bran'], desc: '아버지 드른이 아들을 위해 밤새 벼린 도끼. 방어 +3.' },
 
   // ── 갑옷 ──
@@ -42,6 +49,9 @@ const ITEMS = {
   vestment: { name: '무녀복', kind: 'armor', price: 160, stats: { def: 7, mag: 2 }, who: ['mio'], desc: '리벨 신전의 무녀복. 마력 +2.' },
   chain_mail: { name: '사슬 갑옷', kind: 'armor', price: 380, stats: { def: 14 }, who: ['hero', 'bran'], desc: '쇠사슬을 촘촘히 엮은 갑옷.' },
   shadow_cloak: { name: '그림자 망토', kind: 'armor', price: 420, stats: { def: 11, spd: 5 }, who: ['nell', 'hero'], desc: '어둠에 녹아드는 망토. 민첩 +5.' },
+  mythril_mail: { name: '미스릴 갑옷', kind: 'armor', price: 1200, stats: { def: 22 }, who: ['hero', 'bran'], desc: '미스릴 비늘을 엮은 갑옷. 가볍고 튼튼하다.' },
+  mystic_robe: { name: '신비의 로브', kind: 'armor', price: 1050, stats: { def: 15, mag: 7 }, who: ['linette', 'mio'], desc: '별빛 실로 짠 로브. 마력 +7.' },
+  night_garb: { name: '밤그림자 옷', kind: 'armor', price: 980, stats: { def: 16, spd: 7 }, who: ['nell', 'hero'], desc: '왕도 뒷골목의 장인이 지은 검은 옷. 민첩 +7.' },
   sage_robe: { name: '현자의 로브', kind: 'armor', price: 450, stats: { def: 10, mag: 5 }, who: ['linette', 'mio'], desc: '별무늬가 수놓인 고대 로브. 마력 +5.' },
 
   // ── 방패 ──
@@ -50,11 +60,19 @@ const ITEMS = {
   leather_shield: { name: '가죽 방패', kind: 'shield', price: 95, stats: { def: 6 }, who: ['hero', 'bran', 'nell'], desc: '가죽을 덧댄 가벼운 방패.' },
   iron_shield: { name: '철 방패', kind: 'shield', price: 300, stats: { def: 10 }, who: ['hero', 'bran'], desc: '무겁지만 믿음직한 철 방패.' },
 
+  knight_shield: { name: '기사의 방패', kind: 'shield', price: 900, stats: { def: 15 }, who: ['hero', 'bran'], desc: '수호기사단 문장이 새겨진 방패.' },
+  squire_shield: { name: '견습 기사의 방패', kind: 'shield', price: 0, stats: { def: 13, hp: 20 }, who: ['bran'], desc: '입단 시험을 통과한 견습 기사에게 주어지는 방패. 최대 HP +20.' },
+  buckler: { name: '은 버클러', kind: 'shield', price: 620, stats: { def: 9, spd: 2 }, who: ['hero', 'bran', 'nell', 'linette'], desc: '가벼운 은 방패. 민첩 +2.' },
+
   // ── 투구 ──
   leather_hat: { name: '가죽 모자', kind: 'helm', price: 30, stats: { def: 2 }, who: ALL, desc: '햇볕도 막아주는 가죽 모자.' },
   wizard_hat: { name: '별무늬 모자', kind: 'helm', price: 110, stats: { def: 2, mag: 3 }, who: ['linette', 'mio'], desc: '마도학원 학생들이 쓰는 모자. 마력 +3.' },
   iron_helm: { name: '철 투구', kind: 'helm', price: 240, stats: { def: 6 }, who: ['hero', 'bran'], desc: '머리를 단단히 지켜주는 투구.' },
   hairpin: { name: '은방울 머리꽂이', kind: 'helm', price: 260, stats: { def: 4, mag: 2 }, who: ['mio', 'linette', 'nell'], resist: { silence: 1 }, desc: '맑은 소리가 나는 머리꽂이. 침묵에 걸리지 않는다.' },
+
+  silver_helm: { name: '은 투구', kind: 'helm', price: 760, stats: { def: 10 }, who: ['hero', 'bran'], desc: '은으로 덧댄 투구.' },
+  feather_hat: { name: '깃털 모자', kind: 'helm', price: 680, stats: { def: 6, mag: 3, spd: 3 }, who: ['linette', 'mio', 'nell', 'hero'], desc: '축제 기간에 유행하는 깃털 모자. 마력 +3, 민첩 +3.' },
+  festival_mask: { name: '축제 가면', kind: 'helm', price: 0, stats: { def: 5, spd: 6 }, who: ALL, resist: { sleep: 1 }, desc: '별내림 축제의 가면. 쓰면 기분이 들떠 잠이 오지 않는다. 민첩 +6.' },
 
   // ── 장신구 ──
   swift_boots: { name: '날쌘 장화', kind: 'accessory', price: 300, stats: { spd: 10 }, who: ALL, desc: '사냥꾼 고르도가 아끼던 장화. 민첩 +10.' },
@@ -64,6 +82,9 @@ const ITEMS = {
   sage_earring: { name: '지혜의 귀걸이', kind: 'accessory', price: 380, stats: { mag: 6, mp: 10 }, who: ALL, desc: '마력 +6, 최대 MP +10.' },
   antidote_bangle: { name: '해독의 팔찌', kind: 'accessory', price: 180, stats: {}, who: ALL, resist: { poison: 1 }, desc: '독에 걸리지 않게 해주는 팔찌.' },
   guard_badge: { name: '경비대 증표', kind: 'accessory', price: 200, stats: { def: 3, spd: 3 }, who: ALL, desc: '리벨 경비대가 공로자에게 주는 증표. 방어 +3, 민첩 +3.' },
+  wolf_fang: { name: '회색갈기의 송곳니', kind: 'accessory', price: 600, stats: { atk: 7, spd: 4 }, who: ALL, desc: '가도를 공포에 떨게 한 늑대 우두머리의 송곳니. 공격 +7, 민첩 +4.' },
+  orphan_charm: { name: '별바라기 부적', kind: 'accessory', price: 0, stats: { def: 4, mag: 4 }, who: ALL, resist: { paralyze: 1 }, desc: '보육원 아이들이 한 땀 한 땀 꿰매 만든 부적. 마비에 걸리지 않는다.' },
+  warden_badge: { name: '별의 수호대 문장', kind: 'accessory', price: 0, stats: { atk: 6, def: 6, mag: 6, spd: 6 }, who: ALL, desc: '왕국이 「별의 수호대」에게 내린 문장. 모든 능력 +6.' },
   courage_token: { name: '용기의 증표', kind: 'accessory', price: 0, stats: { atk: 4, def: 4, spd: 4 }, who: ALL, desc: '리벨 마을을 구한 영웅에게 장로가 건넨 증표. 공격·방어·민첩 +4.' },
 
   // ── 귀중품 (퀘스트) ──
@@ -77,6 +98,13 @@ const ITEMS = {
   chime: { name: '별빛 방울', kind: 'key', price: 0, desc: '리벨 신전에 전해지는 방울. 흔들면 별이 노래하는 듯한 소리가 난다.' },
   note_a: { name: '찢어진 쪽지', kind: 'key', price: 0, desc: '"종은 열쇠를 부르고, 열쇠는 문을 연다. ─ A." 단정한 필체다.' },
   bell_shard: { name: '종의 파편', kind: 'key', price: 0, desc: '벨가르가 남긴 빛나는 종의 파편. 희미하게 따뜻하다.' },
+  choir_score: { name: '성가대의 악보', kind: 'key', price: 0, desc: '집행자 베인이 떨어뜨린 악보 조각. 「제2성부는 시간의 종 아래에서 노래하리라」라고 적혀 있다.' },
+  knight_crest: { name: '기사단 문장', kind: 'key', price: 0, desc: '입단 시험을 통과한 견습 기사의 증표. 왕도의 통제 구역에 드나들 수 있다.' },
+  sewer_key: { name: '수로 열쇠', kind: 'key', price: 0, desc: '왕도 지하수로의 맨홀을 여는 무거운 열쇠.' },
+  veil_book: { name: '금서 「장막 너머의 기록」', kind: 'key', price: 0, desc: '마도학원 금서고에서 사라진 책. 표지에 회색 손자국이 묻어 있다.' },
+  star_candy: { name: '별사탕', kind: 'key', price: 0, desc: '별내림 축제의 별사탕. 축제 광장의 소녀 루나가 찾고 있다.' },
+  elly_letter: { name: '빛바랜 편지', kind: 'key', price: 0, desc: '「아빠, 오늘은 기침이 덜 나요. 별내림 축제에는 같이 갈 수 있겠죠? ─ 엘리」' },
+  time_heart: { name: '시간의 심장', kind: 'key', price: 0, desc: '시간의 종에서 빠져나온 빛나는 구슬. 째깍, 째깍… 손안에서 고동친다.' },
   star: { name: '별조각', kind: 'key', price: 0, desc: '밤하늘에서 떨어졌다는 작은 별조각. 괴짜 수집가 피포가 모으고 있다.' },
 };
 for (const id in ITEMS) ITEMS[id].id = id;

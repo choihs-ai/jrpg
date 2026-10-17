@@ -45,6 +45,12 @@ const TILES = {
   'V': { name: 'iconTown' },
   'U': { name: 'iconRuins' },
   'K': { name: 'iconCabin' },
+  'C': { name: 'iconCapital' },
+  // 왕도
+  'M': { name: 'marble', road: true },
+  '@': { name: 'fountain', solid: true },
+  'J': { name: 'statue', solid: true },
+  'd': { name: 'stall', solid: true },
   // 실내
   'I': { name: 'wallIn', solid: true },
   'w': { name: 'floorWood' },
@@ -75,6 +81,9 @@ const TILES = {
   '$': { name: 'abyss', solid: true },
   'y': { name: 'caveFloor' },
   'O': { name: 'bellBase', solid: true },
+  'v': { name: 'sludge', solid: true },
+  '+': { name: 'grate' },
+  '1': { name: 'gearWall', solid: true },
   ' ': { name: 'void', solid: true },
 };
 

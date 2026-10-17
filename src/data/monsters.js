@@ -195,6 +195,211 @@ const MONSTERS = {
     // 2단계에서는 한 턴에 두 번 행동하는 경우가 있다
     extraActions(self) { return (self.mem.phase === 2 && self.mem.turn % 3 === 2) ? 1 : 0; },
   },
+
+  // ════════ 제2장 ════════
+  // ── 은빛 가도 ──
+  gray_wolf: {
+    name: '잿빛늑대', art: 'wolf', pal: { body: '#8a8a98', dark: '#5a5a6a', light: '#b8b8c8', mane: '#4a4a58', eye: '#ffd040' },
+    hp: 120, mp: 0, atk: 46, def: 18, mag: 0, spd: 20, exp: 48, gold: 30,
+    elem: { fire: 1.5 }, resist: {}, drops: [{ item: 'herb', p: 0.15 }, { item: 'potion', p: 0.06 }], steal: { item: 'potion', p: 0.4 },
+    actions: [{ s: 'attack', w: 5 }, { s: 'bite', w: 4 }, { s: 'howl', w: 1 }],
+    desc: '가도를 떼지어 떠도는 늑대. 재빠르고, 울부짖으면 공격력이 오른다. 불을 무서워한다.',
+  },
+  stone_beetle: {
+    name: '바위딱정벌레', art: 'beetle', pal: { shell: '#7a6a5a', dark: '#4a3e34', light: '#a89880', horn: '#c8b090', eye: '#ff8040' },
+    hp: 140, mp: 0, atk: 44, def: 58, mag: 0, spd: 6, exp: 52, gold: 34,
+    elem: { thunder: 2.0, ice: 1.25, fire: 0.5 }, resist: { poison: 0.5 }, drops: [{ item: 'potion', p: 0.1 }], steal: { item: 'ether', p: 0.15 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'horn_ram', w: 3 }, { s: 'shell_guard', w: 2 }],
+    desc: '바위처럼 단단한 껍질을 가진 딱정벌레. 물리 공격은 잘 통하지 않지만 번개에 매우 약하다.',
+  },
+  storm_crow: {
+    name: '폭풍까마귀', art: 'crow', pal: { body: '#3a4a6a', dark: '#1e2a44', light: '#7a9ad0', eye: '#ffe040' },
+    hp: 90, mp: 20, atk: 40, def: 16, mag: 28, spd: 22, evade: 0.12, exp: 44, gold: 28,
+    elem: { ice: 1.5, thunder: 0 }, resist: {}, drops: [{ item: 'smelling', p: 0.15 }], steal: { item: 'thunder_flask', p: 0.2 },
+    actions: [{ s: 'peck', w: 4 }, { s: 'storm_cry', w: 3 }, { s: 'attack', w: 2 }],
+    desc: '날개에 번개를 머금은 까마귀. 일행 전체에 번개를 떨어뜨린다. 번개는 통하지 않지만 얼음에 약하다.',
+  },
+  hob_goblin: {
+    name: '홉고블린 강도', art: 'goblin', pal: { skin: '#6a8a4a', dark: '#3e5a2a', cloth: '#6a3a2a', blade: '#d8dce8' },
+    hp: 150, mp: 0, atk: 50, def: 22, mag: 0, spd: 12, exp: 56, gold: 70,
+    elem: { ice: 1.25, light: 1.25 }, resist: {}, drops: [{ item: 'potion', p: 0.15 }, { item: 'buckler', p: 0.03 }], steal: { item: 'hi_potion', p: 0.3 },
+    actions: [{ s: 'attack', w: 5 }, { s: 'tackle', w: 2 }, { s: 'pilfer', w: 2 }],
+    desc: '가도를 지나는 마차를 노리는 덩치 큰 고블린. 주머니를 노린다. 쓰러뜨리면 빼앗긴 돈을 되찾을 수 있다.',
+  },
+  choir_acolyte: {
+    name: '성가대 신도', art: 'cultist', pal: { robe: '#6a6a78', dark: '#3a3a48', trim: '#a8a8b8', eye: '#c040ff', skin: '#d8c0a8' },
+    hp: 110, mp: 60, atk: 30, def: 18, mag: 34, spd: 12, exp: 60, gold: 40,
+    elem: { light: 1.5, dark: 0 }, resist: { poison: 0.3 }, drops: [{ item: 'ether', p: 0.08 }, { item: 'panacea', p: 0.08 }], steal: { item: 'panacea', p: 0.4 },
+    actions: [{ s: 'grey_hymn', w: 4 }, { s: 'hush', w: 2 }, { s: 'choir_mend', w: 2 }, { s: 'attack', w: 2 }],
+    desc: '잿빛 성가대의 말단 신도. 어둠의 찬송과 침묵을 쓰고, 동료를 치료한다. 빛에 약하다.',
+  },
+  // ── 미니 보스: 집행자 베인 ──
+  vane: {
+    name: '집행자 베인', art: 'cultist', boss: true, artScale: 1.35, pal: { robe: '#4a2a3a', dark: '#2a1420', trim: '#c4a050', eye: '#ff4060', skin: '#c8b0a0', blade: '#d8dce8', scythe: true },
+    hp: 1500, mp: 999, atk: 58, def: 26, mag: 40, spd: 14, exp: 900, gold: 500,
+    elem: { light: 1.5, dark: 0 }, resist: { poison: 0.5, sleep: 1, paralyze: 0.5, silence: 0.5 }, drops: [],
+    desc: '잿빛 성가대의 집행자. 처형 선고를 받은 자는 다음 턴에 큰 낫에 베인다. 빛에 약하다.',
+    ai(self, B) {
+      const m = self.mem;
+      m.turn = (m.turn || 0) + 1;
+      if (m.next) { const n = m.next; m.next = null; return { skill: n, target: m.mark }; }
+      const acolytes = B.enemies.filter((e) => e.alive && e.defId === 'choir_acolyte').length;
+      if (!acolytes && self.hp / self.maxhp < 0.6 && (m.calls || 0) < 2) { m.calls = (m.calls || 0) + 1; return { skill: 'acolyte_call' }; }
+      if (m.turn % 3 === 0) { const t = B.pickTarget('party', 'weakest'); m.next = 'execution'; m.mark = t; return { skill: 'mark_doom', target: t }; }
+      if (m.turn % 3 === 1 && Util.chance(0.5)) return { skill: 'dark_wave' };
+      return { skill: 'attack' };
+    },
+  },
+  // ── 현상수배: 회색갈기 ──
+  greymane: {
+    name: '회색갈기', art: 'wolf', boss: true, artScale: 1.6, pal: { body: '#6a6a78', dark: '#3a3a48', light: '#a0a0b0', mane: '#e8e8f0', eye: '#ff3a3a' },
+    hp: 1700, mp: 0, atk: 66, def: 24, mag: 0, spd: 24, exp: 800, gold: 400,
+    elem: { fire: 1.5 }, resist: { poison: 0.5, sleep: 0.7, paralyze: 0.5, silence: 1 }, drops: [{ item: 'hi_potion', p: 1 }],
+    desc: '가도를 공포에 떨게 한 늑대 무리의 우두머리. 무리를 부르고, 일행 전체를 할퀸다. 불에 약하다.',
+    ai(self, B) {
+      const m = self.mem;
+      m.turn = (m.turn || 0) + 1;
+      const pack = B.enemies.filter((e) => e.alive && e.defId === 'gray_wolf').length;
+      if (!pack && (m.calls || 0) < 2 && m.turn > 1) { m.calls = (m.calls || 0) + 1; return { skill: 'pack_call' }; }
+      if (m.turn % 3 === 0) return { skill: 'rend' };
+      if (self.hp / self.maxhp < 0.5 && !m.howled) { m.howled = true; return { skill: 'howl' }; }
+      return { skill: Util.chance(0.6) ? 'bite' : 'attack', target: B.pickTarget('party', Util.chance(0.4) ? 'fragile' : 'random') };
+    },
+  },
+  // ── 입단 시험: 가웨인 ──
+  gawain: {
+    name: '시험관 기사 가웨인', art: 'knight', boss: true, pal: { metal: '#b8bccc', dark: '#7a7e90', trim: '#d8b040', cloth: '#3f63b8', shield: '#3f63b8', blade: '#c8a070', plume: '#c4473a', eye: '#7cc4ff' },
+    hp: 380, mp: 0, atk: 64, def: 24, mag: 0, spd: 12, exp: 300, gold: 0,
+    elem: {}, resist: { poison: 1, sleep: 1, paralyze: 0.6, silence: 1 }, drops: [],
+    desc: '수호기사단의 시험관. 목검이라지만 한 방 한 방이 무겁다. 높이 치켜든 다음 턴의 일격을 조심하자.',
+    ai(self, B) {
+      const m = self.mem;
+      m.turn = (m.turn || 0) + 1;
+      if (m.next) { const n = m.next; m.next = null; return { skill: n }; }
+      if (m.turn % 3 === 0) { m.next = 'heavy_blow'; return { skill: 'ready_blow' }; }
+      if (self.hp / self.maxhp < 0.5 && !m.stance) { m.stance = true; return { skill: 'knight_stance' }; }
+      return { skill: 'attack' };
+    },
+  },
+  // ── 왕도 지하수로 ──
+  sewer_rat: {
+    name: '하수구 쥐', art: 'rat', pal: { body: '#6a5a5a', dark: '#3e3232', light: '#8a7a7a', tail: '#d89a9a', eye: '#ff4040' },
+    hp: 95, mp: 0, atk: 48, def: 18, mag: 0, spd: 22, exp: 40, gold: 18,
+    elem: { fire: 1.25, ice: 1.25 }, resist: {}, drops: [{ item: 'antidote', p: 0.2 }], steal: { item: 'antidote', p: 0.6 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'plague_bite', w: 4 }],
+    desc: '수로에 우글거리는 큰 쥐. 물리면 병균이 옮는다. 떼로 몰려다닌다.',
+  },
+  sludge: {
+    name: '오물 슬라임', art: 'jelly', pal: { body: '#7a8a4a', dark: '#4a5a2a', light: '#a8b878' },
+    hp: 160, mp: 0, atk: 44, def: 22, mag: 20, spd: 6, exp: 55, gold: 30,
+    elem: { fire: 2.0, ice: 0.5 }, resist: { poison: 1 }, drops: [{ item: 'antidote', p: 0.2 }, { item: 'firebomb', p: 0.08 }], steal: { item: 'firebomb', p: 0.3 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'sludge_spit', w: 4 }],
+    desc: '하수가 뭉쳐 생긴 젤리. 독을 뱉는다. 불에 매우 약하고 얼음은 잘 통하지 않는다.',
+  },
+  drain_toad: {
+    name: '수로두꺼비', art: 'toad', pal: { body: '#4a7a6a', dark: '#2a4a3e', belly: '#c8d8a8', spot: '#2a3a2a', eye: '#ffe040' },
+    hp: 180, mp: 0, atk: 52, def: 26, mag: 0, spd: 10, exp: 64, gold: 36,
+    elem: { ice: 1.5, fire: 0.75 }, resist: { poison: 1 }, drops: [{ item: 'smelling', p: 0.15 }], steal: { item: 'smelling', p: 0.5 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'tongue_lash', w: 3 }],
+    desc: '수로에 사는 커다란 두꺼비. 긴 혀로 휘감아 마비시킨다. 얼음에 약하다.',
+  },
+  drowned: {
+    name: '수로의 망령', art: 'echo', pal: { body: '#2a4a6a', dark: '#14243a', light: '#5a8ab8', eye: '#7cf0ff' },
+    hp: 130, mp: 40, atk: 30, def: 20, mag: 38, spd: 12, exp: 66, gold: 30, undead: true,
+    elem: { light: 2.0, dark: 0, ice: 0.5 }, resist: { poison: 1, sleep: 1 }, drops: [{ item: 'ether', p: 0.08 }], steal: { item: 'panacea', p: 0.3 },
+    actions: [{ s: 'dark_bolt', w: 4 }, { s: 'drown_wail', w: 2 }, { s: 'attack', w: 2 }],
+    desc: '수로에 빠진 이들의 서글픈 잔향. 잠과 침묵을 부르는 통곡을 흘린다. 빛에 매우 약하다.',
+  },
+  // ── 보스: 늙은 이빨 ──
+  old_fang: {
+    name: '수로의 주인 「늙은 이빨」', art: 'croc', boss: true, pal: { body: '#4a6a3a', dark: '#2a3e22', belly: '#a8b888', ridge: '#2a3a1a', eye: '#ffd040' },
+    hp: 3000, mp: 0, atk: 74, def: 30, mag: 0, spd: 10, exp: 1600, gold: 700,
+    elem: { thunder: 1.5, ice: 1.25, fire: 0.75 }, resist: { poison: 0.5, sleep: 0.6, paralyze: 0.6, silence: 1 }, drops: [{ item: 'hi_potion', p: 1 }],
+    desc: '수십 년 동안 왕도 지하에 살아온 거대한 악어. 잠수하면 다음 턴에 무시무시한 회전 공격이 온다. 번개에 약하다.',
+    ai(self, B) {
+      const m = self.mem;
+      m.turn = (m.turn || 0) + 1;
+      if (m.next) { const n = m.next; m.next = null; return { skill: n, target: m.mark }; }
+      if (m.turn % 4 === 0) { m.next = 'death_roll'; m.mark = B.pickTarget('party', 'fragile'); return { skill: 'submerge' }; }
+      if (m.turn % 4 === 2) return { skill: Util.chance(0.5) ? 'tail_sweep' : 'murk' };
+      return { skill: Util.chance(0.6) ? 'bite' : 'attack' };
+    },
+  },
+  // ── 시계탑 ──
+  clock_soldier: {
+    name: '태엽 병정', art: 'sentry', pal: { stone: '#c4a050', dark: '#8a6a2a', light: '#e8d080', eye: '#ff7040' },
+    hp: 200, mp: 0, atk: 60, def: 50, mag: 0, spd: 10, exp: 80, gold: 48,
+    elem: { thunder: 2.0, ice: 1.25, fire: 0.75 }, resist: { poison: 1, sleep: 1, silence: 1 }, drops: [{ item: 'ether', p: 0.08 }], steal: { item: 'thunder_flask', p: 0.3 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'cog_shot', w: 3 }, { s: 'wind_up', w: 2 }],
+    desc: '시계탑을 지키는 놋쇠 병정. 태엽을 감으면 빨라진다. 번개에 매우 약하다.',
+  },
+  time_wisp: {
+    name: '째깍 정령', art: 'echo', pal: { body: '#c4a050', dark: '#7a5a2a', light: '#fff0a0', eye: '#ffffff' },
+    hp: 140, mp: 60, atk: 30, def: 24, mag: 44, spd: 20, exp: 78, gold: 40,
+    elem: { dark: 1.5, light: 0 }, resist: { poison: 1, sleep: 0.5 }, drops: [{ item: 'ether', p: 0.1 }], steal: { item: 'ether', p: 0.3 },
+    actions: [{ s: 'chrono_bolt', w: 4 }, { s: 'time_slow', w: 2 }, { s: 'attack', w: 1 }],
+    desc: '멈춘 시간 속에서 태어난 정령. 빛의 화살을 쏘고 시간을 늦춘다. 어둠에 약하고 빛은 통하지 않는다.',
+  },
+  gear_bat: {
+    name: '태엽박쥐', art: 'bat', pal: { body: '#a8803a', dark: '#6a4a1a', wing: '#d8b060', eye: '#7cf0ff' },
+    hp: 120, mp: 0, atk: 54, def: 26, mag: 0, spd: 26, evade: 0.18, exp: 62, gold: 36,
+    elem: { thunder: 1.75 }, resist: { poison: 1, sleep: 1 }, drops: [{ item: 'smelling', p: 0.1 }], steal: { item: 'smelling', p: 0.4 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'cog_shot', w: 2 }],
+    desc: '태엽으로 움직이는 박쥐 인형. 아주 재빠르다. 번개에 약하다.',
+  },
+  choir_knight: {
+    name: '성가대 기사', art: 'knight', pal: { metal: '#6a6a78', dark: '#3a3a48', trim: '#a8a8b8', cloth: '#4a2a3a', shield: '#4a4a58', blade: '#d8dce8', plume: '#6a6a78', eye: '#c040ff' },
+    hp: 230, mp: 0, atk: 64, def: 40, mag: 20, spd: 14, exp: 96, gold: 60,
+    elem: { light: 1.5, thunder: 1.25, dark: 0 }, resist: { poison: 0.5, sleep: 0.5 }, drops: [{ item: 'hi_potion', p: 0.1 }, { item: 'silver_helm', p: 0.02 }], steal: { item: 'hi_potion', p: 0.3 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'sword_arc', w: 3 }, { s: 'knight_stance', w: 1 }],
+    desc: '잿빛 성가대에 몸담은 타락한 기사. 일행 전체를 베는 반월 베기를 쓴다. 빛에 약하다.',
+  },
+  // ── 보스: 제2성부 카산드라 ──
+  clock_guardian: {
+    name: '시계태엽 수호자', art: 'gearguard', pal: { brass: '#c4a050', dark: '#7a5a2a', light: '#f0dc90', copper: '#c8784a', eye: '#7cf0ff' },
+    hp: 700, mp: 0, atk: 50, def: 46, mag: 30, spd: 8, exp: 400, gold: 0,
+    elem: { thunder: 2.0, ice: 1.25, fire: 0.5 }, resist: { poison: 1, sleep: 1, paralyze: 0.5, silence: 1 }, drops: [],
+    actions: [{ s: 'attack', w: 4 }, { s: 'cog_shot', w: 3 }, { s: 'wind_up', w: 1 }],
+    desc: '카산드라를 지키는 태엽 거인. 살아 있는 동안 카산드라가 받는 피해를 크게 줄인다. 번개에 매우 약하다.',
+  },
+  cassandra: {
+    name: '제2성부 카산드라', art: 'sorceress', boss: true, pal: { dress: '#4a3a6a', dark: '#2a1e44', trim: '#ffd75e', hair: '#4a5a8a', skin: '#f0d8c0', eye: '#c040ff', clock: '#e8d080' },
+    hp: 2600, mp: 999, atk: 50, def: 30, mag: 46, spd: 20, exp: 2600, gold: 1200,
+    elem: { ice: 1.25, thunder: 1.25, light: 0.75, dark: 0 }, resist: { poison: 0.5, sleep: 1, paralyze: 1, silence: 0.3 }, drops: [],
+    desc: '잿빛 성가대의 「제2성부」. 시계태엽 수호자가 살아 있는 동안 결계로 몸을 지킨다. 시간을 되감는 주문은 침묵으로 막을 수 있다.',
+    barrier: (self, B) => B.enemies.some((e) => e.alive && e.defId === 'clock_guardian'),
+    phases: [{ key: 'p2', below: 0.5 }],
+    onPhase(self, B, key) {
+      if (key !== 'p2') return [];
+      self.mem.phase = 2;
+      self.mem.turn = 0;
+      return [
+        { type: 'shake', mag: 6 },
+        { type: 'msg', text: '카산드라가 시곗바늘 지팡이로 바닥을 내리쳤다!' },
+        { type: 'msg', text: '[p]"멈춰. 전부 멈춰 버려. 그날처럼."[/]' },
+        { type: 'msg', text: '[y]시간의 종이 공명한다… 카산드라의 움직임이 빨라졌다![/]' },
+      ];
+    },
+    ai(self, B) {
+      const m = self.mem;
+      m.turn = (m.turn || 0) + 1;
+      if (m.next) { const n = m.next; m.next = null; return { skill: n }; }
+      if ((m.phase || 1) === 1) {
+        if (m.turn % 4 === 0 && self.hp < self.maxhp * 0.9 && (m.rewinds || 0) < 3) { m.rewinds = (m.rewinds || 0) + 1; m.next = 'rewind'; return { skill: 'rewind_charge' }; }
+        if (m.turn % 4 === 2) return { skill: 'shatter_hour' };
+        return { skill: Util.chance(0.6) ? 'hour_hand' : 'attack', target: B.pickTarget('party', Util.chance(0.4) ? 'fragile' : 'random') };
+      }
+      if (m.turn === 1) return { skill: 'stop_toll' };
+      const wisps = B.enemies.filter((e) => e.alive && e.defId === 'time_wisp').length;
+      if (m.turn === 2 && !wisps) return { skill: 'call_wisps' };
+      const c = m.turn % 5;
+      if (c === 0 && (m.rewinds || 0) < 3) { m.rewinds = (m.rewinds || 0) + 1; m.next = 'rewind'; return { skill: 'rewind_charge' }; }
+      if (c === 3) return { skill: 'stop_toll' };
+      if (c === 1) return { skill: 'shatter_hour' };
+      return { skill: 'hour_hand', target: B.pickTarget('party', Util.chance(0.5) ? 'fragile' : 'random') };
+    },
+    extraActions(self) { return self.mem.phase === 2 && self.mem.turn % 2 === 1 ? 1 : 0; },
+  },
 };
 for (const id in MONSTERS) MONSTERS[id].id = id;
 
@@ -238,6 +443,37 @@ const ENCOUNTERS = {
       { w: 6, e: ['ember_lizard'] }, { w: 5, e: ['skeleton', 'shadow_echo'] }, { w: 5, e: ['ruin_sentry', 'vampire_bat'] },
       { w: 4, e: ['ember_lizard', 'skeleton'] }, { w: 4, e: ['shadow_echo', 'shadow_echo'] }, { w: 3, e: ['ruin_sentry', 'ruin_sentry'] },
       { w: 3, e: ['skeleton', 'skeleton', 'vampire_bat'] }, { w: 2, e: ['ember_lizard', 'ember_lizard'] }, { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
+    ],
+  },
+  highway: {
+    bg: 'plains', rate: [14, 24],
+    groups: [
+      { w: 7, e: ['gray_wolf', 'gray_wolf'] }, { w: 5, e: ['stone_beetle'] }, { w: 5, e: ['storm_crow', 'storm_crow'] },
+      { w: 5, e: ['hob_goblin'] }, { w: 4, e: ['gray_wolf', 'storm_crow'] }, { w: 4, e: ['stone_beetle', 'gray_wolf'] },
+      { w: 3, e: ['gray_wolf', 'gray_wolf', 'gray_wolf'] }, { w: 3, e: ['hob_goblin', 'storm_crow'] }, { w: 1, e: ['glimmer_jelly'] },
+    ],
+  },
+  highway_wood: {
+    bg: 'forest', rate: [12, 20],
+    groups: [
+      { w: 7, e: ['gray_wolf', 'gray_wolf'] }, { w: 5, e: ['gray_wolf', 'gray_wolf', 'gray_wolf'] }, { w: 4, e: ['hob_goblin', 'gray_wolf'] },
+      { w: 4, e: ['stone_beetle', 'stone_beetle'] }, { w: 3, e: ['choir_acolyte', 'gray_wolf'] },
+    ],
+  },
+  sewer: {
+    bg: 'sewer', rate: [12, 20],
+    groups: [
+      { w: 7, e: ['sewer_rat', 'sewer_rat', 'sewer_rat'] }, { w: 6, e: ['sludge'] }, { w: 5, e: ['drain_toad'] },
+      { w: 5, e: ['sludge', 'sewer_rat'] }, { w: 4, e: ['drowned', 'sewer_rat'] }, { w: 4, e: ['drain_toad', 'sludge'] },
+      { w: 3, e: ['drowned', 'drowned'] }, { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
+    ],
+  },
+  tower: {
+    bg: 'tower', rate: [12, 20],
+    groups: [
+      { w: 6, e: ['clock_soldier'] }, { w: 6, e: ['time_wisp', 'gear_bat'] }, { w: 5, e: ['gear_bat', 'gear_bat', 'gear_bat'] },
+      { w: 5, e: ['choir_knight'] }, { w: 4, e: ['clock_soldier', 'time_wisp'] }, { w: 4, e: ['choir_knight', 'choir_acolyte'] },
+      { w: 3, e: ['clock_soldier', 'clock_soldier'] }, { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
     ],
   },
   cellar: {
