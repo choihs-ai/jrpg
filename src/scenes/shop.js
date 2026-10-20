@@ -34,6 +34,17 @@ const SHOPS = {
     stock: ['herb', 'potion', 'hi_potion', 'ether', 'antidote', 'smelling', 'panacea', 'feather', 'thunder_flask', 'firebomb', 'return_wing', 'incense', 'antidote_bangle'],
     bye: '다치지 마세요! 다쳤으면 또 오시고요.',
   },
+  bazaar_arms: {
+    name: '바자르 「휘어진 칼」', keeper: '오마르',
+    stock: ['flame_saber', 'sand_axe', 'scorpion_dagger', 'sun_staff', 'desert_mail', 'mirage_robe', 'sand_garb', 'sun_shield', 'turban', 'desert_helm', 'mythril_sword', 'war_axe', 'rune_staff', 'mythril_mail', 'knight_shield', 'silver_helm'],
+    bye: '칼날에 모래가 끼지 않게 잘 닦아 두게.',
+  },
+  bazaar_items: {
+    name: '바자르 「모래 별 상회」', keeper: '알리',
+    stock: ['potion', 'hi_potion', 'mega_potion', 'ether', 'hi_ether', 'antidote', 'smelling', 'panacea', 'feather', 'sand_bomb', 'return_wing', 'incense'],
+    extra: [{ when: () => Game.flag('raiders_beaten'), items: ['oasis_ring'] }],
+    bye: '사막에선 물과 약이 곧 목숨이에요. 넉넉히 챙겨 가세요!',
+  },
 };
 
 const Shop = (() => {

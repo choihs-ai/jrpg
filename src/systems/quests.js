@@ -98,6 +98,40 @@ const QUESTS = {
     ],
     reward: { gold: 1500, items: [['warden_badge', 1]] },
   },
+  main4: {
+    name: '사막의 종', type: 'main', giver: '사미라의 사자 라시드',
+    desc: '사막 너머 오아시스 사미라의 샘이 말라 가고, 물의 사제가 사라졌다. 사막 남쪽의 사원 근처에서 잿빛 옷의 무리가 목격되었다고 한다.',
+    stages: [
+      { goal: '은빛 가도 남쪽의 붉은 협곡을 지나 오아시스 사미라로 간다', hint: '사자가 걸어온 길을 거슬러, 가도의 남쪽으로', target: { map: 'highway', x: 48, y: 31 } },
+      { goal: '사미라 북쪽의 큰 집에서 족장 하킴을 만난다', hint: '사자를 보낸 마을의 우두머리를 찾아가자', target: { map: 'samira', x: 17, y: 4 } },
+      { goal: '여관 「사막의 별」에서 하룻밤 묵는다', hint: '긴 여정이었다. 오늘 밤은 쉬어 가자', target: { map: 'samira', x: 5, y: 5 } },
+      { goal: '족장 하킴에게 미오가 사라진 일을 알린다', hint: '밤사이 일어난 일을 마을의 우두머리에게 알리자', target: { map: 'samira', x: 17, y: 4 } },
+      { goal: '사막 동쪽의 옛 우물 동굴(전갈 굴)에서 태양의 열쇠를 찾는다', hint: '닫힌 문을 여는 열쇠는 말라 버린 옛 우물 어딘가에 잠들어 있다고 한다', target: { map: 'desert', x: 48, y: 9 } },
+      { goal: '사막 남쪽의 모래시계 사원에서 해의 문을 연다', hint: '열쇠를 들고, 모래 바다의 남쪽으로', target: { map: 'desert', x: 30, y: 35 } },
+      { goal: '흐르는 모래의 회랑을 지나 미오를 구한다', hint: '흐르는 모래 너머, 미오의 노래가 들리는 곳으로', target: { map: 'temple2', x: 12, y: 8 } },
+      { goal: '사원 가장 아래, 모래 종의 방으로 향한다', hint: '종의 노래가 더 아래에서 들린다', target: { map: 'temple3', x: 9, y: 5 } },
+      { goal: '사미라의 족장 하킴에게 돌아간다', hint: '물소리가 돌아온 마을로 돌아가자', target: { map: 'samira', x: 17, y: 4 } },
+    ],
+    reward: { gold: 3000, items: [['sand_badge', 1]] },
+  },
+  s_diary: {
+    name: '무녀의 일기', type: 'sub', giver: '모래에 묻힌 일기장',
+    desc: '사막에서 낡은 일기장의 찢어진 페이지를 발견했다. 단정한 글씨의 주인은 십 년 전 사미라에 왔던 사람인 듯하다.',
+    stages: [
+      { goal: '사막 곳곳에 흩어진 일기 조각을 모은다', hint: '모래 속에 흩어진 이야기의 나머지를 찾아보자', count: () => Math.min(3, Game.count('aria_page')), max: 3 },
+      { goal: '사미라 동쪽, 무녀가 머물던 집의 나디아에게 일기를 보여 준다 (미오와 함께)', hint: '일기의 주인이 머물던 곳을 찾아가자. 일기가 부르는 사람과 함께', target: { map: 'samira', x: 30, y: 19 } },
+    ],
+    reward: { items: [['aria_chime', 1]] },
+  },
+  s_caravan: {
+    name: '길 잃은 대상', type: 'sub', giver: '바자르의 상인 알리',
+    desc: '알리의 대상 행렬이 사막에서 모래 도적에게 둘러싸였다. 매가 물어 온 편지에는 「동남쪽 바위 야영지」라고 적혀 있다.',
+    stages: [
+      { goal: '사막 동남쪽 바위 야영지에서 대상 행렬을 구한다', hint: '사막의 동남쪽, 바위 언덕 아래 야영지를 찾아가자', target: { map: 'desert', x: 50, y: 33 } },
+      { goal: '바자르의 상인 알리에게 알린다', hint: '기다리는 사람에게 소식을 전하자', target: { map: 'samira', x: 5, y: 19 } },
+    ],
+    reward: { gold: 1000, items: [['oasis_ring', 1], ['mega_potion', 3]] },
+  },
   s_bounty: {
     name: '회색갈기 현상수배', type: 'sub', giver: '수호기사단 게시판',
     desc: '은빛 가도 북동쪽 숲에 늑대 우두머리 「회색갈기」가 나타나 상인 마차를 습격하고 있다. 토벌하면 상금 600G.',
@@ -180,8 +214,9 @@ const Quests = (() => {
     },
     // 현재 화면에 띄울 대표 목표 (메인 우선)
     currentGoal() {
-      for (const id of ['main1', 'main2', 'main3']) if (this.isActive(id)) return { id, text: this.goal(id), target: this.target(id) };
-      if (Game.flag('chapter2_done')) return { id: null, text: '자유 탐험 — 다음 이야기를 기다리며 남은 일을 정리해 보자', target: null };
+      for (const id of ['main1', 'main2', 'main3', 'main4']) if (this.isActive(id)) return { id, text: this.goal(id), target: this.target(id) };
+      if (Game.flag('chapter3_done')) return { id: null, text: '자유 탐험 — 다음 이야기를 기다리며 남은 일을 정리해 보자', target: null };
+      if (Game.flag('chapter2_done')) return { id: null, text: detailed() ? '마도학원의 오필리아 학장을 찾아가 다음 여정에 대해 듣자' : '왕도에서 쉬는 동안, 학원에서 새 소식이 기다리고 있을지도 모른다', target: detailed() ? { map: 'capital', x: 7, y: 10 } : null };
       if (Game.flag('chapter1_done')) return { id: null, text: detailed() ? '리벨의 하르도 장로에게 작별 인사를 하고 왕도로 떠나자' : '새로운 여정을 앞두고, 마을의 어른께 인사를 드리자', target: detailed() ? { map: 'rivel', x: 18, y: 5 } : null };
       return null;
     },
@@ -202,6 +237,10 @@ const Quests = (() => {
       if (itemId === 'star_candy' && this.isActive('s_candy') && this.stage('s_candy') === 0 && Game.count('star_candy') >= 3) {
         this.setStage('s_candy', 1);
         return '[y]「축제의 별사탕」 별사탕을 3개 모두 찾았다! 광장의 루나에게 가져가자.[/]';
+      }
+      if (itemId === 'aria_page' && this.isActive('s_diary') && this.stage('s_diary') === 0 && Game.count('aria_page') >= 3) {
+        this.setStage('s_diary', 1);
+        return null; // 안내는 일기 장면(Story.ariaPage)에서
       }
       if (itemId === 'veil_book' && this.isActive('s_book') && this.stage('s_book') === 0) {
         this.setStage('s_book', 1);

@@ -112,6 +112,26 @@ const Sound = (() => {
       mel: `D5.4 F5.4 A5.4 F5.4 E5.4 C#5.4 A4.8 D5.4 F5.4 Bb5.6 A5.2 G5.4 E5.4 C#5.8
             F5.4 A5.4 D6.6 C6.2 Bb5.4 A5.2 G5.2 D5.8 E5.4 G5.4 A5.4 C#6.4 A5.12 r.4`,
     },
+    oasis: {
+      bpm: 104, bar: 16, loop: true, bass: 'hits', arp: 'up8', drums: 'pulse', lead: 'p25', leadVol: 0.085,
+      chords: 'Dm Dm C Dm Bb C A A',
+      mel: `D5.4 E5.2 F5.2 A5.4 F5.4 E5.4 D5.4 C#5.4 D5.4 E5.4 G5.4 F5.2 E5.2 C5.4 D5.12 F5.4
+            F5.4 G5.2 A5.2 Bb5.4 A5.4 G5.4 E5.4 C5.8 A4.4 C#5.4 E5.4 G5.4 F5.2 E5.2 C#5.4 A4.4 r.4`,
+    },
+    desert: {
+      bpm: 118, bar: 16, loop: true, bass: 'drive', arp: 'none', drums: 'march', lead: 'p25', leadVol: 0.085, harmony: true,
+      chords: 'Am Am G Am F G E E Am C G Am F Dm E E',
+      mel: `A4.4 C5.4 E5.4 A5.4 G5.2 F5.2 E5.4 C5.8 B4.4 D5.4 G5.4 F5.2 E5.2 D5.8 E5.4 A5.4 C6.4 B5.2 A5.2
+            F5.4 A5.4 C6.4 A5.4 G5.4 F5.4 E5.4 D5.4 E5.4 G#5.4 B5.4 E6.4 D6.2 C6.2 B5.4 G#5.8
+            A5.4 E5.4 C5.4 E5.4 G5.4 C6.4 E6.4 C6.4 B5.4 G5.4 D5.4 G5.4 A5.4 C6.4 E5.8
+            F5.4 A5.4 C6.4 F6.4 D6.4 A5.4 F5.4 D5.4 E5.4 G#5.4 B5.4 D6.4 C6.2 B5.2 A5.4`,
+    },
+    sandtemple: {
+      bpm: 88, bar: 16, loop: true, bass: 'long', arp: 'slow', drums: 'pulse', lead: 'p12', leadVol: 0.08,
+      chords: 'Em C Am B Em G Am B',
+      mel: `E5.4 G5.4 B5.6 A5.2 G5.4 E5.4 C5.8 A4.4 C5.4 E5.4 D5.4 D#5.8 B4.8
+            E5.4 B5.4 G5.6 F#5.2 G5.4 B5.4 D6.8 C6.4 B5.4 A5.4 E5.4 F#5.4 D#5.4 B4.8`,
+    },
     levelup: { bpm: 170, bar: 16, loop: false, bass: 'none', arp: 'none', drums: 'none', lead: 'p25', leadVol: 0.1, chords: 'C', mel: `C5.2 E5.2 G5.2 C6.4 r.2 G5.2 C6.8` },
     item: { bpm: 150, bar: 16, loop: false, bass: 'none', arp: 'none', drums: 'none', lead: 'p25', leadVol: 0.1, chords: 'G', mel: `G5.2 A5.2 B5.2 D6.6 r.4` },
     inn: {

@@ -406,7 +406,7 @@ const Story = {
     await new Promise((res) => { const iv = setInterval(() => { if (card.done) { clearInterval(iv); res(); } }, 50); });
     await Engine.fadeOut(500);
     Engine.remove(card);
-    Sound.bgm('town');
+    Sound.bgm(o.bgm || 'town');
     await Engine.fadeIn(500);
   },
 };

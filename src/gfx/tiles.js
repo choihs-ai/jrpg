@@ -6,8 +6,8 @@ const Tiles = (() => {
   const S = 16;
   const cache = new Map();
   // 바닥 위에 올려 그리는 물체 타일
-  const OBJ = new Set(['T', 'Y', 'Z', 'r', 'F', 'e', 'l', 'S', 'o', 'x', 'X', 'j', 'P', 'g', 'b', 't', 'h', 'p', 'a', 'z', '*', 'A', 'V', 'U', 'K', 'C', '|', 'O', '@', 'J', 'd']);
-  const ANIM = new Set(['~', '&', 'f', '*', 'V', 'C', '@', 'v', '1', 'Z']);
+  const OBJ = new Set(['T', 'Y', 'Z', 'r', 'F', 'e', 'l', 'S', 'o', 'x', 'X', 'j', 'P', 'g', 'b', 't', 'h', 'p', 'a', 'z', '*', 'A', 'V', 'U', 'K', 'C', '|', 'O', '@', 'J', 'd', '3', '4', '6', '?', '(', ')']);
+  const ANIM = new Set(['~', '&', 'f', '*', 'V', 'C', '@', 'v', '1', 'Z', '9', '?']);
 
   const C = {
     g0: '#5fae4c', g1: '#4f9b3f', g2: '#76c45e', g3: '#3f8a35',
@@ -316,6 +316,74 @@ const Tiles = (() => {
       for (let i = 0; i < 8; i++) { const a = (i / 8) * Math.PI * 2 + (f ? Math.PI / 8 : 0); p.rect(Math.round(cx + Math.cos(a) * r) - 1, Math.round(cy + Math.sin(a) * r) - 1, 2, 2, '#c4a050'); }
       p.circle(cx, cy, 2, '#5a4418'); p.px(cx, cy, '#e8d080');
     },
+    // ── 사막 ──
+    '2': (p, v) => {
+      p.fill(C.sand); p.noise([C.sandD, '#f0e0aa'], 0.08, 131 + v);
+      for (let i = 0; i < 2; i++) { const y = 4 + i * 7 + (v % 2); for (let x = 0; x < 16; x++) p.px(x, y + Math.round(Math.sin((x + v * 3) * 0.6)), C.sandD); }
+    },
+    '3': (p) => {
+      p.ellipse(8, 14, 5, 2, 'rgba(0,0,0,0.25)');
+      for (let y = 5; y < 15; y++) p.rect(7 + Math.round(Math.sin(y * 0.4)), y, 2, 1, y % 3 ? '#8a6a3a' : '#6b4426');
+      const leaf = '#3f9a4a', leafD = '#2a7038';
+      p.line(8, 4, 1, 7, leaf); p.line(8, 4, 15, 7, leaf); p.line(8, 4, 3, 1, leafD); p.line(8, 4, 13, 1, leafD); p.line(8, 4, 8, 0, leaf);
+      p.line(8, 5, 2, 9, leafD); p.line(8, 5, 14, 9, leafD); p.circle(8, 4, 2, '#5ab85a'); p.px(7, 6, '#8a5a2a'); p.px(9, 6, '#8a5a2a');
+    },
+    '4': (p) => {
+      p.ellipse(8, 14, 5, 2, 'rgba(0,0,0,0.25)');
+      p.rect(6, 3, 4, 12, '#4a9a4a'); p.rect(6, 3, 1, 12, '#6aba5a'); p.rect(9, 3, 1, 12, '#2a6a2a'); p.rect(7, 2, 2, 1, '#4a9a4a');
+      p.rect(2, 7, 4, 2, '#4a9a4a'); p.rect(2, 4, 2, 4, '#4a9a4a'); p.rect(10, 9, 4, 2, '#4a9a4a'); p.rect(12, 5, 2, 5, '#4a9a4a');
+      p.px(7, 1, '#ff6b8a'); p.px(8, 6, '#f0e8c0'); p.px(7, 10, '#f0e8c0');
+    },
+    '5': (p) => { bricks(p, '#d8b884', '#a88a5a', '#ecd4a4', 4); p.rect(0, 14, 16, 2, '#9a7a4a'); },
+    '[': (p, v, f, nb) => {
+      p.fill('#e8d0a0'); p.noise(['#d8c090', '#f4e0b4'], 0.1, 141 + v);
+      if (nb) { if (nb.d !== '[') { p.rect(0, 13, 16, 3, '#a88a5a'); p.rect(0, 12, 16, 1, '#c8a878'); } if (nb.u !== '[') p.rect(0, 0, 16, 2, '#f8ecc8'); }
+    },
+    '6': (p, v) => {
+      const cols = [['#c4473a', '#e8dcc0'], ['#3f63b8', '#e8dcc0'], ['#d8a040', '#7a3a2a']][v % 3];
+      p.ellipse(8, 14, 7, 2, 'rgba(0,0,0,0.25)');
+      for (let y = 1; y < 14; y++) { const w = Math.min(7, y); for (let x = 8 - w; x < 8 + w; x++) p.px(x, y, ((x + 16) >> 1) % 2 ? cols[0] : cols[1]); }
+      p.rect(6, 9, 4, 5, '#2a1a10'); p.px(8, 0, '#6b4426');
+    },
+    '?': (p, v, f) => {
+      p.fill(C.sand); p.noise([C.sandD], 0.06, 151);
+      p.ellipse(8, 11, 6, 3, C.water); p.ellipse(8, 11, 4, 2, f ? C.waterL : C.water);
+      p.line(4, 10, 4, 3, '#8a6a3a'); p.line(4, 3, 1, 5, '#3f9a4a'); p.line(4, 3, 8, 4, '#3f9a4a'); p.line(4, 3, 4, 0, '#2a7038');
+      p.line(12, 10, 12, 4, '#8a6a3a'); p.line(12, 4, 9, 6, '#3f9a4a'); p.line(12, 4, 15, 6, '#3f9a4a');
+      p.rect(6, 5, 4, 3, '#e8dcc0'); p.rect(7, 6, 2, 2, '#5b3b1e');
+    },
+    '(': (p) => {
+      p.fill(C.sand);
+      for (let y = 2; y < 15; y++) { const w = Math.floor((y - 1) * 0.58); p.rect(8 - w, y, w * 2, 1, y % 3 ? '#d8b884' : '#a88a5a'); }
+      p.rect(6, 10, 4, 5, '#2a1a10'); p.px(8, 2, '#ffd75e');
+    },
+    ')': (p) => {
+      p.fill(C.sand);
+      p.ellipse(8, 9, 7, 6, '#a88a5a'); p.ellipse(8, 8, 6, 5, '#c8a878'); p.ellipse(8, 11, 3, 3, '#1a1010'); p.rect(5, 11, 6, 3, '#1a1010');
+      p.px(4, 5, '#e8d0a0'); p.px(11, 6, '#e8d0a0');
+    },
+    '7': (p, v, f, nb) => {
+      const face = nb && nb.d !== undefined && !'#&%017'.includes(nb.d);
+      if (face) { bricks(p, '#b89868', '#8a6a40', '#d8b884', 4); p.rect(0, 0, 16, 2, '#4a3a24'); p.rect(0, 15, 16, 1, '#3a2a18'); p.px(4 + v, 7, '#e8c070'); }
+      else {
+        p.fill('#4a3a24'); p.noise(['#5a4830', '#3a2a18'], 0.18, 161 + v);
+        if (nb) { const open = (c) => c !== undefined && !'#&%017 '.includes(c); if (open(nb.l)) p.rect(0, 0, 1, 16, '#6a5838'); if (open(nb.r)) p.rect(15, 0, 1, 16, '#6a5838'); if (open(nb.u)) p.rect(0, 0, 16, 1, '#6a5838'); }
+      }
+    },
+    '8': (p, v) => {
+      p.fill('#c8a878'); p.rect(0, 0, 16, 1, '#a88a5a'); p.rect(0, 0, 1, 16, '#a88a5a'); p.rect(8, 8, 8, 1, '#b89868'); p.rect(8, 8, 1, 8, '#b89868');
+      p.noise(['#d8b884', '#b89868'], 0.06, 171 + v);
+    },
+    '/': (p, v) => {
+      p.fill('#a8583a');
+      for (let y = 0; y < 16; y += 4) { p.rect(0, y + (v % 2), 16, 1, '#7a3a24'); p.rect(0, y + 2, 16, 1, '#c8784a'); }
+      p.noise(['#8a4a2a', '#c87050'], 0.12, 181 + v); p.px(3 + v * 2, 6, '#e8a070');
+    },
+    '9': (p, v, f) => {
+      p.fill('#b8925a');
+      for (let r = 7; r > 0; r -= 2) p.ellipse(8, 8, r, r * 0.8, r % 4 === 1 ? '#8a6a3a' : '#a88048');
+      const a = f ? 1 : 0; p.px(4 + a, 6, '#d8b884'); p.px(11 - a, 10, '#d8b884'); p.px(8, 4 + a, '#d8b884'); p.ellipse(8, 8, 1.5, 1.2, '#5a4020');
+    },
     // 실내
     'I': (p, v, f, nb) => {
       const face = nb && nb.d !== undefined && nb.d !== 'I';
@@ -405,14 +473,14 @@ const Tiles = (() => {
     },
     // 던전
     '#': (p, v, f, nb) => {
-      const face = nb && nb.d !== undefined && !'#&%01'.includes(nb.d);
+      const face = nb && nb.d !== undefined && !'#&%017'.includes(nb.d);
       if (face) {
         bricks(p, C.dWall, C.dWallD, C.dWallL, 4);
         p.rect(0, 0, 16, 2, C.dTop); p.rect(0, 15, 16, 1, '#1e1b28');
       } else {
         p.fill(C.dTop); p.noise(['#2f2c3a', '#1d1a26'], 0.18, 91 + v);
         if (nb) {
-          const open = (c) => c !== undefined && !'#&%01 '.includes(c);
+          const open = (c) => c !== undefined && !'#&%017 '.includes(c);
           if (open(nb.l)) p.rect(0, 0, 1, 16, '#3a3648');
           if (open(nb.r)) p.rect(15, 0, 1, 16, '#3a3648');
           if (open(nb.u)) p.rect(0, 0, 16, 1, '#3a3648');
@@ -473,7 +541,7 @@ const Tiles = (() => {
     }
   }
 
-  const NB_TILES = new Set(['~', 'I', '#', '&', '%', 'R', 'Q', 'G', 'c', 'v', '1']);
+  const NB_TILES = new Set(['~', 'I', '#', '&', '%', 'R', 'Q', 'G', 'c', 'v', '1', '7', '[']);
 
   function get(ch, v, f, nbKey, nb) {
     const key = ch + v + '|' + f + '|' + (nbKey || '');
@@ -505,8 +573,9 @@ const Tiles = (() => {
       else if (ch === '~') nbKey = ['u', 'd', 'l', 'r'].map((k) => (nb[k] === undefined || '~=H$'.includes(nb[k]) ? 0 : 1)).join('');
       else if (ch === 'R' || ch === 'Q' || ch === 'G') nbKey = ['u', 'd', 'l', 'r'].map((k) => (nb[k] === ch ? 1 : 0)).join('');
       else if (ch === 'c') nbKey = ['u', 'd', 'l', 'r'].map((k) => (nb[k] === undefined || nb[k] === 'c' ? 0 : 1)).join('');
+      else if (ch === '[') nbKey = (nb.d === '[' ? 'T' : 'F') + (nb.u === '[' ? 'T' : 'F');
       else if (ch === 'I') nbKey = nb.d !== undefined && nb.d !== 'I' ? 'F' : 'T';
-      else nbKey = (nb.d !== undefined && !'#&%01'.includes(nb.d) ? 'F' : 'T') + ['u', 'l', 'r'].map((k) => (nb[k] !== undefined && !'#&%01 '.includes(nb[k]) ? 1 : 0)).join('');
+      else nbKey = (nb.d !== undefined && !'#&%017'.includes(nb.d) ? 'F' : 'T') + ['u', 'l', 'r'].map((k) => (nb[k] !== undefined && !'#&%017 '.includes(nb[k]) ? 1 : 0)).join('');
     }
     g.drawImage(get(ch, OBJ.has(ch) ? 0 : v, f, nbKey, nb), sx, sy);
   }
@@ -519,6 +588,7 @@ const Tiles = (() => {
     'W': '#b4783f', 'B': '#9d9cab', 'n': '#b4783f', 'N': '#9d9cab', 'R': '#c4473a', 'Q': '#3f63b8', 'G': '#4b8a4c', 'D': '#5e3818',
     'I': '#3b2b22', 'w': '#b98852', 'c': '#a8304a', '#': '#25222f', '_': '#4b4759', '-': '#4b4759', '>': '#ffd75e', '<': '#ffd75e',
     '$': '#07050c', 'y': '#5a4a3a', '*': '#7cc4ff', ' ': '#000',
+    '2': '#e2cd90', '3': '#3f9a4a', '4': '#4a9a4a', '5': '#d8b884', '6': '#c4473a', '[': '#e8d0a0', '?': '#3c7fd6', '(': '#ffd75e', ')': '#8a6a40', '7': '#4a3a24', '8': '#c8a878', '9': '#8a6a3a', '/': '#a8583a',
     'C': '#ffd75e', 'M': '#d8d4cc', '@': '#3c7fd6', 'J': '#bcbcca', 'd': '#c4473a', 'v': '#4a5a2a', '+': '#5a5a66', '1': '#c4a050',
     'O': '#6a6680', 'P': '#9d9cab', '|': '#55556a', '0': '#6a6680', '&': '#25222f', '%': '#25222f', 'k': '#c8925a', 'L': '#5e3818',
   };

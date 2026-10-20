@@ -234,6 +234,7 @@ const Menu = (() => {
       // 가 본 마을 중 하나를 고른다
       const towns = [{ label: '리벨 마을', value: ['rivel', 19, 27, 'up'] }];
       if (Game.flag('reached_capital')) towns.push({ label: '왕도 아스테리온', value: ['capital', 23, 37, 'up'] });
+      if (Game.flag('reached_samira')) towns.push({ label: '오아시스 사미라', value: ['samira', 17, 25, 'up'] });
       let dest = towns[0].value;
       if (towns.length > 1) {
         const r = await UI.list({ x: 220, y: 160, w: 220, items: towns, title: '어디로 돌아갈까?', cancel: true });

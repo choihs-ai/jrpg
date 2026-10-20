@@ -346,5 +346,75 @@ t('장비 비교: 상승·하락·장비 불가·장비 중', () => {
   ok(Game.equipDiffText('hero', 'umbrella').includes('[r]-'));
 });
 
+console.log('제3장 전투 · 진행');
+t('신기루: 소환되면 진짜와 섞이고, 공격·분석 한 번에 사라지며 진짜는 다치지 않는다', () => {
+  Util.setSeed(7); party(['hero', 'bran', 'linette', 'mio'], 22);
+  const core = new BattleCore({ enemies: ['zahir'], boss: true });
+  const z = core.enemies[0];
+  core.useSkill(z, SKILLS.mirage, [z], null);
+  const mir = core.enemies.filter((e) => e.def.mirage);
+  eq(mir.length, 2);
+  ok(mir.every((e) => e.mirrorOf === z && e.def.name === z.def.name), '같은 이름·원본 연결');
+  ok(new Set(core.enemies.map((e) => e.name)).size === 3, '이름표(A·B·C)로만 구분된다');
+  eq(mir[0].knownId, 'zahir');
+  const hp = z.hp;
+  for (let i = 0; i < 6 && mir[0].alive; i++) core.useSkill(core.party[1], SKILLS.attack, [mir[0]], null); // 빗나갈 수도 있다
+  ok(!mir[0].alive, '공격하면 사라진다');
+  eq(z.hp, hp, '진짜는 그대로');
+  core.useSkill(core.party[0], SKILLS.insight, core.aliveEnemyList, null);
+  ok(!mir[1].alive, '통찰로 걷힌다');
+  ok(z.alive && Game.state.seen.zahir, '진짜는 분석 기록');
+  ok(!Game.state.seen.zahir_mirage, '신기루는 따로 도감에 남지 않는다');
+});
+t('신기루: 진짜가 쓰러지면 남은 신기루도 사라진다', () => {
+  party(['hero', 'bran', 'linette', 'mio'], 22);
+  const core = new BattleCore({ enemies: ['zahir'], boss: true });
+  const z = core.enemies[0];
+  core.useSkill(z, SKILLS.mirage, [z], null);
+  z.hp = 1;
+  core.useSkill(core.party[1], SKILLS.attack, [z], null);
+  ok(!z.alive);
+  ok(core.enemies.every((e) => !e.alive), 'mirages gone');
+  ok(core.checkEnd());
+  eq(core.result, 'win');
+});
+t('생명의 물결: 라운드가 끝날 때마다 회복되고 횟수가 줄어든다', () => {
+  party(['hero', 'mio'], 20);
+  const core = new BattleCore({ enemies: ['sand_scorpion'] });
+  const h = core.party[0];
+  core.useSkill(core.party[1], SKILLS.regen, core.party, null);
+  ok(h.buffs.regen && h.buffs.regen.turns === 4, 'regen buff');
+  h.hp = Math.floor(h.mhp / 2);
+  const before = h.hp;
+  core.endRound();
+  ok(h.hp > before, 'healed at end of round');
+  eq(h.hp - before, Math.round(h.mhp * 0.08));
+});
+t('모래 폭탄: 적 전체 피해 + 명중률 저하', () => {
+  party(['hero'], 20);
+  Game.addItem('sand_bomb', 1);
+  const core = new BattleCore({ enemies: ['sand_scorpion', 'sand_scorpion'] });
+  core.execute({ actor: core.party[0], cmd: { kind: 'item', item: 'sand_bomb' } });
+  ok(core.enemies.every((e) => e.hp < e.mhp), 'all damaged');
+  ok(core.enemies.every((e) => !e.alive || (e.buffs.hit && e.buffs.hit.mult < 1)), 'hit debuff');
+  eq(Game.count('sand_bomb'), 0);
+});
+t('3장 진행도: 플래그 순서대로 17 → 24', () => {
+  Game.newState('x');
+  Game.setFlag('chapter2_done'); eq(Game.progress(), 16);
+  const steps = ['ch3_started', 'reached_samira', 'met_hakim', 'mio_taken', 'queen_defeated', 'mio_rescued', 'zahir_defeated', 'chapter3_done'];
+  steps.forEach((f, i) => { Game.setFlag(f); eq(Game.progress(), 17 + i, f); });
+});
+t('3장 퀘스트: 일기 조각 3개를 모으면 다음 단계로', () => {
+  Game.newState('x');
+  Quests.start('s_diary');
+  Game.addItem('aria_page', 2); Quests.onItem('aria_page');
+  eq(Quests.stage('s_diary'), 0);
+  Game.addItem('aria_page', 1); Quests.onItem('aria_page');
+  eq(Quests.stage('s_diary'), 1);
+  Quests.start('main4');
+  eq(Quests.currentGoal().id, 'main4');
+});
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

@@ -26,21 +26,21 @@ defMap('highway', {
     'T.....;.....S.:..........s~~~............:....,.."..,TTT', // 14
     'T.S.;.......,.:.........S.~~~........"...:.....""""..TTT', // 15
     '::::::::::::::::::::::::::===:::::::::::::::::::::::CTTT', // 16
-    'T.."..:.................,s~~~.....""...."..,..."""S".TTT', // 17
-    'T.....:..........;........~~~......".,.......;.......TTT', // 18
-    'T..TT.:,T.T...TTT.T.YTT...~~~s......Y.T"Y..TT.YTYT.T.T.T', // 19
-    'TTYY.,:....TT.YT.T"TY....s~~~....T....T."....Y.....T...T', // 20
-    'TT...,:.T..YY.TT..T..YY.s~~~..."....;.T~~~~~~~....,.Y.TT', // 21
-    'T,T...:,.Y,TYT.Y.T.TTT...~~~..Y...,..T~~~~~~~~~.....YY.T', // 22
-    'TTY..,:..T...TYTTTTTY....~~~s...T..T..~~~~~~~~~Y.Y.....T', // 23
-    'T...T,:,."TT....TTTTTTT.s~~~.......;Y.~~~~~~~~~.Y.Y....T', // 24
-    'TTTY.....T....TT.TYTY....~~~..,.r.r...~~~~~~~~~...,...YT', // 25
-    'TYT......YTTTT,..YT.T.T..s~~~....r..".~~~~~~~~~...Y,...T', // 26
-    'TY.,.....T..Y.TYT.,.,.T.".~~~"Y,...,Y,..~~~~~..Y.T.Y,TTT', // 27
-    'TY..YTTYYTYT..T..YYTY.Y...~~~s.,...TYY.,...........Y.".T', // 28
-    'T"...".,.....;...........s~~~.Y,.....T.............Y.".T', // 29
-    'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT', // 30
-    'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT', // 31
+    'T.."..:.................,s~~~.....""...."..,...":"S".TTT', // 17
+    'T.....:..........;........~~~......".,.......;..:....TTT', // 18
+    'T..TT.:,T.T...TTT.T.YTT...~~~s......Y.T"Y..TT.YT:T.T.T.T', // 19
+    'TTYY.,:....TT.YT.T"TY....s~~~....T....T."....Y..:..T...T', // 20
+    'TT...,:.T..YY.TT..T..YY.s~~~..."....;.T~~~~~~~..:.,.Y.TT', // 21
+    'T,T...:,.Y,TYT.Y.T.TTT...~~~..Y...,..T~~~~~~~~~.:...YY.T', // 22
+    'TTY..,:..T...TYTTTTTY....~~~s...T..T..~~~~~~~~~Y:Y.....T', // 23
+    'T...T,:,."TT....TTTTTTT.s~~~.......;Y.~~~~~~~~~.:.Y....T', // 24
+    'TTTY.....T....TT.TYTY....~~~..,.r.r...~~~~~~~~~.:.,...YT', // 25
+    'TYT......YTTTT,..YT.T.T..s~~~....r..".~~~~~~~~~.:.Y,...T', // 26
+    'TY.,.....T..Y.TYT.,.,.T.".~~~"Y,...,Y,..~~~~~..Y:T.Y,TTT', // 27
+    'TY..YTTYYTYT..T..YYTY.Y...~~~s.,...TYY.,........:..Y.".T', // 28
+    'T"...".,.....;...........s~~~.Y,.....T..........:S.Y.".T', // 29
+    'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT:TTTTTTT', // 30
+    'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT:TTTTTTT', // 31
   ],
   enc: {
     default: 'highway',
@@ -55,6 +55,10 @@ defMap('highway', {
     { x: 0, y: 16, to: 'field', tx: 62, ty: 30, dir: 'left' },
     { x: 14, y: 12, to: 'waystation', tx: 6, ty: 8, dir: 'up', sfx: 'door' },
     { x: 52, y: 16, to: 'capital', tx: 23, ty: 38, dir: 'up', cond: () => Game.flag('vane_defeated') },
+    {
+      x: 48, y: 31, to: 'canyon', tx: 15, ty: 1, dir: 'down', cond: () => Game.flag('ch3_started'),
+      blocked: async () => { await S.say(null, '(협곡 쪽에서 모래 섞인 바람이 사납게 몰아친다. 눈을 뜨기도 힘들다.)\n…지금은 이 너머로 갈 수 없을 것 같다.'); },
+    },
   ],
   triggers: [
     { x: 23, y: 15, w: 2, h: 3, when: () => !Game.flag('vane_defeated'), run: () => Story.vane() },
@@ -95,10 +99,11 @@ defMap('highway', {
     { type: 'sign', x: 12, y: 14, text: '역참 「쉬어 가는 말」\n「따뜻한 수프와 푹신한 침대. 여행자의 친구」' },
     { type: 'sign', x: 24, y: 15, text: '은빛 다리\n「이 다리를 건너면 왕국의 심장, 아스테리온의 땅」' },
     { type: 'sign', x: 50, y: 17, text: '왕도 아스테리온\n「별이 내리는 도시에 오신 것을 환영합니다」 ─ 별내림 축제 개최 중!' },
+    { type: 'sign', x: 49, y: 29, text: '↓ 붉은 협곡 · 사막 너머 오아시스 사미라\n「모래 폭풍이 잦을 때는 통행을 삼가시오」' },
     { type: 'chest', id: 'hw_sw', x: 5, y: 26, item: 'hi_potion', n: 2 },
     { type: 'chest', id: 'hw_nw', x: 21, y: 4, item: 'thunder_flask', n: 2 },
     { type: 'chest', id: 'hw_den', x: 49, y: 4, item: 'buckler' },
-    { type: 'chest', id: 'hw_lake', x: 48, y: 26, gold: 300 },
+    { type: 'chest', id: 'hw_lake', x: 49, y: 26, gold: 300 },
     { type: 'chest', id: 'hw_ne', x: 52, y: 13, item: 'ether', n: 2 },
     { type: 'search', id: 'hw_rocks', x: 33, y: 25, item: 'feather', hidden: true, msg: '바위 틈에 깃털 하나가 끼어 있다. 은은하게 빛난다…!' },
     { type: 'search', id: 'hw_bridge', x: 29, y: 18, gold: 120, hidden: true, msg: '다리 아래 모래 속에 누군가 떨어뜨린 지갑이 묻혀 있다.' },
@@ -308,7 +313,7 @@ defMap('academy', {
   npcs: [
     {
       id: 'ophelia', x: 12, y: 3, look: 'dean', dir: 'down',
-      mark: () => P() === 11 || P() === 15,
+      mark: () => P() === 11 || P() === 15 || P() === 16,
       talk: () => Story.dean(),
     },
     {

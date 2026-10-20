@@ -1,7 +1,7 @@
 // 맵 정적 검증: 크기, 타일, 워프, NPC/오브젝트 배치, 도달 가능성, 아이템 참조
 import { loadGame } from './load.mjs';
 const G = loadGame();
-const { MAPS, TILES, ITEMS, QUESTS } = G;
+const { MAPS, TILES, ITEMS, QUESTS, HOURGLASS } = G;
 let errors = 0, warns = 0;
 const err = (m) => { errors++; console.log('ERROR', m); };
 const warn = (m) => { warns++; console.log('warn ', m); };
@@ -13,7 +13,7 @@ function grid(map, allFlags) {
   return rt;
 }
 function solidObj(map, x, y, allFlags) {
-  return map.objects.some((o) => o.x === x && o.y === y && (o.type === 'chest' || o.type === 'lever' || o.type === 'dial' || o.solid === true) && !(allFlags && o.show));
+  return map.objects.some((o) => o.x === x && o.y === y && (o.type === 'chest' || o.type === 'lever' || o.type === 'dial' || o.type === 'hourglass' || o.solid === true) && !(allFlags && o.show));
 }
 function walkable(map, rt, x, y, allFlags) {
   if (x < 0 || y < 0 || x >= map.w || y >= map.h) return false;
@@ -54,6 +54,8 @@ addEntry('cellar', 1, 2, 'well');
 addEntry('rivel', 19, 27, 'returnwing');
 addEntry('capital', 23, 37, 'returnwing');
 addEntry('cap_inn', 9, 7, 'respawn');
+addEntry('samira', 17, 25, 'returnwing');
+addEntry('samira_inn', 9, 7, 'respawn');
 
 const usedIds = new Set();
 for (const id in MAPS) {
@@ -136,6 +138,43 @@ for (const qid in QUESTS) for (const st of QUESTS[qid].stages) {
   if (!bfs(MAPS.sewer2, [[3, 18]], true).has('16,3')) err('sewer2: ladder unreachable with valves');
   if (bfs(MAPS.tower2, [[20, 17]], false).has('3,3')) err('tower2: stairs reachable without dials');
   if (!bfs(MAPS.tower2, [[20, 17]], true).has('3,3')) err('tower2: stairs unreachable with dials');
+}
+// 제3장 관문
+{
+  // 모래시계 회랑: 뒤집기 상태(x, y, flip)를 포함한 BFS — 모래시계를 써야만 위층 계단에 닿는다
+  const m = MAPS.temple1;
+  const rtFor = (flip) => { const rt = m.tiles.map((r) => r.split('')); for (const [x, y] of flip ? HOURGLASS.A : HOURGLASS.B) rt[y][x] = '8'; return rt; };
+  const grids = [rtFor(false), rtFor(true)];
+  const goal = m.warps.find((w) => w.to === 'temple2');
+  const plain = (flip) => { const save = m.tileFlags; m.tileFlags = []; const r = (() => { const rt = grids[flip ? 1 : 0]; const seen = new Set(['12,18']); const q = [[12, 18]]; while (q.length) { const [x, y] = q.shift(); for (const [dx, dy] of D4) { const nx = x + dx, ny = y + dy, k = nx + ',' + ny; if (seen.has(k) || !walkable(m, rt, nx, ny, false)) continue; seen.add(k); q.push([nx, ny]); } } return seen; })(); m.tileFlags = save; return r; };
+  if (plain(false).has(goal.x + ',' + goal.y) || plain(true).has(goal.x + ',' + goal.y)) err('temple1: upstairs reachable without flipping hourglasses');
+  const glasses = m.objects.filter((o) => o.type === 'hourglass');
+  const seen = new Set(['12,18,0']); const q = [[12, 18, 0]]; let ok = false, flips = 0;
+  while (q.length) {
+    const [x, y, f] = q.shift();
+    if (x === goal.x && y === goal.y) { ok = true; break; }
+    const rt = grids[f];
+    for (const [dx, dy] of D4) { const nx = x + dx, ny = y + dy, k = nx + ',' + ny + ',' + f; if (seen.has(k) || !walkable(m, rt, nx, ny, false)) continue; seen.add(k); q.push([nx, ny, f]); }
+    // 모래시계 옆에서 뒤집기 (발밑이 꺼지는 칸에서는 불가)
+    if (glasses.some((g) => Math.abs(g.x - x) + Math.abs(g.y - y) === 1)) {
+      const nf = 1 - f, k = x + ',' + y + ',' + nf;
+      const sinks = (nf ? HOURGLASS.B : HOURGLASS.A).some(([sx, sy]) => sx === x && sy === y);
+      if (!sinks && !seen.has(k)) { seen.add(k); q.push([x, y, nf]); flips++; }
+    }
+  }
+  if (!ok) err('temple1: upstairs unreachable even with hourglass flips');
+  // 침묵의 제단: 미오 구출 전에는 아래층 계단 철창이 닫혀 있다
+  const t2 = MAPS.temple2;
+  const vane = t2.npcs.find((n) => n.id === 'vane_t2');
+  const withBlock2 = (blocks, flags) => { const save = t2.objects; t2.objects = save.filter((o) => !o.show).concat(blocks.map(([x, y]) => ({ type: 'block', x, y, solid: true }))); const r = bfs(t2, [[12, 15]], flags); t2.objects = save; return r; };
+  if (withBlock2([[vane.x, vane.y]], false).has('20,1')) err('temple2: downstairs reachable before rescuing Mio');
+  if (!withBlock2([], true).has('20,1')) err('temple2: downstairs unreachable after rescue');
+  // 전갈 굴: 열쇠 상자는 여왕 구역을 지나야만 닿는다
+  const sc = MAPS.sandcave;
+  const zone = sc.triggers[0];
+  const blocks = [];
+  for (let y = zone.y; y < zone.y + zone.h; y++) for (let x = zone.x; x < zone.x + zone.w; x++) blocks.push({ type: 'block', x, y, solid: true });
+  { const save = sc.objects; sc.objects = save.concat(blocks); const r = bfs(sc, [[4, 19]], false); sc.objects = save; if (D4.some(([dx, dy]) => r.has((26 + dx) + ',' + (1 + dy)))) err('sandcave: sun key reachable without passing the queen'); }
 }
 // 별조각 8개
 const stars = [];

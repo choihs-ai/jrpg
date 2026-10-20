@@ -75,6 +75,42 @@ const BattleBG = (() => {
       for (const x of [24, 282]) { p.rect(x, 0, 14, 112, '#3a3650'); p.rect(x, 0, 3, 112, '#4a465c'); }
       p.rect(0, 112, 320, 128, '#2a2438'); p.rect(110, 112, 100, 128, '#3a2a5a'); p.rect(110, 112, 3, 128, '#e8d080'); p.rect(207, 112, 3, 128, '#e8d080');
     },
+    canyon(p, g) {
+      sky(p, '#e8905a', '#f8d0a0', 110);
+      g.fillStyle = '#a84a2a'; g.beginPath(); g.moveTo(0, 110); g.lineTo(0, 20); g.lineTo(40, 30); g.lineTo(70, 10); g.lineTo(100, 40); g.lineTo(110, 110); g.fill();
+      g.fillStyle = '#b8583a'; g.beginPath(); g.moveTo(320, 110); g.lineTo(320, 14); g.lineTo(280, 34); g.lineTo(250, 8); g.lineTo(215, 44); g.lineTo(205, 110); g.fill();
+      for (let y = 30; y < 110; y += 12) { p.rect(0, y, 100, 1, 'rgba(90,30,20,0.4)'); p.rect(210, y + 4, 110, 1, 'rgba(90,30,20,0.4)'); }
+      p.rect(0, 110, 320, 130, '#c8784a'); p.noise(['#b86a3a', '#d8905a'], 0.08, 201, [0, 110, 320, 130]);
+      for (let i = 0; i < 6; i++) p.ellipse(30 + i * 55, 150 + (i % 2) * 14, 20, 4, 'rgba(120,50,20,0.35)');
+    },
+    desert(p, g) {
+      sky(p, '#5aa8ec', '#f8e8c0', 110);
+      g.fillStyle = '#fff6c0'; g.beginPath(); g.arc(250, 30, 14, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#e8c88a'; g.beginPath(); g.moveTo(0, 110); for (let x = 0; x <= 320; x += 10) g.lineTo(x, 92 + Math.sin(x * 0.03) * 10); g.lineTo(320, 110); g.fill();
+      g.fillStyle = '#d8b070'; g.beginPath(); g.moveTo(0, 116); for (let x = 0; x <= 320; x += 10) g.lineTo(x, 104 + Math.sin(x * 0.05 + 2) * 6); g.lineTo(320, 240); g.lineTo(0, 240); g.fill();
+      p.rect(0, 118, 320, 122, '#e2cd90'); p.noise(['#cdb675', '#f0e0aa'], 0.06, 211, [0, 118, 320, 122]);
+      for (let i = 0; i < 5; i++) p.ellipse(40 + i * 64, 165, 28, 4, 'rgba(160,120,60,0.35)');
+    },
+    sandcave(p, g) {
+      p.rect(0, 0, 320, 240, '#3a2a18');
+      for (let i = 0; i < 12; i++) { const x = i * 30; g.fillStyle = '#5a4428'; g.beginPath(); g.moveTo(x, 0); g.lineTo(x + 15, 22 + (i * 13) % 20); g.lineTo(x + 30, 0); g.fill(); }
+      g.fillStyle = 'rgba(255,220,140,0.18)'; g.beginPath(); g.moveTo(140, 0); g.lineTo(180, 0); g.lineTo(230, 120); g.lineTo(90, 120); g.fill();
+      p.rect(0, 112, 320, 128, '#a88048'); p.noise(['#8a6a3a', '#c8a060'], 0.1, 221, [0, 112, 320, 128]);
+    },
+    temple(p, g) {
+      p.rect(0, 0, 320, 240, '#3a2a18');
+      for (let y = 0; y < 112; y += 8) for (let x = (y / 8) % 2 ? 0 : 12; x < 320; x += 24) { p.rect(x, y, 23, 7, '#8a6a40'); p.rect(x, y, 23, 1, '#a88a5a'); }
+      for (const x of [36, 268]) { p.rect(x, 14, 18, 98, '#c8a878'); p.rect(x, 14, 4, 98, '#e8d0a0'); p.rect(x - 4, 10, 26, 6, '#e8d0a0'); }
+      g.fillStyle = '#e8c070'; for (const x of [110, 210]) { g.beginPath(); g.moveTo(x - 6, 40); g.lineTo(x + 6, 40); g.lineTo(x, 52); g.fill(); g.beginPath(); g.moveTo(x - 6, 64); g.lineTo(x + 6, 64); g.lineTo(x, 52); g.fill(); }
+      p.rect(0, 112, 320, 128, '#b89868'); for (let x = 0; x < 320; x += 32) p.rect(x, 112, 1, 128, '#8a6a40'); for (let y = 112; y < 240; y += 16) p.rect(0, y, 320, 1, '#8a6a40');
+    },
+    sandbell(p, g) {
+      sky(p, '#2a1a10', '#6a4a2a', 112);
+      g.fillStyle = 'rgba(232,192,112,0.25)'; g.beginPath(); g.moveTo(130, 10); g.quadraticCurveTo(160, -4, 190, 10); g.lineTo(204, 96); g.lineTo(116, 96); g.fill();
+      g.fillStyle = 'rgba(232,192,112,0.5)'; for (let i = 0; i < 30; i++) g.fillRect((i * 37) % 320, (i * 23) % 110, 1, 3);
+      for (const x of [26, 280]) { p.rect(x, 10, 14, 102, '#8a6a40'); p.rect(x, 10, 3, 102, '#b89868'); }
+      p.rect(0, 112, 320, 128, '#a88048'); p.rect(110, 112, 100, 128, '#7a3a2a'); p.rect(110, 112, 3, 128, '#e8c070'); p.rect(207, 112, 3, 128, '#e8c070');
+    },
   };
   function get(name) {
     if (!cache[name]) cache[name] = Pix.make(320, 240, (p, g) => (DEFS[name] || DEFS.plains)(p, g));
@@ -285,7 +321,9 @@ const Battle = (() => {
       let tx = cx - (tags.length * 34) / 2;
       for (const [t, c] of tags) { drawTag(ctx, tx, top - 4, t, c); tx += 34; }
       // 보스/분석된 적은 HP 막대
-      if (e.def.boss || Game.state.seen[e.defId]) UI.gauge(ctx, cx - 40, d.y * 2 + d.h * 2 + 4, 80, 5, e.hp / e.mhp, e.def.boss ? '#ff6060' : '#63e07a');
+      // 신기루는 본체의 체력을 그대로 비춰 보인다
+      const hpSrc = e.mirrorOf && e.mirrorOf.alive ? e.mirrorOf : e;
+      if (e.def.boss || Game.state.seen[e.knownId]) UI.gauge(ctx, cx - 40, d.y * 2 + d.h * 2 + 4, 80, 5, hpSrc.hp / hpSrc.mhp, e.def.boss ? '#ff6060' : '#63e07a');
     }
     // 아군 패널
     core.party.forEach((a, i) => drawPanel(ctx, a, i));
@@ -351,9 +389,12 @@ const Battle = (() => {
     if (dead) tags.push(['전투불능', Theme.red]);
     for (const s of ['poison', 'sleep', 'paralyze', 'silence']) if (a.status[s]) tags.push([STATUS_NAMES[s], { poison: '#c070ff', sleep: '#70a8ff', paralyze: '#ffd050', silence: '#a0a0b0' }[s]]);
     if (a.defending) tags.push(['방어', '#7cc4ff']);
-    if (a.buffs.atk) tags.push(['공↑', '#ff8a5a']);
+    if (a.buffs.atk) tags.push(a.buffs.atk.mult >= 1 ? ['공↑', '#ff8a5a'] : ['공↓', '#a0a0b0']);
     if (a.buffs.def && a.buffs.def.mult > 1) tags.push(['방↑', '#ffd050']);
     if (a.buffs.def && a.buffs.def.mult < 1) tags.push(['방↓', '#a0a0b0']);
+    if (a.buffs.regen) tags.push(['재생', '#63e07a']);
+    if (a.buffs.spd && a.buffs.spd.mult < 1) tags.push(['속↓', '#70a8ff']);
+    if (a.buffs.hit && a.buffs.hit.mult < 1) tags.push(['명↓', '#a0a0b0']);
     let tx = x + 4;
     for (const [t, c] of tags.slice(0, 4)) { const tw = Math.max(32, Text.width(ctx, t, 12) + 10); ctx.fillStyle = 'rgba(10,10,20,0.85)'; UI.roundRect(ctx, tx, y + h - 2, tw, 17, 4); ctx.fill(); Text.draw(ctx, t, tx + tw / 2, y + h - 1, { size: 12, align: 'center', color: c, bold: true, shadow: false }); tx += tw + 3; }
   }
@@ -509,10 +550,10 @@ const Battle = (() => {
           // 이번에 쓸 속성 (기술 속성 > 무기 속성)
           const el = skill ? skill.element || (skill.id === 'attack' && user.isParty ? user.st.element : null) : null;
           if (!all && !t0.isParty && el) {
-            const m = Game.knownElem(t0.defId, el);
+            const m = Game.knownElem(t0.knownId, el);
             extra = m === undefined ? ' [d](상성 ?)[/]' : m > 1 ? ' [y]약점![/]' : m === 0 ? ' [r]무효[/]' : m < 1 ? ' [b]내성[/]' : '';
           }
-          const sum = !all && !t0.isParty ? Game.knownSummary(t0.defId) : '';
+          const sum = !all && !t0.isParty ? Game.knownSummary(t0.knownId) : '';
           const w = Math.max(Text.width(ctx, label + Text.strip(extra), 18, true), sum ? Text.width(ctx, Text.strip(sum), 14) : 0) + 40;
           UI.drawWindow(ctx, Engine.W / 2 - w / 2, 100, w, sum ? 60 : 38);
           Text.draw(ctx, label + extra, Engine.W / 2, 109, { size: 18, bold: true, align: 'center' });
