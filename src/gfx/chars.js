@@ -323,5 +323,16 @@ const LOOKS = {
   pharmacist: { hair: '#4a2a5a', style: 'long', cloth: '#f4f4f4', accent: '#4b8a4c', pants: '#4b8a4c', extras: ['robe', 'glasses'] },
   capinnkeeper: { hair: '#3a2a20', style: 'short', cloth: '#7a3a2a', accent: '#f4f4f4', pants: '#3a2a20', extras: ['apron', 'beard'] },
   caravan: { hair: '#6a4a2a', style: 'bandana', hat: '#c4473a', cloth: '#5a7a9a', accent: '#d8b040', pants: '#4a3a2a', skin: '#d8a070' },
+  // ── 제3장 인물 ──
+  hakim: { hair: '#2a2a2a', style: 'bandana', hat: '#f4f0e0', cloth: '#3a6ab0', accent: '#d8b040', pants: '#e8dcc0', skin: '#a8704a', extras: ['beard', 'robe'] },
+  desertM: { hair: '#2a2a2a', style: 'bandana', hat: '#e8dcc0', cloth: '#c8784a', accent: '#5a3a22', pants: '#e8dcc0', skin: '#b8804a' },
+  desertF: { hair: '#1a1a2a', style: 'long', cloth: '#c4473a', accent: '#d8b040', pants: '#c4473a', skin: '#b8804a', extras: ['robe'] },
+  desertKid: { hair: '#1a1a2a', style: 'short', cloth: '#e8dcc0', accent: '#3a6ab0', pants: '#7a5a3a', skin: '#b8804a', extras: ['blush'] },
+  zahir: { hair: '#2a2a2a', style: 'hood', cloth: '#e8dcc0', accent: '#3a6ab0', pants: '#e8dcc0', boots: '#7a5a3a', skin: '#a8704a', extras: ['robe', 'beard'] },
+  aria: { hair: '#1a1a2a', style: 'long', cloth: '#f4f4f4', accent: '#c4473a', pants: '#c4473a', boots: '#7a2a2a', extras: ['robe'] },
+  messenger: { hair: '#2a2a2a', style: 'bandana', hat: '#d8b040', cloth: '#7a5a3a', accent: '#e8dcc0', pants: '#5a4030', skin: '#b8804a' },
+  raider: { hair: '#2a2a2a', style: 'bandana', hat: '#3a3a3a', cloth: '#7a4a2a', accent: '#c4473a', pants: '#3a2a1a', skin: '#b07850' },
+  nadia: { hair: '#b8b0a8', style: 'bun', cloth: '#c8a878', accent: '#3a6ab0', pants: '#a88858', skin: '#b07850', extras: ['robe'] },
+  teller: { hair: '#4a2a5a', style: 'hood', cloth: '#6a3fa0', accent: '#ffd75e', pants: '#4a2a6a', skin: '#c88a5a', extras: ['robe'] },
   mushking: 'critter:mushroom',
 };

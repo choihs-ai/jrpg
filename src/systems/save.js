@@ -25,7 +25,7 @@ const Save = (() => {
       time: s.playTime,
       party: s.party.slice(),
       date: Date.now(),
-      chapter: Game.flag('chapter1_done') ? '제1장 완료' : '제1장',
+      chapter: Game.flag('chapter3_done') ? '제3장 완료' : Game.flag('ch3_started') ? '제3장' : Game.flag('chapter2_done') ? '제2장 완료' : Game.flag('ch2_started') ? '제2장' : Game.flag('chapter1_done') ? '제1장 완료' : '제1장',
     };
   }
 

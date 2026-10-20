@@ -32,6 +32,9 @@ function policy(core, a) {
   const low = allies.filter((x) => x.hp / x.mhp < 0.45).sort((x, y) => x.hp / x.mhp - y.hp / y.mhp);
   const dead = core.party.filter((x) => !x.alive);
   if (dead.length && has('revive')) return { kind: 'skill', skill: 'revive', target: dead[0] };
+  // 3장: 신기루는 통찰로 걷어낸다
+  if (a.id === 'hero' && has('insight') && foes.some((e) => e.def.mirage)) return { kind: 'skill', skill: 'insight' };
+  if (low.length >= 2 && has('mother_song')) return { kind: 'skill', skill: 'mother_song' };
   if (dead.length && Game.count('feather') && a.id !== 'bran') { return { kind: 'item', item: 'feather', target: dead[0] }; }
   if (low.length >= 2 && has('heal_all')) return { kind: 'skill', skill: 'heal_all' };
   if (low.length && has('heal_more') && (a.id === 'mio' || (a.id === 'hero' && low[0].hp / low[0].mhp < 0.3))) return { kind: 'skill', skill: 'heal_more', target: low[0] };
@@ -47,6 +50,9 @@ function policy(core, a) {
     if (charging.charging === 'rampage' && charging.mem.markTarget === a) return { kind: 'defend' };
   }
   if (a.id === 'bran' && charging && charging.charging === 'rampage' && has('cover') && charging.mem.markTarget !== a) return { kind: 'skill', skill: 'cover', target: charging.mem.markTarget };
+  if (charging && charging.charging === 'queen_strike' && charging.mem.mark === a) return { kind: 'defend' };
+  if (charging && charging.charging === 'falling_sand' && (a.mhp < 420 || a.hp / a.mhp < 0.6)) return { kind: 'defend' };
+  if (a.id === 'mio' && has('regen') && core.boss && !allies.some((x) => x.buffs.regen) && core.round % 4 === 2) return { kind: 'skill', skill: 'regen' };
   if (a.id === 'mio' && has('protect') && core.boss && !allies.some((x) => x.buffs.def) && core.round % 4 === 1) return { kind: 'skill', skill: 'protect' };
   if (a.id === 'bran' && has('warcry') && core.boss && !allies.some((x) => x.buffs.atk) ) return { kind: 'skill', skill: 'warcry' };
   // 약점 공격
@@ -67,7 +73,11 @@ function policy(core, a) {
   if (a.id === 'mio' && !core.boss) return { kind: 'attack', target: foes[0] };
   const bossT = foes.find((f) => f.defId === 'clock_guardian') || foes.find((f) => f.def.boss) || foes[0];
   if (core.party.length === 1 && a.hp / a.mhp < 0.4 && (Game.count('hi_potion') || Game.count('potion'))) return { kind: 'item', item: Game.count('hi_potion') ? 'hi_potion' : 'potion', target: a };
+  if (has('stellar_blade') && core.boss) return { kind: 'skill', skill: 'stellar_blade', target: bossT };
   if (has('meteor_slash') && core.boss) return { kind: 'skill', skill: 'meteor_slash', target: bossT };
+  if (has('axe_storm') && foes.length >= 3) return { kind: 'skill', skill: 'axe_storm' };
+  if (has('unbroken') && core.boss && !a.buffs.atk) return { kind: 'skill', skill: 'unbroken' };
+  if (has('death_mark') && core.boss) return { kind: 'skill', skill: 'death_mark', target: bossT };
   if (has('star_slash') && core.boss) return { kind: 'skill', skill: 'star_slash', target: bossT };
   if (has('bash') && core.boss) return { kind: 'skill', skill: 'bash', target: bossT };
   if (has('quake') && foes.length >= 3) return { kind: 'skill', skill: 'quake' };
@@ -202,4 +212,40 @@ NAIVE = false;
 console.log('── 평균 보상 (2장) ──');
 for (const z of ['highway', 'highway_wood', 'sewer', 'tower']) console.log(`${z.padEnd(12)} ${avgExp(z)} EXP  ${avgGold(z)} G`);
 for (const L of [10, 12, 14, 16, 18]) process.stdout.write(`Lv${L}:${G.expForLevel(L)}  `);
+console.log();
+
+// ════════ 제3장 ════════
+const E_CH3 = {
+  hero: { weapon: 'flame_saber', armor: 'desert_mail', shield: 'sun_shield', helm: 'desert_helm', accessory: 'courage_token' },
+  bran: { weapon: 'sand_axe', armor: 'desert_mail', shield: 'squire_shield', helm: 'desert_helm' },
+  linette: { weapon: 'sun_staff', armor: 'mirage_robe', helm: 'turban', accessory: 'sage_earring' },
+  mio: { weapon: 'sun_staff', armor: 'mirage_robe', helm: 'turban' },
+  nell: { weapon: 'scorpion_dagger', armor: 'sand_garb', helm: 'turban' },
+};
+const NOMIO = ['hero', 'bran', 'linette', 'nell'];
+const POT3 = { potion: 5, hi_potion: 5, mega_potion: 3, ether: 3, hi_ether: 2, feather: 2 };
+console.log('\n── 제3장: 협곡 · 사막 ──');
+run('Lv17 4인 ch2 gear canyon', N, () => setup(P4, 17, E_CH2B, POT3), encounter('canyon'));
+run('Lv18 4인 ch2 gear desert', N, () => setup(P4, 18, E_CH2B, POT3), encounter('desert'));
+run('Lv18 4인 ch2 gear 여관 습격', N, () => setup(P4, 18, E_CH2B, POT3), () => ['sand_spirit', 'choir_knight', 'sand_spirit']);
+console.log('── 전갈 굴 (미오 없음) ──');
+run('Lv18 미오없음 ch2 gear sandcave', N, () => setup(NOMIO, 18, E_CH2B, POT3), encounter('sandcave'));
+run('Lv19 미오없음 ch3 gear sandcave', N, () => setup(NOMIO, 19, E_CH3, POT3), encounter('sandcave'));
+for (const L of [18, 19, 20, 21]) run(`Lv${L} 미오없음 ch2 gear 전갈 여왕`, N, () => setup(NOMIO, L, E_CH2B, POT3), () => ['scorpion_queen'], { boss: true });
+for (const L of [19, 20]) run(`Lv${L} 미오없음 ch3 gear 전갈 여왕`, N, () => setup(NOMIO, L, E_CH3, POT3), () => ['scorpion_queen'], { boss: true });
+console.log('── 모래시계 사원 ──');
+run('Lv20 미오없음 ch3 gear temple', N, () => setup(NOMIO, 20, E_CH3, POT3), encounter('temple'));
+run('Lv20 미오없음 ch3 gear 황금 탐욕상자', N, () => setup(NOMIO, 20, E_CH3, POT3), () => ['cursed_chest']);
+for (const L of [20, 21, 22]) run(`Lv${L} 미오없음 ch3 gear 베인(재전)`, N, () => setup(NOMIO, L, E_CH3, POT3), () => ['choir_knight', 'vane2'], { boss: true });
+run('Lv21 4인 ch3 gear temple', N, () => setup(P4, 21, E_CH3, POT3), encounter('temple'));
+for (const L of [21, 22, 23]) run(`Lv${L} 4인 ch3 gear 자히르`, N, () => setup(P4, L, E_CH3, POT3), () => ['zahir'], { boss: true });
+for (const L of [21, 22]) run(`Lv${L} 넬 포함 ch3 gear 자히르`, N, () => setup(['hero', 'nell', 'linette', 'mio'], L, E_CH3, POT3), () => ['zahir'], { boss: true });
+NAIVE = true;
+run('NAIVE Lv20 전갈 여왕', N, () => setup(NOMIO, 20, E_CH3, POT3), () => ['scorpion_queen'], { boss: true });
+run('NAIVE Lv21 베인(재전)', N, () => setup(NOMIO, 21, E_CH3, POT3), () => ['choir_knight', 'vane2'], { boss: true });
+run('NAIVE Lv22 자히르', N, () => setup(P4, 22, E_CH3, POT3), () => ['zahir'], { boss: true });
+NAIVE = false;
+console.log('── 평균 보상 (3장) ──');
+for (const z of ['canyon', 'desert', 'sandcave', 'temple']) console.log(`${z.padEnd(12)} ${avgExp(z)} EXP  ${avgGold(z)} G`);
+for (const L of [17, 18, 19, 20, 21, 22, 23, 24]) process.stdout.write(`Lv${L}:${G.expForLevel(L)}  `);
 console.log();

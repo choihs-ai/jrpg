@@ -400,6 +400,162 @@ const MONSTERS = {
     },
     extraActions(self) { return self.mem.phase === 2 && self.mem.turn % 2 === 1 ? 1 : 0; },
   },
+
+  // ════════ 제3장 ════════
+  // ── 붉은 협곡 · 타는 모래 사막 ──
+  sand_scorpion: {
+    name: '모래전갈', art: 'scorpion', pal: { body: '#c8904a', dark: '#8a5a2a', light: '#e8b878', sting: '#5a1a2a', eye: '#ff4040' },
+    hp: 230, mp: 0, atk: 72, def: 40, mag: 0, spd: 14, exp: 120, gold: 60,
+    elem: { ice: 1.5, fire: 0.5 }, resist: { poison: 1 }, drops: [{ item: 'antidote', p: 0.2 }, { item: 'hi_potion', p: 0.05 }], steal: { item: 'hi_potion', p: 0.3 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'sting', w: 4 }, { s: 'pincer', w: 2 }],
+    desc: '모래 속에 숨어 지나가는 것을 노리는 전갈. 독침에 찔리면 독에 걸린다. 차가운 것을 싫어한다.',
+  },
+  dune_worm: {
+    name: '사구 지렁이', art: 'worm', pal: { body: '#b87a5a', dark: '#7a4a3a', light: '#d89a7a', sand: '#d8b878' },
+    hp: 320, mp: 0, atk: 78, def: 30, mag: 0, spd: 8, exp: 150, gold: 70,
+    elem: { ice: 1.5, thunder: 1.25, fire: 0.75 }, resist: { sleep: 0.5 }, drops: [{ item: 'mega_potion', p: 0.05 }], steal: { item: 'potion', p: 0.5 },
+    actions: [{ s: 'attack', w: 3 }, { s: 'burrow_bite', w: 4 }, { s: 'sand_spray', w: 2 }],
+    desc: '모래 언덕 아래를 헤엄치는 거대한 지렁이. 모래를 뿜어 시야를 가린다.',
+  },
+  cactus_man: {
+    name: '가시선인장', art: 'cactus', pal: { body: '#5a9a4a', dark: '#3a6a2a', light: '#7aba6a', spine: '#f0e8c0', flower: '#ff6b8a', sand: '#d8b878' },
+    hp: 200, mp: 0, atk: 64, def: 36, mag: 30, spd: 12, exp: 110, gold: 50,
+    elem: { fire: 2.0, ice: 0.75 }, resist: { poison: 0.5 }, drops: [{ item: 'hi_ether', p: 0.04 }], steal: { item: 'hi_ether', p: 0.12 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'needle_rain', w: 3 }],
+    desc: '사막을 걸어 다니는 선인장. 온몸의 가시를 일행 전체에 쏘아 댄다. 불을 보면 질색한다.',
+  },
+  desert_hawk: {
+    name: '사막매', art: 'crow', pal: { body: '#a87a4a', dark: '#6a4a2a', light: '#e8c890', eye: '#ffe040' },
+    hp: 170, mp: 0, atk: 70, def: 26, mag: 0, spd: 30, evade: 0.15, exp: 105, gold: 50,
+    elem: { thunder: 1.5, ice: 1.25 }, resist: {}, drops: [{ item: 'feather', p: 0.04 }], steal: { item: 'feather', p: 0.15 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'dive', w: 3 }, { s: 'peck', w: 2 }],
+    desc: '모래 위를 낮게 나는 사나운 매. 아주 빠르고 피하기를 잘한다.',
+  },
+  sand_raider: {
+    name: '모래 약탈자', art: 'bandit', pal: { skin: '#c88a5a', cloth: '#8a3a2a', pants: '#4a3a2a', sash: '#d8b040', wrap: '#e8dcc0', blade: '#d8dce8' },
+    hp: 260, mp: 0, atk: 74, def: 32, mag: 0, spd: 20, exp: 130, gold: 140,
+    elem: { light: 1.25 }, resist: {}, drops: [{ item: 'mega_potion', p: 0.06 }, { item: 'turban', p: 0.03 }], steal: { item: 'sand_bomb', p: 0.35 },
+    actions: [{ s: 'attack', w: 5 }, { s: 'plunder', w: 3 }, { s: 'tackle', w: 2 }],
+    desc: '대상 행렬을 노리는 사막의 도적. 주머니를 노린다. 쓰러뜨리면 빼앗긴 돈을 되찾을 수 있다.',
+  },
+  heat_lizard: {
+    name: '열기도마뱀', art: 'lizard', pal: { body: '#d8a040', dark: '#9a6a2a', light: '#f0c870', flame: '#ff7020' },
+    hp: 240, mp: 0, atk: 70, def: 34, mag: 40, spd: 14, exp: 125, gold: 60,
+    elem: { ice: 2.0, fire: 0 }, resist: {}, drops: [{ item: 'firebomb', p: 0.15 }], steal: { item: 'sand_bomb', p: 0.2 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'heat_wave', w: 3 }],
+    desc: '모래 열기를 머금은 도마뱀. 일행 전체에 열풍을 일으킨다.',
+  },
+  // ── 전갈 굴의 주인 ──
+  scorpion_queen: {
+    name: '모래전갈 여왕', art: 'scorpion', boss: true, artScale: 1.9, pal: { body: '#8a4a6a', dark: '#5a2a44', light: '#c87aa0', sting: '#ffd040', eye: '#ff3a3a', crown: '#ffd75e' },
+    hp: 3600, mp: 0, atk: 84, def: 42, mag: 30, spd: 16, exp: 2600, gold: 1200,
+    elem: { ice: 1.5, fire: 0.5 }, resist: { poison: 1, sleep: 0.7, paralyze: 0.5, silence: 1 }, drops: [{ item: 'mega_potion', p: 1 }],
+    desc: '오래된 우물 동굴을 차지한 전갈들의 여왕. 모래 속으로 사라질 때가 가장 위험하다.',
+    ai(self, B) {
+      const m = self.mem;
+      m.turn = (m.turn || 0) + 1;
+      if (m.next) { const n = m.next; m.next = null; return { skill: n, target: m.mark }; }
+      if (self.hp / self.maxhp < 0.6 && !m.brood) { m.brood = true; return { skill: 'brood_call' }; }
+      if (m.turn % 4 === 0) { m.next = 'queen_strike'; m.mark = B.pickTarget('party', 'fragile'); return { skill: 'dig_in' }; }
+      if (m.turn % 4 === 2) return { skill: 'tail_lash' };
+      return { skill: Util.chance(0.55) ? 'sting' : 'pincer', target: B.pickTarget('party', Util.chance(0.4) ? 'fragile' : 'random') };
+    },
+  },
+  // ── 모래시계 사원 ──
+  mummy: {
+    name: '사원의 미라', art: 'mummy', pal: { wrap: '#e0d4b0', dark: '#a89870', loose: '#c8bc98', eye: '#7cf0ff' },
+    hp: 300, mp: 30, atk: 76, def: 34, mag: 34, spd: 10, exp: 150, gold: 70, undead: true,
+    elem: { fire: 2.0, light: 1.5, dark: 0 }, resist: { poison: 1, sleep: 1 }, drops: [{ item: 'panacea', p: 0.12 }], steal: { item: 'panacea', p: 0.4 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'wrap', w: 3 }, { s: 'curse_word', w: 2 }],
+    desc: '사원을 지키다 잠든 신관의 미라. 붕대로 휘감아 마비시키고 저주를 중얼거린다.',
+  },
+  temple_guardian: {
+    name: '사암 수호상', art: 'sentry', pal: { stone: '#c8a070', dark: '#8a6a40', light: '#e8c898', eye: '#ffd040' },
+    hp: 360, mp: 0, atk: 80, def: 70, mag: 36, spd: 8, exp: 170, gold: 80,
+    elem: { thunder: 1.5, ice: 1.25, fire: 0.5 }, resist: { poison: 1, sleep: 1, silence: 1 }, drops: [{ item: 'hi_ether', p: 0.05 }], steal: { item: 'hi_ether', p: 0.15 },
+    actions: [{ s: 'attack', w: 3 }, { s: 'stone_beam', w: 3 }, { s: 'stone_fist', w: 2 }, { s: 'guard_stance', w: 1 }],
+    desc: '사암을 깎아 만든 사원의 수호상. 매우 단단하고, 눈에서 빛줄기를 쏜다.',
+  },
+  sand_spirit: {
+    name: '모래 정령', art: 'echo', pal: { body: '#d8b070', dark: '#9a7040', light: '#f8e0a0', eye: '#ff8a40' },
+    hp: 220, mp: 40, atk: 40, def: 30, mag: 50, spd: 22, exp: 140, gold: 60,
+    elem: { ice: 1.5, light: 0.5, dark: 1.25 }, resist: { poison: 1, sleep: 0.5 }, drops: [{ item: 'hi_ether', p: 0.05 }], steal: { item: 'sand_bomb', p: 0.3 },
+    actions: [{ s: 'heat_wave', w: 3 }, { s: 'sand_spray', w: 2 }, { s: 'attack', w: 2 }],
+    desc: '사막의 모래가 뭉쳐 생긴 정령. 열풍과 모래로 일행을 괴롭힌다.',
+  },
+  cursed_chest: {
+    name: '황금 탐욕상자', art: 'mimic', pal: { wood: '#c8a040', dark: '#8a6a20', gold: '#fff0a0', mouth: '#5a1020', tongue: '#e05a7a' },
+    hp: 420, mp: 30, atk: 86, def: 40, mag: 40, spd: 18, exp: 300, gold: 400,
+    elem: { light: 1.25, ice: 1.25 }, resist: { poison: 1, sleep: 0.5 }, drops: [{ item: 'hi_ether', p: 1 }],
+    actions: [{ s: 'gnaw', w: 5 }, { s: 'attack', w: 3 }, { s: 'curse_word', w: 2 }],
+    desc: '황금으로 치장한 탐욕상자. 사원의 보물 사이에 숨어 있다.',
+  },
+  // ── 베인 (재전) ──
+  vane2: {
+    name: '집행자 베인', art: 'cultist', boss: true, artScale: 1.35, pal: { robe: '#3a1420', dark: '#1a0a10', trim: '#d8b040', eye: '#ff2040', skin: '#c8b0a0', blade: '#ff8a8a', scythe: true },
+    hp: 3800, mp: 999, atk: 92, def: 36, mag: 56, spd: 18, exp: 2400, gold: 900,
+    elem: { light: 1.5, dark: 0 }, resist: { poison: 0.5, sleep: 1, paralyze: 0.5, silence: 0.5 }, drops: [],
+    desc: '잿빛 성가대의 집행자. 왕도에서의 패배 이후 낫이 붉게 물들었다. 처형 선고는 여전하다.',
+    ai(self, B) {
+      const m = self.mem;
+      m.turn = (m.turn || 0) + 1;
+      if (m.next) { const n = m.next; m.next = null; return { skill: n, target: m.mark }; }
+      if (m.turn % 3 === 0) { const t = B.pickTarget('party', 'weakest'); m.next = 'execution'; m.mark = t; return { skill: 'mark_doom', target: t }; }
+      if (m.turn % 3 === 2) return { skill: Util.chance(0.5) ? 'blood_scythe' : 'dark_wave' };
+      return { skill: 'attack', target: B.pickTarget('party', Util.chance(0.4) ? 'fragile' : 'random') };
+    },
+    extraActions(self) { return self.hp / self.maxhp < 0.4 && self.mem.turn % 2 === 0 ? 1 : 0; },
+  },
+  // ── 보스: 제3성부 자히르 ──
+  zahir: {
+    name: '제3성부 자히르', art: 'prophet', boss: true, pal: { robe: '#e8dcc0', dark: '#a89870', trim: '#d8b040', sash: '#3a6ab0', cloth: '#f4f0e0', skin: '#a8704a', beard: '#2a2a2a', eye: '#40c0ff', glass: '#c8e8f8', sand: '#e8c070' },
+    hp: 4200, mp: 999, atk: 60, def: 36, mag: 64, spd: 22, exp: 4000, gold: 2000,
+    elem: { ice: 1.25, thunder: 1.25, fire: 0.5, light: 0.75 }, resist: { poison: 0.5, sleep: 1, paralyze: 0.7, silence: 0.3 }, drops: [],
+    desc: '오아시스 사미라의 물의 사제였던 남자. 지금은 잿빛 성가대의 「제3성부」. 아지랑이처럼 모습을 흐린다. 진짜를 꿰뚫어 볼 눈이 있다면…',
+    phases: [{ key: 'p2', below: 0.5 }],
+    onPhase(self, B, key) {
+      if (key !== 'p2') return [];
+      self.mem.phase = 2;
+      self.mem.turn = 0;
+      const ev = [
+        { type: 'shake', mag: 6 },
+        { type: 'msg', text: '자히르가 지팡이 끝의 모래시계를 높이 들었다!' },
+        { type: 'msg', text: '[p]"모래가 다 떨어지기 전에… 바다를 돌려받겠다!"[/]' },
+      ];
+      const mio = B.party.find((a) => a.id === 'mio' && a.alive);
+      if (mio) {
+        for (const a of B.alivePartyList) a.buffs.regen = { mult: 1.08, turns: 99 };
+        ev.push({ type: 'msg', text: '…그때, 종 안쪽에서 노랫소리가 흘러나왔다. 미오의 목소리와 똑같은, 그러나 조금 더 낮은 목소리.' });
+        ev.push({ type: 'buff', target: mio, up: true });
+        ev.push({ type: 'msg', text: '[g]일행이 따뜻한 노랫소리에 감싸였다! (생명의 물결)[/]' });
+      }
+      return ev;
+    },
+    ai(self, B) {
+      const m = self.mem;
+      m.turn = (m.turn || 0) + 1;
+      if (m.next) { const n = m.next; m.next = null; return { skill: n }; }
+      const mirages = B.enemies.filter((e) => e.alive && e.def.mirage).length;
+      if ((m.phase || 1) === 1) {
+        if (m.turn === 1 || (!mirages && m.turn % 4 === 0)) return { skill: 'mirage' };
+        if (m.turn % 4 === 2) return { skill: 'sandstorm' };
+        return { skill: 'dune_spear', target: B.pickTarget('party', Util.chance(0.4) ? 'fragile' : 'random') };
+      }
+      if (m.turn === 1) return { skill: 'spirit_call' };
+      if (m.turn % 4 === 0) { m.next = 'falling_sand'; return { skill: 'hourglass_flip' }; }
+      if (!mirages && m.turn % 4 === 2) return { skill: 'mirage' };
+      if (m.turn % 4 === 3) return { skill: 'sandstorm' };
+      return { skill: 'dune_spear', target: B.pickTarget('party', Util.chance(0.5) ? 'fragile' : 'random') };
+    },
+    extraActions(self) { return self.mem.phase === 2 && self.mem.turn % 3 === 1 ? 1 : 0; },
+  },
+  zahir_mirage: {
+    name: '제3성부 자히르', art: 'prophet', boss: true, mirage: true, knownAs: 'zahir', pal: { robe: '#e8dcc0', dark: '#a89870', trim: '#d8b040', sash: '#3a6ab0', cloth: '#f4f0e0', skin: '#a8704a', beard: '#2a2a2a', eye: '#40c0ff', glass: '#c8e8f8', sand: '#e8c070' },
+    hp: 4400, mp: 0, atk: 20, def: 36, mag: 10, spd: 22, exp: 0, gold: 0,
+    elem: { ice: 1.25, thunder: 1.25, fire: 0.5, light: 0.75 }, resist: { poison: 1, sleep: 1, paralyze: 1, silence: 1 }, drops: [],
+    desc: '…',
+    actions: [{ s: 'idle_shimmer', w: 3 }, { s: 'mirage_spear', w: 2 }],
+  },
 };
 for (const id in MONSTERS) MONSTERS[id].id = id;
 
@@ -474,6 +630,37 @@ const ENCOUNTERS = {
       { w: 6, e: ['clock_soldier'] }, { w: 6, e: ['time_wisp', 'gear_bat'] }, { w: 5, e: ['gear_bat', 'gear_bat', 'gear_bat'] },
       { w: 5, e: ['choir_knight'] }, { w: 4, e: ['clock_soldier', 'time_wisp'] }, { w: 4, e: ['choir_knight', 'choir_acolyte'] },
       { w: 3, e: ['clock_soldier', 'clock_soldier'] }, { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
+    ],
+  },
+  canyon: {
+    bg: 'canyon', rate: [14, 22],
+    groups: [
+      { w: 7, e: ['sand_scorpion', 'sand_scorpion'] }, { w: 6, e: ['desert_hawk', 'desert_hawk'] }, { w: 5, e: ['sand_raider'] },
+      { w: 5, e: ['cactus_man', 'sand_scorpion'] }, { w: 4, e: ['sand_raider', 'desert_hawk'] }, { w: 3, e: ['sand_scorpion', 'sand_scorpion', 'desert_hawk'] },
+      { w: 1, e: ['glimmer_jelly'] },
+    ],
+  },
+  desert: {
+    bg: 'desert', rate: [14, 22],
+    groups: [
+      { w: 7, e: ['dune_worm'] }, { w: 6, e: ['cactus_man', 'cactus_man'] }, { w: 6, e: ['heat_lizard', 'sand_scorpion'] },
+      { w: 5, e: ['sand_raider', 'sand_raider'] }, { w: 4, e: ['desert_hawk', 'heat_lizard'] }, { w: 4, e: ['dune_worm', 'cactus_man'] },
+      { w: 3, e: ['heat_lizard', 'heat_lizard', 'desert_hawk'] }, { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
+    ],
+  },
+  sandcave: {
+    bg: 'sandcave', rate: [12, 20],
+    groups: [
+      { w: 7, e: ['sand_scorpion', 'sand_scorpion', 'sand_scorpion'] }, { w: 6, e: ['dune_worm', 'sand_scorpion'] }, { w: 5, e: ['heat_lizard', 'heat_lizard'] },
+      { w: 4, e: ['dune_worm', 'dune_worm'] }, { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
+    ],
+  },
+  temple: {
+    bg: 'temple', rate: [12, 20],
+    groups: [
+      { w: 6, e: ['mummy', 'mummy'] }, { w: 6, e: ['temple_guardian'] }, { w: 5, e: ['sand_spirit', 'mummy'] },
+      { w: 5, e: ['choir_knight', 'choir_acolyte'] }, { w: 4, e: ['temple_guardian', 'sand_spirit'] }, { w: 3, e: ['mummy', 'mummy', 'sand_spirit'] },
+      { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
     ],
   },
   cellar: {

@@ -7,7 +7,7 @@
 // ─────────────────────────────────────────────────────────────
 const ELEMENTS = { fire: '불', ice: '얼음', thunder: '번개', light: '빛', dark: '어둠' };
 const STATUS_NAMES = { poison: '독', sleep: '수면', paralyze: '마비', silence: '침묵' };
-const BUFF_NAMES = { atk: '공격력', def: '방어력', spd: '민첩', hit: '명중률', mag: '마력', eva: '회피율' };
+const BUFF_NAMES = { atk: '공격력', def: '방어력', spd: '민첩', hit: '명중률', mag: '마력', eva: '회피율', regen: '재생' };
 
 const SKILLS = {
   attack: { name: '공격', kind: 'basic', target: 'enemy', type: 'physical', mult: 1, anim: 'slash' },
@@ -21,6 +21,8 @@ const SKILLS = {
   starfall: { name: '별똥별', kind: 'spell', mp: 10, target: 'enemies', type: 'magic', element: 'light', power: 34, scale: 0.7, anim: 'light', desc: '하늘에서 별똥별을 쏟아붓는다. 적 전체에 빛 속성 피해.' },
   resolve: { name: '각오', kind: 'skill', mp: 4, target: 'self', type: 'buff', buff: { atk: 1.4, def: 1.3 }, turns: 4, anim: 'buff', desc: '마음을 다잡는다. 자신의 공격력과 방어력이 오른다. (4턴)' },
   meteor_slash: { name: '유성 베기', kind: 'skill', mp: 9, target: 'enemy', type: 'physical', mult: 2.1, element: 'light', anim: 'starslash', desc: '유성처럼 내리꽂는 일격. 강력한 빛 속성 물리 공격.' },
+  insight: { name: '통찰', kind: 'skill', mp: 6, target: 'enemies', type: 'analyze', priority: true, anim: 'scan', desc: '이방인의 눈으로 적 전체를 한꺼번에 꿰뚫어 본다. 가장 먼저 행동한다.' },
+  stellar_blade: { name: '성운 가르기', kind: 'skill', mp: 14, target: 'enemy', type: 'physical', mult: 2.7, element: 'light', anim: 'starslash', desc: '별의 열쇠의 힘을 칼끝에 모은 일격. 매우 강력한 빛 속성 물리 공격.' },
   thunder: { name: '번개', kind: 'spell', mp: 5, target: 'enemy', type: 'magic', element: 'thunder', power: 26, scale: 0.6, anim: 'thunder', desc: '하늘에서 번개를 내리꽂는다. 번개 속성.' },
 
   // ── 브란 ──
@@ -34,6 +36,10 @@ const SKILLS = {
   guardian: { name: '수호의 맹세', kind: 'skill', mp: 6, target: 'allies', type: 'coverAll', priority: true, anim: 'guard', desc: '이번 턴, 동료 전원이 받을 단일 물리 공격을 대신 맞는다. 자신의 방어력도 오른다. 가장 먼저 행동한다.' },
   earthsplit: { name: '대지 분쇄', kind: 'skill', mp: 8, target: 'enemies', type: 'physical', mult: 1.25, anim: 'quake', desc: '도끼를 내리꽂아 대지를 부순다. 강력한 전체 공격.' },
   knight_oath: { name: '기사의 서약', kind: 'skill', mp: 8, target: 'allies', type: 'buff', buff: { atk: 1.25, def: 1.25 }, turns: 4, anim: 'buff', desc: '기사의 서약을 외친다. 아군 전체의 공격력과 방어력이 오른다. (4턴)' },
+
+  provoke: { name: '도발', kind: 'skill', mp: 4, target: 'self', type: 'buff', buff: { def: 1.6 }, turns: 2, taunt: true, priority: true, anim: 'guard', desc: '적을 도발해 공격을 끌어들인다. 2턴 동안 방어력이 오른다. 가장 먼저 행동한다.' },
+  axe_storm: { name: '도끼 폭풍', kind: 'skill', mp: 12, target: 'enemies', type: 'physical', mult: 1.55, anim: 'quake', desc: '도끼를 휘몰아쳐 적 전체를 벤다. 대지 분쇄보다 강하다.' },
+  unbroken: { name: '불굴', kind: 'skill', mp: 8, target: 'self', type: 'buff', buff: { atk: 1.6, def: 1.3 }, turns: 4, anim: 'buff', desc: '쓰러지지 않겠다는 각오. 자신의 공격력과 방어력이 크게 오른다. (4턴)' },
 
   // ── 리네트 ──
   fire: { name: '불꽃', kind: 'spell', mp: 3, target: 'enemy', type: 'magic', element: 'fire', power: 14, scale: 0.7, anim: 'fire', desc: '불덩이를 날린다. 불 속성.' },
@@ -49,6 +55,10 @@ const SKILLS = {
   ice_lance: { name: '빙창', kind: 'spell', mp: 9, target: 'enemy', type: 'magic', element: 'ice', power: 55, scale: 1.1, anim: 'ice', desc: '거대한 얼음 창을 꽂는다. 강력한 얼음 속성 단일 공격.' },
   inferno: { name: '업화', kind: 'spell', mp: 9, target: 'enemy', type: 'magic', element: 'fire', power: 55, scale: 1.1, anim: 'fire', desc: '모든 것을 태우는 불길. 강력한 불 속성 단일 공격.' },
 
+  thunder_lance: { name: '뇌창', kind: 'spell', mp: 10, target: 'enemy', type: 'magic', element: 'thunder', power: 62, scale: 1.15, anim: 'thunder', desc: '번개로 된 창을 꽂는다. 강력한 번개 속성 단일 공격.' },
+  shadow_flare: { name: '그림자 불꽃', kind: 'spell', mp: 12, target: 'enemies', type: 'magic', element: 'dark', power: 32, scale: 0.7, anim: 'dark', desc: '검은 불꽃으로 적 전체를 태운다. 어둠 속성.' },
+  meteor: { name: '유성우', kind: 'spell', mp: 20, target: 'enemies', type: 'magic', element: null, power: 52, scale: 0.85, anim: 'fire', desc: '하늘에서 유성을 떨어뜨린다. 속성 없는 강력한 전체 공격.' },
+
   // ── 미오 ──
   cure: { name: '정화', kind: 'spell', mp: 2, target: 'ally', type: 'cure', cures: ['poison', 'sleep', 'paralyze', 'silence'], anim: 'heal', field: true, desc: '아군 한 명의 독·수면·마비·침묵을 치료한다.' },
   protect: { name: '수호의 기도', kind: 'spell', mp: 4, target: 'allies', type: 'buff', buff: { def: 1.35 }, turns: 4, anim: 'buff', desc: '아군 전체의 방어력을 높인다. (4턴)' },
@@ -59,6 +69,10 @@ const SKILLS = {
   chime_cleanse: { name: '정화의 방울', kind: 'spell', mp: 6, target: 'allies', type: 'cure', cures: ['poison', 'sleep', 'paralyze', 'silence'], anim: 'heal', field: true, desc: '별빛 방울을 울려 아군 전체의 독·수면·마비·침묵을 치료한다.' },
   holy_burst: { name: '성광', kind: 'spell', mp: 10, target: 'enemies', type: 'magic', element: 'light', power: 30, scale: 0.7, anim: 'light', desc: '눈부신 빛을 터뜨려 적 전체에 빛 속성 피해.' },
   sanctuary: { name: '성역', kind: 'spell', mp: 10, target: 'allies', type: 'buff', buff: { def: 1.4, mag: 1.2 }, turns: 4, anim: 'buff', desc: '빛의 결계를 펼친다. 아군 전체의 방어력과 마력이 오른다. (4턴)' },
+
+  regen: { name: '생명의 물결', kind: 'spell', mp: 8, target: 'allies', type: 'buff', buff: { regen: 1.08 }, turns: 4, anim: 'heal', desc: '아군 전체에 치유의 물결을 두른다. 4턴 동안 턴이 끝날 때마다 HP가 조금씩 회복된다.' },
+  full_heal: { name: '완전 치유', kind: 'spell', mp: 14, target: 'ally', type: 'heal', power: 9999, scale: 0, anim: 'heal', field: true, desc: '아군 한 명의 HP를 모두 회복한다.' },
+  mother_song: { name: '어머니의 자장가', kind: 'spell', mp: 24, target: 'allies', type: 'heal', power: 140, scale: 1.0, regenAfter: 4, anim: 'heal', field: true, desc: '어머니에게 배운 노래. 아군 전체를 크게 회복하고 생명의 물결을 두른다.' },
 
   // ── 넬 ──
   steal: { name: '훔치기', kind: 'skill', mp: 0, target: 'enemy', type: 'steal', anim: 'steal', desc: '적이 가진 물건을 훔친다. 민첩이 높을수록 성공하기 쉽다.' },
@@ -71,6 +85,9 @@ const SKILLS = {
   shadow_step: { name: '그림자 걸음', kind: 'skill', mp: 4, target: 'self', type: 'buff', buff: { spd: 1.5, eva: 1.45 }, turns: 4, priority: true, anim: 'buff', desc: '그림자에 녹아든다. 민첩과 회피율이 크게 오른다. (4턴)' },
   poison_cloud: { name: '독안개', kind: 'skill', mp: 6, target: 'enemies', type: 'status', status: { poison: 0.65 }, anim: 'mist', desc: '독안개를 퍼뜨려 적 전체를 중독시킨다. (확률)' },
   assassinate: { name: '암살', kind: 'skill', mp: 8, target: 'enemy', type: 'physical', mult: 1.6, crit: 0.45, anim: 'slash', desc: '그림자에서 급소를 꿰뚫는다. 강력하고 회심이 나오기 쉽다.' },
+
+  shadow_twin: { name: '그림자 분신', kind: 'skill', mp: 7, target: 'enemy', type: 'physical', mult: 1.0, hits: 2, randomTargets: true, crit: 0.2, anim: 'slash', desc: '분신과 함께 두 번 벤다. (무작위 대상, 회심이 나오기 쉽다)' },
+  death_mark: { name: '사신의 표식', kind: 'skill', mp: 10, target: 'enemy', type: 'physical', mult: 2.0, status: { poison: 0.6, paralyze: 0.3 }, anim: 'slash', desc: '급소에 표식을 새긴다. 강력한 일격에 독과 마비를 노린다.' },
 
   // ── 적 기술 ──
   tackle: { name: '몸통박치기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.25, hit: -0.05, msg: '{A|이} 몸을 날려 부딪쳐 왔다!' },
@@ -132,6 +149,35 @@ const SKILLS = {
   stop_toll: { name: '정지의 종소리', kind: 'enemy', target: 'enemies', type: 'debuff', buff: { spd: 0.55 }, turns: 3, chance: 0.85, anim: 'wave', msg: '데에엥──. 시간의 종이 울리자 세상이 느려졌다!' },
   shatter_hour: { name: '부서지는 시각', kind: 'enemy', target: 'enemies', type: 'magic', element: 'dark', power: 16, scale: 0.35, anim: 'dark', msg: '{A|이} 시곗바늘을 휘두르자 시간의 파편이 쏟아졌다!' },
   hour_hand: { name: '시침 찌르기', kind: 'enemy', target: 'enemy', type: 'magic', element: 'light', power: 26, scale: 0.4, anim: 'light', msg: '{A|이} 거대한 시침을 {T|에게} 꽂았다!' },
+
+  // ── 제3장 적 기술 ──
+  sting: { name: '독침', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.15, status: { poison: 0.5 }, msg: '{A|이} 꼬리의 독침을 꽂았다!' },
+  pincer: { name: '집게 조이기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.35, msg: '{A|이} 거대한 집게로 조였다!' },
+  sand_spray: { name: '모래 뿜기', kind: 'enemy', target: 'enemies', type: 'debuff', buff: { hit: 0.7 }, turns: 3, chance: 0.6, anim: 'mist', msg: '{A|이} 모래를 사방에 뿜었다!' },
+  burrow_bite: { name: '땅속 습격', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.5, hit: -0.05, msg: '{A|이} 모래 속에서 솟구쳐 물었다!' },
+  wrap: { name: '붕대 감기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 0.9, status: { paralyze: 0.35 }, msg: '{A|이} 낡은 붕대로 휘감았다!' },
+  curse_word: { name: '저주의 말', kind: 'enemy', target: 'enemies', type: 'magic', element: 'dark', power: 30, scale: 0.45, status: { silence: 0.25 }, anim: 'dark', msg: '{A|이} 알 수 없는 저주를 중얼거렸다…' },
+  needle_rain: { name: '가시 비', kind: 'enemy', target: 'enemies', type: 'physical', mult: 0.7, anim: 'slash', msg: '{A|이} 온몸의 가시를 쏘아 댔다!' },
+  heat_wave: { name: '열풍', kind: 'enemy', target: 'enemies', type: 'magic', element: 'fire', power: 30, scale: 0.4, anim: 'fire', msg: '{A|이} 이글거리는 열풍을 일으켰다!' },
+  dive: { name: '급강하', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.4, msg: '{A|이} 하늘에서 내리꽂혔다!' },
+  stone_beam: { name: '석안 광선', kind: 'enemy', target: 'enemy', type: 'magic', element: 'light', power: 46, scale: 0.5, anim: 'light', msg: '{A|의} 눈에서 빛줄기가 뿜어져 나왔다!' },
+  plunder: { name: '약탈', kind: 'enemy', target: 'enemy', type: 'pilfer', msg: '{A|이} 칼을 휘두르며 주머니를 노렸다!' },
+  // 보스: 전갈 여왕
+  dig_in: { name: '모래 잠행', kind: 'enemy', target: 'enemy', type: 'charge', next: 'queen_strike', buffSelf: { def: 2.2 }, msg: '{A|이} 모래 속으로 파고들었다… 발밑이 꿈틀거린다.', hint: '[y]모래 속에서 무언가 노리고 있다…[/]' },
+  queen_strike: { name: '여왕의 독침', kind: 'enemy', target: 'enemy', type: 'physical', mult: 2.3, status: { poison: 0.9 }, anim: 'impact', msg: '{A|이} 모래를 뚫고 솟아올라 {T|에게} 독침을 박았다!' },
+  brood_call: { name: '새끼 부르기', kind: 'enemy', target: 'none', type: 'summon', summon: ['sand_scorpion', 'sand_scorpion'], msg: '{A|이} 집게를 부딪치자 모래 속에서 전갈들이 기어 나왔다!' },
+  tail_lash: { name: '꼬리 후려치기', kind: 'enemy', target: 'enemies', type: 'physical', mult: 0.8, status: { poison: 0.25 }, anim: 'quake', msg: '{A|이} 거대한 꼬리로 일행을 후려쳤다!' },
+  // 보스: 베인 (재전)
+  blood_scythe: { name: '피의 낫', kind: 'enemy', target: 'enemies', type: 'physical', mult: 0.9, anim: 'bigslash', msg: '{A|이} 낫을 크게 휘둘러 붉은 반원을 그렸다!' },
+  // 보스: 자히르
+  mirage: { name: '신기루', kind: 'enemy', target: 'none', type: 'summon', summon: ['zahir_mirage', 'zahir_mirage'], shuffle: true, msg: '{A|의} 모습이 아지랑이처럼 일렁이더니… 여러 개로 갈라졌다!' },
+  sandstorm: { name: '모래 폭풍', kind: 'enemy', target: 'enemies', type: 'magic', element: null, power: 24, scale: 0.32, debuffAll: { hit: 0.75 }, anim: 'mist', msg: '{A|이} 지팡이를 들자 사원 안에 모래 폭풍이 휘몰아쳤다!' },
+  hourglass_flip: { name: '모래시계 뒤집기', kind: 'enemy', target: 'none', type: 'charge', next: 'falling_sand', msg: '{A|이} 커다란 모래시계를 뒤집었다… 모래가 흘러내리기 시작한다.', hint: '[y]모래가 다 떨어지는 순간, 무언가 쏟아질 것이다…[/]' },
+  falling_sand: { name: '쏟아지는 모래', kind: 'enemy', target: 'enemies', type: 'magic', element: 'dark', power: 54, scale: 0.5, anim: 'wave', msg: '쏴아아──! 천장에서 모래가 폭포처럼 쏟아졌다!' },
+  dune_spear: { name: '사구의 창', kind: 'enemy', target: 'enemy', type: 'magic', element: 'light', power: 44, scale: 0.55, anim: 'light', msg: '{A|이} 모래를 굳혀 만든 창을 {T|에게} 날렸다!' },
+  spirit_call: { name: '모래 정령 부르기', kind: 'enemy', target: 'none', type: 'summon', summon: ['sand_spirit'], msg: '{A|이} 기도하자 모래가 일어나 정령의 모습이 되었다!' },
+  mirage_spear: { name: '사구의 창', kind: 'enemy', target: 'enemy', type: 'magic', element: 'light', power: 14, scale: 0, anim: 'light', msg: '{A|이} 모래를 굳혀 만든 창을 {T|에게} 날렸다!' },
+  idle_shimmer: { name: '일렁임', kind: 'enemy', target: 'none', type: 'none', msg: '{A|의} 모습이 아지랑이처럼 일렁인다…' },
 
   // ── 보스: 철엄니 ──
   tusk: { name: '엄니 찌르기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.2, msg: '{A|이} 쇠 같은 엄니로 들이받았다!' },

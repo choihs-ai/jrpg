@@ -42,7 +42,7 @@ const Field = (() => {
     return true;
   }
   function objSolid(o) {
-    return ['chest', 'lever', 'dial', 'note-solid', 'block'].includes(o.type) || o.solid === true;
+    return ['chest', 'lever', 'dial', 'hourglass', 'note-solid', 'block'].includes(o.type) || o.solid === true;
   }
   const npcAt = (x, y) => npcs.find((n) => n.visible && ((n.x === x && n.y === y) || (n.moving && n.fromX === x && n.fromY === y)));
   function blocked(x, y, who) {
@@ -318,10 +318,10 @@ const Field = (() => {
         if (o.mimic) {
           await S.say(null, '상자를 열려고 하자 뚜껑이 저절로 덜컹거린다…!');
           Engine.shake(5, 0.4);
-          const r = await S.battle(['greed_chest'], { bg: map.kind === 'dungeon' ? 'ruins' : 'plains', ambushSafe: true });
+          const r = await S.battle([o.monster || 'greed_chest'], { bg: o.bg || (map.kind === 'dungeon' ? 'ruins' : 'plains'), ambushSafe: true });
           if (r !== 'win') break;
           Game.setFlag(key);
-          await S.say(null, '탐욕상자가 품고 있던 보물이 쏟아졌다!');
+          await S.say(null, `${Util.j(MONSTERS[o.monster || 'greed_chest'].name, '이')} 품고 있던 보물이 쏟아졌다!`);
         } else {
           Sound.sfx('chest');
           Game.setFlag(key);
@@ -379,6 +379,9 @@ const Field = (() => {
       }
       case 'dial':
         await Dials.turn(o);
+        break;
+      case 'hourglass':
+        await Hourglass.flip();
         break;
       case 'event':
       case 'block':
@@ -601,6 +604,8 @@ const Field = (() => {
       else if (o.type === 'rope') g.drawImage(ObjArt.rope(), sx, sy);
       else if (o.type === 'deco' && o.draw === 'windmill') ObjArt.windmill(g, sx + 8, sy + 6, T);
       else if (o.type === 'deco' && o.draw === 'bell') g.drawImage(ObjArt.bell(!!Game.flag('velgar_defeated')), sx - 24, sy - 30);
+      else if (o.type === 'deco' && o.draw === 'sandbell') g.drawImage(ObjArt.sandbell(!!Game.flag('zahir_defeated'), T), sx - 24, sy - 30);
+      else if (o.type === 'hourglass') g.drawImage(ObjArt.hourglass(!!Game.flag('hg_flip')), sx, sy);
       else if (o.type === 'search' && o.hidden && hasNell() && !Game.flag('got:' + o.id)) g.drawImage(ObjArt.sparkle(T + o.x), sx, sy);
       else if (o.art === 'circle') {
         // 귀환의 마법진
@@ -647,6 +652,16 @@ const Field = (() => {
         // 퀘스트 표시 (!)
         const by = sy - 12 + Math.sin(T * 5) * 1.5;
         g.fillStyle = '#ffd75e'; g.fillRect(sx + 7, by, 2, 5); g.fillRect(sx + 7, by + 6, 2, 2);
+      }
+    }
+    // 날씨: 모래바람
+    const weather = typeof map.weather === 'function' ? map.weather() : map.weather;
+    if (weather === 'sand') {
+      g.fillStyle = 'rgba(220,170,90,0.16)'; g.fillRect(0, 0, Engine.LW, Engine.LH);
+      g.fillStyle = 'rgba(250,220,160,0.55)';
+      for (let i = 0; i < 40; i++) {
+        const x = ((i * 53 + T * (120 + (i % 5) * 30)) % (Engine.LW + 40)) - 20, y = (i * 37 + Math.sin(T * 2 + i) * 6) % Engine.LH;
+        g.fillRect(Engine.LW - x, y, 6 + (i % 3) * 3, 1);
       }
     }
     Engine.blitLow(ctx);

@@ -686,6 +686,26 @@ const Sound = (() => {
       mel: `D5.4 F5.4 A5.4 F5.4 E5.4 C#5.4 A4.8 D5.4 F5.4 Bb5.6 A5.2 G5.4 E5.4 C#5.8
             F5.4 A5.4 D6.6 C6.2 Bb5.4 A5.2 G5.2 D5.8 E5.4 G5.4 A5.4 C#6.4 A5.12 r.4`,
     },
+    oasis: {
+      bpm: 104, bar: 16, loop: true, bass: 'hits', arp: 'up8', drums: 'pulse', lead: 'p25', leadVol: 0.085,
+      chords: 'Dm Dm C Dm Bb C A A',
+      mel: `D5.4 E5.2 F5.2 A5.4 F5.4 E5.4 D5.4 C#5.4 D5.4 E5.4 G5.4 F5.2 E5.2 C5.4 D5.12 F5.4
+            F5.4 G5.2 A5.2 Bb5.4 A5.4 G5.4 E5.4 C5.8 A4.4 C#5.4 E5.4 G5.4 F5.2 E5.2 C#5.4 A4.4 r.4`,
+    },
+    desert: {
+      bpm: 118, bar: 16, loop: true, bass: 'drive', arp: 'none', drums: 'march', lead: 'p25', leadVol: 0.085, harmony: true,
+      chords: 'Am Am G Am F G E E Am C G Am F Dm E E',
+      mel: `A4.4 C5.4 E5.4 A5.4 G5.2 F5.2 E5.4 C5.8 B4.4 D5.4 G5.4 F5.2 E5.2 D5.8 E5.4 A5.4 C6.4 B5.2 A5.2
+            F5.4 A5.4 C6.4 A5.4 G5.4 F5.4 E5.4 D5.4 E5.4 G#5.4 B5.4 E6.4 D6.2 C6.2 B5.4 G#5.8
+            A5.4 E5.4 C5.4 E5.4 G5.4 C6.4 E6.4 C6.4 B5.4 G5.4 D5.4 G5.4 A5.4 C6.4 E5.8
+            F5.4 A5.4 C6.4 F6.4 D6.4 A5.4 F5.4 D5.4 E5.4 G#5.4 B5.4 D6.4 C6.2 B5.2 A5.4`,
+    },
+    sandtemple: {
+      bpm: 88, bar: 16, loop: true, bass: 'long', arp: 'slow', drums: 'pulse', lead: 'p12', leadVol: 0.08,
+      chords: 'Em C Am B Em G Am B',
+      mel: `E5.4 G5.4 B5.6 A5.2 G5.4 E5.4 C5.8 A4.4 C5.4 E5.4 D5.4 D#5.8 B4.8
+            E5.4 B5.4 G5.6 F#5.2 G5.4 B5.4 D6.8 C6.4 B5.4 A5.4 E5.4 F#5.4 D#5.4 B4.8`,
+    },
     levelup: { bpm: 170, bar: 16, loop: false, bass: 'none', arp: 'none', drums: 'none', lead: 'p25', leadVol: 0.1, chords: 'C', mel: `C5.2 E5.2 G5.2 C6.4 r.2 G5.2 C6.8` },
     item: { bpm: 150, bar: 16, loop: false, bass: 'none', arp: 'none', drums: 'none', lead: 'p25', leadVol: 0.1, chords: 'G', mel: `G5.2 A5.2 B5.2 D6.6 r.4` },
     inn: {
@@ -1691,8 +1711,8 @@ const Tiles = (() => {
   const S = 16;
   const cache = new Map();
   // 바닥 위에 올려 그리는 물체 타일
-  const OBJ = new Set(['T', 'Y', 'Z', 'r', 'F', 'e', 'l', 'S', 'o', 'x', 'X', 'j', 'P', 'g', 'b', 't', 'h', 'p', 'a', 'z', '*', 'A', 'V', 'U', 'K', 'C', '|', 'O', '@', 'J', 'd']);
-  const ANIM = new Set(['~', '&', 'f', '*', 'V', 'C', '@', 'v', '1', 'Z']);
+  const OBJ = new Set(['T', 'Y', 'Z', 'r', 'F', 'e', 'l', 'S', 'o', 'x', 'X', 'j', 'P', 'g', 'b', 't', 'h', 'p', 'a', 'z', '*', 'A', 'V', 'U', 'K', 'C', '|', 'O', '@', 'J', 'd', '3', '4', '6', '?', '(', ')']);
+  const ANIM = new Set(['~', '&', 'f', '*', 'V', 'C', '@', 'v', '1', 'Z', '9', '?']);
 
   const C = {
     g0: '#5fae4c', g1: '#4f9b3f', g2: '#76c45e', g3: '#3f8a35',
@@ -2001,6 +2021,74 @@ const Tiles = (() => {
       for (let i = 0; i < 8; i++) { const a = (i / 8) * Math.PI * 2 + (f ? Math.PI / 8 : 0); p.rect(Math.round(cx + Math.cos(a) * r) - 1, Math.round(cy + Math.sin(a) * r) - 1, 2, 2, '#c4a050'); }
       p.circle(cx, cy, 2, '#5a4418'); p.px(cx, cy, '#e8d080');
     },
+    // ── 사막 ──
+    '2': (p, v) => {
+      p.fill(C.sand); p.noise([C.sandD, '#f0e0aa'], 0.08, 131 + v);
+      for (let i = 0; i < 2; i++) { const y = 4 + i * 7 + (v % 2); for (let x = 0; x < 16; x++) p.px(x, y + Math.round(Math.sin((x + v * 3) * 0.6)), C.sandD); }
+    },
+    '3': (p) => {
+      p.ellipse(8, 14, 5, 2, 'rgba(0,0,0,0.25)');
+      for (let y = 5; y < 15; y++) p.rect(7 + Math.round(Math.sin(y * 0.4)), y, 2, 1, y % 3 ? '#8a6a3a' : '#6b4426');
+      const leaf = '#3f9a4a', leafD = '#2a7038';
+      p.line(8, 4, 1, 7, leaf); p.line(8, 4, 15, 7, leaf); p.line(8, 4, 3, 1, leafD); p.line(8, 4, 13, 1, leafD); p.line(8, 4, 8, 0, leaf);
+      p.line(8, 5, 2, 9, leafD); p.line(8, 5, 14, 9, leafD); p.circle(8, 4, 2, '#5ab85a'); p.px(7, 6, '#8a5a2a'); p.px(9, 6, '#8a5a2a');
+    },
+    '4': (p) => {
+      p.ellipse(8, 14, 5, 2, 'rgba(0,0,0,0.25)');
+      p.rect(6, 3, 4, 12, '#4a9a4a'); p.rect(6, 3, 1, 12, '#6aba5a'); p.rect(9, 3, 1, 12, '#2a6a2a'); p.rect(7, 2, 2, 1, '#4a9a4a');
+      p.rect(2, 7, 4, 2, '#4a9a4a'); p.rect(2, 4, 2, 4, '#4a9a4a'); p.rect(10, 9, 4, 2, '#4a9a4a'); p.rect(12, 5, 2, 5, '#4a9a4a');
+      p.px(7, 1, '#ff6b8a'); p.px(8, 6, '#f0e8c0'); p.px(7, 10, '#f0e8c0');
+    },
+    '5': (p) => { bricks(p, '#d8b884', '#a88a5a', '#ecd4a4', 4); p.rect(0, 14, 16, 2, '#9a7a4a'); },
+    '[': (p, v, f, nb) => {
+      p.fill('#e8d0a0'); p.noise(['#d8c090', '#f4e0b4'], 0.1, 141 + v);
+      if (nb) { if (nb.d !== '[') { p.rect(0, 13, 16, 3, '#a88a5a'); p.rect(0, 12, 16, 1, '#c8a878'); } if (nb.u !== '[') p.rect(0, 0, 16, 2, '#f8ecc8'); }
+    },
+    '6': (p, v) => {
+      const cols = [['#c4473a', '#e8dcc0'], ['#3f63b8', '#e8dcc0'], ['#d8a040', '#7a3a2a']][v % 3];
+      p.ellipse(8, 14, 7, 2, 'rgba(0,0,0,0.25)');
+      for (let y = 1; y < 14; y++) { const w = Math.min(7, y); for (let x = 8 - w; x < 8 + w; x++) p.px(x, y, ((x + 16) >> 1) % 2 ? cols[0] : cols[1]); }
+      p.rect(6, 9, 4, 5, '#2a1a10'); p.px(8, 0, '#6b4426');
+    },
+    '?': (p, v, f) => {
+      p.fill(C.sand); p.noise([C.sandD], 0.06, 151);
+      p.ellipse(8, 11, 6, 3, C.water); p.ellipse(8, 11, 4, 2, f ? C.waterL : C.water);
+      p.line(4, 10, 4, 3, '#8a6a3a'); p.line(4, 3, 1, 5, '#3f9a4a'); p.line(4, 3, 8, 4, '#3f9a4a'); p.line(4, 3, 4, 0, '#2a7038');
+      p.line(12, 10, 12, 4, '#8a6a3a'); p.line(12, 4, 9, 6, '#3f9a4a'); p.line(12, 4, 15, 6, '#3f9a4a');
+      p.rect(6, 5, 4, 3, '#e8dcc0'); p.rect(7, 6, 2, 2, '#5b3b1e');
+    },
+    '(': (p) => {
+      p.fill(C.sand);
+      for (let y = 2; y < 15; y++) { const w = Math.floor((y - 1) * 0.58); p.rect(8 - w, y, w * 2, 1, y % 3 ? '#d8b884' : '#a88a5a'); }
+      p.rect(6, 10, 4, 5, '#2a1a10'); p.px(8, 2, '#ffd75e');
+    },
+    ')': (p) => {
+      p.fill(C.sand);
+      p.ellipse(8, 9, 7, 6, '#a88a5a'); p.ellipse(8, 8, 6, 5, '#c8a878'); p.ellipse(8, 11, 3, 3, '#1a1010'); p.rect(5, 11, 6, 3, '#1a1010');
+      p.px(4, 5, '#e8d0a0'); p.px(11, 6, '#e8d0a0');
+    },
+    '7': (p, v, f, nb) => {
+      const face = nb && nb.d !== undefined && !'#&%017'.includes(nb.d);
+      if (face) { bricks(p, '#b89868', '#8a6a40', '#d8b884', 4); p.rect(0, 0, 16, 2, '#4a3a24'); p.rect(0, 15, 16, 1, '#3a2a18'); p.px(4 + v, 7, '#e8c070'); }
+      else {
+        p.fill('#4a3a24'); p.noise(['#5a4830', '#3a2a18'], 0.18, 161 + v);
+        if (nb) { const open = (c) => c !== undefined && !'#&%017 '.includes(c); if (open(nb.l)) p.rect(0, 0, 1, 16, '#6a5838'); if (open(nb.r)) p.rect(15, 0, 1, 16, '#6a5838'); if (open(nb.u)) p.rect(0, 0, 16, 1, '#6a5838'); }
+      }
+    },
+    '8': (p, v) => {
+      p.fill('#c8a878'); p.rect(0, 0, 16, 1, '#a88a5a'); p.rect(0, 0, 1, 16, '#a88a5a'); p.rect(8, 8, 8, 1, '#b89868'); p.rect(8, 8, 1, 8, '#b89868');
+      p.noise(['#d8b884', '#b89868'], 0.06, 171 + v);
+    },
+    '/': (p, v) => {
+      p.fill('#a8583a');
+      for (let y = 0; y < 16; y += 4) { p.rect(0, y + (v % 2), 16, 1, '#7a3a24'); p.rect(0, y + 2, 16, 1, '#c8784a'); }
+      p.noise(['#8a4a2a', '#c87050'], 0.12, 181 + v); p.px(3 + v * 2, 6, '#e8a070');
+    },
+    '9': (p, v, f) => {
+      p.fill('#b8925a');
+      for (let r = 7; r > 0; r -= 2) p.ellipse(8, 8, r, r * 0.8, r % 4 === 1 ? '#8a6a3a' : '#a88048');
+      const a = f ? 1 : 0; p.px(4 + a, 6, '#d8b884'); p.px(11 - a, 10, '#d8b884'); p.px(8, 4 + a, '#d8b884'); p.ellipse(8, 8, 1.5, 1.2, '#5a4020');
+    },
     // 실내
     'I': (p, v, f, nb) => {
       const face = nb && nb.d !== undefined && nb.d !== 'I';
@@ -2090,14 +2178,14 @@ const Tiles = (() => {
     },
     // 던전
     '#': (p, v, f, nb) => {
-      const face = nb && nb.d !== undefined && !'#&%01'.includes(nb.d);
+      const face = nb && nb.d !== undefined && !'#&%017'.includes(nb.d);
       if (face) {
         bricks(p, C.dWall, C.dWallD, C.dWallL, 4);
         p.rect(0, 0, 16, 2, C.dTop); p.rect(0, 15, 16, 1, '#1e1b28');
       } else {
         p.fill(C.dTop); p.noise(['#2f2c3a', '#1d1a26'], 0.18, 91 + v);
         if (nb) {
-          const open = (c) => c !== undefined && !'#&%01 '.includes(c);
+          const open = (c) => c !== undefined && !'#&%017 '.includes(c);
           if (open(nb.l)) p.rect(0, 0, 1, 16, '#3a3648');
           if (open(nb.r)) p.rect(15, 0, 1, 16, '#3a3648');
           if (open(nb.u)) p.rect(0, 0, 16, 1, '#3a3648');
@@ -2158,7 +2246,7 @@ const Tiles = (() => {
     }
   }
 
-  const NB_TILES = new Set(['~', 'I', '#', '&', '%', 'R', 'Q', 'G', 'c', 'v', '1']);
+  const NB_TILES = new Set(['~', 'I', '#', '&', '%', 'R', 'Q', 'G', 'c', 'v', '1', '7', '[']);
 
   function get(ch, v, f, nbKey, nb) {
     const key = ch + v + '|' + f + '|' + (nbKey || '');
@@ -2190,8 +2278,9 @@ const Tiles = (() => {
       else if (ch === '~') nbKey = ['u', 'd', 'l', 'r'].map((k) => (nb[k] === undefined || '~=H$'.includes(nb[k]) ? 0 : 1)).join('');
       else if (ch === 'R' || ch === 'Q' || ch === 'G') nbKey = ['u', 'd', 'l', 'r'].map((k) => (nb[k] === ch ? 1 : 0)).join('');
       else if (ch === 'c') nbKey = ['u', 'd', 'l', 'r'].map((k) => (nb[k] === undefined || nb[k] === 'c' ? 0 : 1)).join('');
+      else if (ch === '[') nbKey = (nb.d === '[' ? 'T' : 'F') + (nb.u === '[' ? 'T' : 'F');
       else if (ch === 'I') nbKey = nb.d !== undefined && nb.d !== 'I' ? 'F' : 'T';
-      else nbKey = (nb.d !== undefined && !'#&%01'.includes(nb.d) ? 'F' : 'T') + ['u', 'l', 'r'].map((k) => (nb[k] !== undefined && !'#&%01 '.includes(nb[k]) ? 1 : 0)).join('');
+      else nbKey = (nb.d !== undefined && !'#&%017'.includes(nb.d) ? 'F' : 'T') + ['u', 'l', 'r'].map((k) => (nb[k] !== undefined && !'#&%017 '.includes(nb[k]) ? 1 : 0)).join('');
     }
     g.drawImage(get(ch, OBJ.has(ch) ? 0 : v, f, nbKey, nb), sx, sy);
   }
@@ -2204,6 +2293,7 @@ const Tiles = (() => {
     'W': '#b4783f', 'B': '#9d9cab', 'n': '#b4783f', 'N': '#9d9cab', 'R': '#c4473a', 'Q': '#3f63b8', 'G': '#4b8a4c', 'D': '#5e3818',
     'I': '#3b2b22', 'w': '#b98852', 'c': '#a8304a', '#': '#25222f', '_': '#4b4759', '-': '#4b4759', '>': '#ffd75e', '<': '#ffd75e',
     '$': '#07050c', 'y': '#5a4a3a', '*': '#7cc4ff', ' ': '#000',
+    '2': '#e2cd90', '3': '#3f9a4a', '4': '#4a9a4a', '5': '#d8b884', '6': '#c4473a', '[': '#e8d0a0', '?': '#3c7fd6', '(': '#ffd75e', ')': '#8a6a40', '7': '#4a3a24', '8': '#c8a878', '9': '#8a6a3a', '/': '#a8583a',
     'C': '#ffd75e', 'M': '#d8d4cc', '@': '#3c7fd6', 'J': '#bcbcca', 'd': '#c4473a', 'v': '#4a5a2a', '+': '#5a5a66', '1': '#c4a050',
     'O': '#6a6680', 'P': '#9d9cab', '|': '#55556a', '0': '#6a6680', '&': '#25222f', '%': '#25222f', 'k': '#c8925a', 'L': '#5e3818',
   };
@@ -2538,6 +2628,17 @@ const LOOKS = {
   pharmacist: { hair: '#4a2a5a', style: 'long', cloth: '#f4f4f4', accent: '#4b8a4c', pants: '#4b8a4c', extras: ['robe', 'glasses'] },
   capinnkeeper: { hair: '#3a2a20', style: 'short', cloth: '#7a3a2a', accent: '#f4f4f4', pants: '#3a2a20', extras: ['apron', 'beard'] },
   caravan: { hair: '#6a4a2a', style: 'bandana', hat: '#c4473a', cloth: '#5a7a9a', accent: '#d8b040', pants: '#4a3a2a', skin: '#d8a070' },
+  // ── 제3장 인물 ──
+  hakim: { hair: '#2a2a2a', style: 'bandana', hat: '#f4f0e0', cloth: '#3a6ab0', accent: '#d8b040', pants: '#e8dcc0', skin: '#a8704a', extras: ['beard', 'robe'] },
+  desertM: { hair: '#2a2a2a', style: 'bandana', hat: '#e8dcc0', cloth: '#c8784a', accent: '#5a3a22', pants: '#e8dcc0', skin: '#b8804a' },
+  desertF: { hair: '#1a1a2a', style: 'long', cloth: '#c4473a', accent: '#d8b040', pants: '#c4473a', skin: '#b8804a', extras: ['robe'] },
+  desertKid: { hair: '#1a1a2a', style: 'short', cloth: '#e8dcc0', accent: '#3a6ab0', pants: '#7a5a3a', skin: '#b8804a', extras: ['blush'] },
+  zahir: { hair: '#2a2a2a', style: 'hood', cloth: '#e8dcc0', accent: '#3a6ab0', pants: '#e8dcc0', boots: '#7a5a3a', skin: '#a8704a', extras: ['robe', 'beard'] },
+  aria: { hair: '#1a1a2a', style: 'long', cloth: '#f4f4f4', accent: '#c4473a', pants: '#c4473a', boots: '#7a2a2a', extras: ['robe'] },
+  messenger: { hair: '#2a2a2a', style: 'bandana', hat: '#d8b040', cloth: '#7a5a3a', accent: '#e8dcc0', pants: '#5a4030', skin: '#b8804a' },
+  raider: { hair: '#2a2a2a', style: 'bandana', hat: '#3a3a3a', cloth: '#7a4a2a', accent: '#c4473a', pants: '#3a2a1a', skin: '#b07850' },
+  nadia: { hair: '#b8b0a8', style: 'bun', cloth: '#c8a878', accent: '#3a6ab0', pants: '#a88858', skin: '#b07850', extras: ['robe'] },
+  teller: { hair: '#4a2a5a', style: 'hood', cloth: '#6a3fa0', accent: '#ffd75e', pants: '#4a2a6a', skin: '#c88a5a', extras: ['robe'] },
   mushking: 'critter:mushroom',
 };
 
@@ -2801,6 +2902,63 @@ const MonsterArt = (() => {
       R(g, 20, 4, 24, 14, p.brass); R(g, 20, 4, 24, 2, p.light); E(g, 32, 11, 7, 4, '#140c1c'); E(g, 32, 11, 3, 2, p.eye);
       L(g, 32, 4, 32, 0, p.dark, 2); E(g, 32, 0, 2, 2, p.eye);
     } },
+
+    // ── 제3장 ──
+    scorpion: { w: 60, h: 44, draw(g, p) {
+      // 꼬리 (등 위로 휘어 올라간 독침)
+      for (let i = 0; i < 12; i++) { const t = i / 11; E(g, 44 + Math.sin(t * 2.6) * 10, 30 - t * 26, 4 - t * 1.2, 4 - t * 1.2, i % 2 ? p.body : p.dark); }
+      Poly(g, [42, 2, 48, 0, 46, 8], p.sting); E(g, 47, 3, 1.4, 1.4, '#ffffff');
+      for (let i = 0; i < 4; i++) { L(g, 22 + i * 6, 34, 16 + i * 6, 42, p.dark, 2); L(g, 24 + i * 6, 34, 30 + i * 6, 42, p.dark, 2); }
+      E(g, 30, 30, 16, 8, p.dark); E(g, 30, 29, 15, 7, p.body); for (let i = 0; i < 4; i++) L(g, 20 + i * 6, 24, 20 + i * 6, 35, p.dark, 1);
+      E(g, 14, 30, 6, 5, p.body); eye(g, 12, 27, 1.6, '#140c1c', p.eye); eye(g, 16, 27, 1.6, '#140c1c', p.eye);
+      // 집게
+      L(g, 10, 30, 4, 22, p.body, 3); E(g, 4, 19, 4.5, 3.5, p.light); Poly(g, [1, 16, 5, 13, 3, 19], p.dark);
+      L(g, 12, 33, 6, 38, p.body, 3); E(g, 4, 39, 4.5, 3.5, p.light); Poly(g, [0, 41, 4, 44, 3, 38], p.dark);
+      if (p.crown) Poly(g, [8, 24, 9, 18, 12, 22, 15, 17, 18, 22, 20, 18, 21, 24], p.crown);
+    } },
+    worm: { w: 52, h: 60, draw(g, p) {
+      E(g, 26, 56, 22, 4, p.sand);
+      for (let i = 0; i < 9; i++) { const y = 54 - i * 5.5, x = 26 + Math.sin(i * 0.7) * 5; E(g, x, y, 11 - i * 0.4, 6, p.dark); E(g, x, y - 1, 10 - i * 0.4, 5, i % 2 ? p.body : p.light); }
+      E(g, 30, 10, 12, 9, p.body); E(g, 30, 11, 8, 6, '#3a1418');
+      for (let i = 0; i < 8; i++) { const a = (i / 8) * Math.PI * 2; Poly(g, [30 + Math.cos(a) * 8, 11 + Math.sin(a) * 6, 30 + Math.cos(a) * 4, 11 + Math.sin(a) * 3, 30 + Math.cos(a + 0.3) * 8, 11 + Math.sin(a + 0.3) * 6], '#f0e8d0'); }
+      E(g, 30, 11, 2.5, 2, '#140c1c');
+    } },
+    mummy: { w: 44, h: 56, draw(g, p) {
+      R(g, 15, 38, 6, 16, p.wrap); R(g, 24, 38, 6, 16, p.wrap);
+      R(g, 12, 20, 21, 20, p.wrap); for (let y = 21; y < 54; y += 4) L(g, 11, y, 34, y + 2, p.dark, 1);
+      E(g, 22, 12, 9, 10, p.wrap); L(g, 13, 8, 31, 12, p.dark, 1); L(g, 13, 15, 31, 11, p.dark, 1); L(g, 14, 18, 30, 16, p.dark, 1);
+      E(g, 18, 12, 2, 1.6, p.eye); E(g, 26, 12, 2, 1.6, p.eye);
+      L(g, 12, 22, 2, 30, p.wrap, 4); L(g, 33, 22, 42, 28, p.wrap, 4); L(g, 40, 28, 44, 36, p.loose, 1.5); L(g, 4, 30, 1, 40, p.loose, 1.5);
+    } },
+    cactus: { w: 44, h: 56, draw(g, p) {
+      R(g, 16, 14, 13, 40, p.body); E(g, 22.5, 14, 6.5, 6, p.body); R(g, 16, 14, 3, 40, p.light); R(g, 26, 14, 3, 40, p.dark);
+      R(g, 4, 24, 12, 6, p.body); R(g, 4, 12, 6, 14, p.body); E(g, 7, 12, 3, 3, p.body);
+      R(g, 29, 30, 11, 6, p.body); R(g, 34, 18, 6, 14, p.body); E(g, 37, 18, 3, 3, p.body);
+      for (let i = 0; i < 14; i++) { const x = 16 + (i * 7) % 14, y = 16 + (i * 11) % 36; R(g, x, y, 1, 2, p.spine); }
+      E(g, 20, 24, 2, 2.5, '#140c1c'); E(g, 26, 24, 2, 2.5, '#140c1c'); L(g, 19, 31, 27, 31, '#140c1c', 1.2);
+      E(g, 22.5, 7, 4, 3, p.flower); E(g, 22.5, 7, 1.5, 1.5, '#ffe060');
+      E(g, 22, 54, 12, 2.5, p.sand);
+    } },
+    prophet: { w: 52, h: 72, draw(g, p) {
+      E(g, 26, 70, 18, 3, 'rgba(232,200,120,0.35)');
+      Poly(g, [10, 70, 16, 30, 36, 30, 42, 70], p.robe); Poly(g, [28, 32, 36, 30, 42, 70, 30, 70], p.dark);
+      R(g, 14, 60, 26, 3, p.trim); Poly(g, [22, 30, 30, 30, 28, 70, 24, 70], p.sash);
+      E(g, 26, 20, 10, 11, p.cloth); E(g, 26, 22, 6.5, 7, p.skin); Poly(g, [16, 18, 26, 6, 36, 18, 26, 13], p.cloth);
+      R(g, 20, 26, 12, 4, p.beard); E(g, 23, 21, 1.3, 1.3, p.eye); E(g, 29, 21, 1.3, 1.3, p.eye);
+      L(g, 14, 36, 6, 46, p.skin, 2.5); L(g, 38, 36, 44, 30, p.skin, 2.5);
+      L(g, 44, 6, 44, 70, '#6b4426', 2.5);
+      // 지팡이 끝의 모래시계
+      Poly(g, [39, 2, 49, 2, 44, 8], p.glass); Poly(g, [39, 14, 49, 14, 44, 8], p.glass); R(g, 38, 0, 12, 2, p.trim); R(g, 38, 14, 12, 2, p.trim);
+      Poly(g, [41, 4, 47, 4, 44, 7], p.sand); Poly(g, [42, 13, 46, 13, 44, 11], p.sand);
+    } },
+    bandit: { w: 44, h: 56, draw(g, p) {
+      R(g, 15, 38, 6, 16, p.pants); R(g, 24, 38, 6, 16, p.pants);
+      Poly(g, [12, 22, 33, 22, 31, 40, 14, 40], p.cloth); R(g, 13, 32, 19, 3, p.sash);
+      E(g, 22, 14, 8, 9, p.skin); Poly(g, [13, 12, 22, 3, 31, 12, 30, 9, 14, 9], p.wrap); R(g, 14, 16, 16, 6, p.wrap);
+      E(g, 19, 13, 1.4, 1.2, '#140c1c'); E(g, 25, 13, 1.4, 1.2, '#140c1c');
+      L(g, 31, 26, 38, 32, p.skin, 3); Poly(g, [36, 32, 44, 14, 42, 12, 34, 30], p.blade); Poly(g, [43, 13, 44, 8, 40, 12], p.blade);
+      L(g, 13, 26, 8, 34, p.skin, 3);
+    } },
   };
 
   const cache = new Map();
@@ -2833,7 +2991,7 @@ const MonsterArt = (() => {
 // ── src/gfx/objects.js ──
 'use strict';
 // ─────────────────────────────────────────────────────────────
-// ObjArt: 필드 오브젝트 그림 (보물상자, 레버, 약초, 쪽지, 반짝임, 풍차 날개, 거대한 종)
+// ObjArt: 필드 오브젝트 그림 (보물상자, 레버, 약초, 쪽지, 반짝임, 풍차 날개, 거대한 종, 모래시계)
 // ─────────────────────────────────────────────────────────────
 const ObjArt = (() => {
   const cache = {};
@@ -2965,7 +3123,36 @@ const ObjArt = (() => {
       g.fillStyle = '#5a4818'; g.beginPath(); g.ellipse(24, 43, 4, 3, 0, 0, Math.PI * 2); g.fill();
     });
   }
-  return { chest, lever, herb, note, rope, sparkle, windmill, bell, valve, dial, manhole, plaque, timebell };
+  // 모래시계 사원의 커다란 모래시계 (flipped: 모래가 아래쪽에 쌓여 있음 ↔ 위쪽)
+  function hourglass(flipped) {
+    return once('hglass' + flipped, 16, 16, (p) => {
+      const wood = '#7a4a22', glass = 'rgba(220,240,255,0.55)', sand = '#e8b860';
+      p.ellipse(8, 15, 6, 1, 'rgba(0,0,0,0.3)');
+      p.rect(2, 0, 12, 2, wood); p.rect(2, 14, 12, 2, wood); p.rect(2, 1, 1, 14, wood); p.rect(13, 1, 1, 14, wood);
+      for (let y = 2; y < 14; y++) { const w = Math.max(1, Math.round(Math.abs(y - 7.5) * 1.1)); p.rect(8 - w, y, w * 2, 1, glass); }
+      if (flipped) { p.rect(4, 2, 8, 2, sand); p.rect(5, 4, 6, 2, sand); p.rect(7, 6, 2, 2, sand); p.rect(7, 12, 2, 2, sand); }
+      else { p.rect(7, 8, 2, 2, sand); p.rect(5, 10, 6, 2, sand); p.rect(4, 12, 8, 2, sand); p.rect(7, 2, 2, 2, sand); }
+      p.px(5, 3, '#ffffff');
+    });
+  }
+  // 모래 종 (모래빛 몸통 · 해 문양)
+  function sandbell(rung, t) {
+    const f = rung ? Math.floor(t * 3) % 2 : 0;
+    return once('sbell' + rung + f, 48, 48, (p, g) => {
+      const body = rung ? '#f0c878' : '#c89a58', dark = '#7a5426', light = '#fff0c0';
+      g.fillStyle = dark; g.fillRect(22, 0, 4, 6);
+      g.fillStyle = body;
+      g.beginPath(); g.moveTo(14, 8); g.quadraticCurveTo(24, 0, 34, 8); g.lineTo(38, 34); g.lineTo(44, 40); g.lineTo(4, 40); g.lineTo(10, 34); g.closePath(); g.fill();
+      g.fillStyle = dark; g.fillRect(4, 38, 40, 4);
+      g.fillStyle = light; g.fillRect(15, 10, 3, 24);
+      g.fillStyle = rung ? '#ffffff' : '#e86a3a';
+      g.beginPath(); g.arc(24, 21, 4, 0, Math.PI * 2); g.fill();
+      for (let i = 0; i < 8; i++) { const a = (i * Math.PI) / 4 + f * 0.2; g.fillRect(24 + Math.cos(a) * 7 - 1, 21 + Math.sin(a) * 7 - 1, 2, 2); }
+      g.fillStyle = '#5a3c18'; g.beginPath(); g.ellipse(24, 43, 4, 3, 0, 0, Math.PI * 2); g.fill();
+      if (!rung) { g.fillStyle = 'rgba(232,184,96,0.8)'; g.fillRect(23, 44, 2, 4); }
+    });
+  }
+  return { chest, lever, herb, note, rope, sparkle, windmill, bell, valve, dial, manhole, plaque, timebell, hourglass, sandbell };
 })();
 
 
@@ -2988,9 +3175,12 @@ const ITEMS = {
   feather: { name: '되살림 깃털', kind: 'consumable', price: 150, desc: '불사조의 깃털이라 불리는 물건. 쓰러진 동료를 HP 절반으로 되살린다.', use: { type: 'revive', pct: 0.5, target: 'deadAlly' }, battle: true, field: true },
   starwater: { name: '별의 물', kind: 'consumable', price: 400, desc: '별빛을 머금은 물. 아군 한 명의 HP와 MP를 모두 회복한다.', use: { type: 'full', target: 'ally' }, battle: true, field: true },
   firebomb: { name: '화염병', kind: 'consumable', price: 45, desc: '던지면 터지는 기름병. 적 전체에 불 속성 피해(약 30).', use: { type: 'damage', power: 30, element: 'fire', target: 'enemies', anim: 'fire' }, battle: true, field: false },
-  return_wing: { name: '귀환의 날개', kind: 'consumable', price: 20, desc: '던지면 가 본 적 있는 마을(리벨·왕도)로 돌아간다. (필드·던전에서 사용)', use: { type: 'return', target: 'none' }, battle: false, field: true },
+  return_wing: { name: '귀환의 날개', kind: 'consumable', price: 20, desc: '던지면 가 본 적 있는 마을(리벨·왕도·사미라)로 돌아간다. (필드·던전에서 사용)', use: { type: 'return', target: 'none' }, battle: false, field: true },
   hi_potion: { name: '고급 상처약', kind: 'consumable', price: 90, desc: '왕도 약방의 고급 상처약. HP를 약 200 회복한다.', use: { type: 'heal', amount: 200, target: 'ally' }, battle: true, field: true },
   thunder_flask: { name: '번개병', kind: 'consumable', price: 80, desc: '마도학원 실험실에서 나온 번개를 가둔 병. 적 전체에 번개 속성 피해(약 60).', use: { type: 'damage', power: 60, element: 'thunder', target: 'enemies', anim: 'thunder' }, battle: true, field: false },
+  mega_potion: { name: '오아시스의 물', kind: 'consumable', price: 220, desc: '사미라 오아시스의 맑은 샘물. HP를 약 400 회복한다.', use: { type: 'heal', amount: 400, target: 'ally' }, battle: true, field: true },
+  hi_ether: { name: '사막의 이슬', kind: 'consumable', price: 320, desc: '선인장 꽃에 맺힌 진한 이슬. MP를 60 회복한다.', use: { type: 'mp', amount: 60, target: 'ally' }, battle: true, field: true },
+  sand_bomb: { name: '모래 폭탄', kind: 'consumable', price: 140, desc: '모래와 화약을 섞은 폭탄. 적 전체에 피해(약 110)를 주고 명중률을 떨어뜨린다.', use: { type: 'damage', power: 110, target: 'enemies', anim: 'impact', debuffAll: { hit: 0.75 } }, battle: true, field: false },
   incense: { name: '정령의 향', kind: 'consumable', price: 25, desc: '마물이 싫어하는 향. 한동안(약 120걸음) 마물과 마주치지 않는다.', use: { type: 'ward', steps: 120, target: 'none' }, battle: false, field: true },
 
   // ── 무기 ──
@@ -3010,6 +3200,10 @@ const ITEMS = {
   silver_dagger: { name: '은빛 단검', kind: 'weapon', price: 980, stats: { atk: 26, spd: 5 }, who: ['nell', 'hero', 'linette'], element: 'light', desc: '은으로 도금한 단검. 공격에 빛 속성이 깃든다. 민첩 +5.' },
   rune_staff: { name: '룬 지팡이', kind: 'weapon', price: 1100, stats: { atk: 8, mag: 16 }, who: ['linette', 'mio'], desc: '마도학원 교수들이 쓰는 룬 지팡이. 마력 +16.' },
   veil_tome: { name: '장막의 마도서', kind: 'weapon', price: 0, stats: { atk: 4, mag: 22, mp: 15 }, who: ['linette'], desc: '금서를 되찾아 준 답례로 받은 마도서. 마력 +22, 최대 MP +15.' },
+  flame_saber: { name: '화염 시미터', kind: 'weapon', price: 2600, stats: { atk: 42 }, who: ['hero', 'bran', 'nell'], element: 'fire', desc: '사막 장인이 벼린 휘어진 칼. 공격에 불 속성이 깃든다.' },
+  sand_axe: { name: '사구의 도끼', kind: 'weapon', price: 2900, stats: { atk: 48, spd: -2 }, who: ['bran'], desc: '모래 바람에도 녹슬지 않는 검은 쇠 도끼. 민첩 -2.' },
+  scorpion_dagger: { name: '전갈 꼬리 단검', kind: 'weapon', price: 2400, stats: { atk: 36, spd: 7 }, who: ['nell', 'hero'], onHit: { poison: 0.3 }, desc: '전갈 여왕의 꼬리를 깎아 만든 단검. 공격 시 가끔 독. 민첩 +7.' },
+  sun_staff: { name: '태양의 지팡이', kind: 'weapon', price: 2500, stats: { atk: 12, mag: 22 }, who: ['linette', 'mio'], desc: '꼭대기에 태양석이 박힌 지팡이. 마력 +22.' },
   dorn_axe: { name: '드른의 도끼', kind: 'weapon', price: 0, stats: { atk: 28, def: 3 }, who: ['bran'], desc: '아버지 드른이 아들을 위해 밤새 벼린 도끼. 방어 +3.' },
 
   // ── 갑옷 ──
@@ -3024,6 +3218,9 @@ const ITEMS = {
   mythril_mail: { name: '미스릴 갑옷', kind: 'armor', price: 1200, stats: { def: 22 }, who: ['hero', 'bran'], desc: '미스릴 비늘을 엮은 갑옷. 가볍고 튼튼하다.' },
   mystic_robe: { name: '신비의 로브', kind: 'armor', price: 1050, stats: { def: 15, mag: 7 }, who: ['linette', 'mio'], desc: '별빛 실로 짠 로브. 마력 +7.' },
   night_garb: { name: '밤그림자 옷', kind: 'armor', price: 980, stats: { def: 16, spd: 7 }, who: ['nell', 'hero'], desc: '왕도 뒷골목의 장인이 지은 검은 옷. 민첩 +7.' },
+  desert_mail: { name: '사막 비늘 갑옷', kind: 'armor', price: 2700, stats: { def: 29 }, who: ['hero', 'bran'], desc: '모래도마뱀 비늘을 엮은 갑옷. 가볍고 시원하다.' },
+  mirage_robe: { name: '신기루 로브', kind: 'armor', price: 2500, stats: { def: 20, mag: 9 }, who: ['linette', 'mio'], desc: '보는 각도에 따라 색이 일렁이는 로브. 마력 +9.' },
+  sand_garb: { name: '모래바람 옷', kind: 'armor', price: 2300, stats: { def: 21, spd: 9 }, who: ['nell', 'hero'], desc: '사막 유목민의 가벼운 옷. 민첩 +9.' },
   sage_robe: { name: '현자의 로브', kind: 'armor', price: 450, stats: { def: 10, mag: 5 }, who: ['linette', 'mio'], desc: '별무늬가 수놓인 고대 로브. 마력 +5.' },
 
   // ── 방패 ──
@@ -3036,6 +3233,8 @@ const ITEMS = {
   squire_shield: { name: '견습 기사의 방패', kind: 'shield', price: 0, stats: { def: 13, hp: 20 }, who: ['bran'], desc: '입단 시험을 통과한 견습 기사에게 주어지는 방패. 최대 HP +20.' },
   buckler: { name: '은 버클러', kind: 'shield', price: 620, stats: { def: 9, spd: 2 }, who: ['hero', 'bran', 'nell', 'linette'], desc: '가벼운 은 방패. 민첩 +2.' },
 
+  sun_shield: { name: '태양의 방패', kind: 'shield', price: 2200, stats: { def: 20 }, who: ['hero', 'bran'], resist: { sleep: 0.5 }, desc: '태양 문양이 새겨진 둥근 방패. 수면에 조금 강해진다.' },
+
   // ── 투구 ──
   leather_hat: { name: '가죽 모자', kind: 'helm', price: 30, stats: { def: 2 }, who: ALL, desc: '햇볕도 막아주는 가죽 모자.' },
   wizard_hat: { name: '별무늬 모자', kind: 'helm', price: 110, stats: { def: 2, mag: 3 }, who: ['linette', 'mio'], desc: '마도학원 학생들이 쓰는 모자. 마력 +3.' },
@@ -3045,6 +3244,9 @@ const ITEMS = {
   silver_helm: { name: '은 투구', kind: 'helm', price: 760, stats: { def: 10 }, who: ['hero', 'bran'], desc: '은으로 덧댄 투구.' },
   feather_hat: { name: '깃털 모자', kind: 'helm', price: 680, stats: { def: 6, mag: 3, spd: 3 }, who: ['linette', 'mio', 'nell', 'hero'], desc: '축제 기간에 유행하는 깃털 모자. 마력 +3, 민첩 +3.' },
   festival_mask: { name: '축제 가면', kind: 'helm', price: 0, stats: { def: 5, spd: 6 }, who: ALL, resist: { sleep: 1 }, desc: '별내림 축제의 가면. 쓰면 기분이 들떠 잠이 오지 않는다. 민첩 +6.' },
+
+  turban: { name: '사막 터번', kind: 'helm', price: 1600, stats: { def: 9, mag: 2, spd: 2 }, who: ALL, resist: { paralyze: 0.5 }, desc: '머리를 시원하게 지켜 주는 터번. 마비에 조금 강해진다.' },
+  desert_helm: { name: '모래 투구', kind: 'helm', price: 1900, stats: { def: 14 }, who: ['hero', 'bran'], desc: '모래가 들어가지 않게 만든 투구.' },
 
   // ── 장신구 ──
   swift_boots: { name: '날쌘 장화', kind: 'accessory', price: 300, stats: { spd: 10 }, who: ALL, desc: '사냥꾼 고르도가 아끼던 장화. 민첩 +10.' },
@@ -3057,6 +3259,10 @@ const ITEMS = {
   wolf_fang: { name: '회색갈기의 송곳니', kind: 'accessory', price: 600, stats: { atk: 7, spd: 4 }, who: ALL, desc: '가도를 공포에 떨게 한 늑대 우두머리의 송곳니. 공격 +7, 민첩 +4.' },
   orphan_charm: { name: '별바라기 부적', kind: 'accessory', price: 0, stats: { def: 4, mag: 4 }, who: ALL, resist: { paralyze: 1 }, desc: '보육원 아이들이 한 땀 한 땀 꿰매 만든 부적. 마비에 걸리지 않는다.' },
   warden_badge: { name: '별의 수호대 문장', kind: 'accessory', price: 0, stats: { atk: 6, def: 6, mag: 6, spd: 6 }, who: ALL, desc: '왕국이 「별의 수호대」에게 내린 문장. 모든 능력 +6.' },
+  oasis_ring: { name: '오아시스의 반지', kind: 'accessory', price: 1800, stats: { hp: 40, mp: 15 }, who: ALL, desc: '맑은 물빛 보석 반지. 최대 HP +40, 최대 MP +15.' },
+  queen_fang: { name: '여왕의 독침', kind: 'accessory', price: 0, stats: { atk: 9, spd: 4 }, who: ALL, resist: { poison: 1 }, desc: '전갈 여왕의 독침을 다듬은 장신구. 공격 +9, 민첩 +4, 독에 걸리지 않는다.' },
+  aria_chime: { name: '아리아의 방울', kind: 'accessory', price: 0, stats: { mag: 10, mp: 20, def: 5 }, who: ['mio'], healBonus: 0.2, desc: '미오의 어머니가 쓰던 작은 방울. 마력 +10, 최대 MP +20, 회복 주문 효과 +20%.' },
+  sand_badge: { name: '사막의 은인 징표', kind: 'accessory', price: 0, stats: { atk: 8, def: 8, mag: 8, spd: 8 }, who: ALL, desc: '사미라 오아시스가 은인에게 주는 징표. 모든 능력 +8.' },
   courage_token: { name: '용기의 증표', kind: 'accessory', price: 0, stats: { atk: 4, def: 4, spd: 4 }, who: ALL, desc: '리벨 마을을 구한 영웅에게 장로가 건넨 증표. 공격·방어·민첩 +4.' },
 
   // ── 귀중품 (퀘스트) ──
@@ -3077,6 +3283,11 @@ const ITEMS = {
   star_candy: { name: '별사탕', kind: 'key', price: 0, desc: '별내림 축제의 별사탕. 축제 광장의 소녀 루나가 찾고 있다.' },
   elly_letter: { name: '빛바랜 편지', kind: 'key', price: 0, desc: '「아빠, 오늘은 기침이 덜 나요. 별내림 축제에는 같이 갈 수 있겠죠? ─ 엘리」' },
   time_heart: { name: '시간의 심장', kind: 'key', price: 0, desc: '시간의 종에서 빠져나온 빛나는 구슬. 째깍, 째깍… 손안에서 고동친다.' },
+  canyon_pass: { name: '족장의 통행패', kind: 'key', price: 0, desc: '사미라 오아시스 족장의 인장이 찍힌 나무패. 사자가 왕도까지 들고 온 것.' },
+  sun_key: { name: '태양의 열쇠', kind: 'key', price: 0, desc: '태양 문양이 새겨진 황금 열쇠. 모래시계 사원의 「해의 문」을 연다.' },
+  aria_page: { name: '아리아의 일기 조각', kind: 'key', price: 0, desc: '모래에 바랜 일기장의 찢어진 페이지. 단정한 글씨로 「미오에게」라고 적혀 있다.' },
+  sand_heart: { name: '모래의 심장', kind: 'key', price: 0, desc: '모래 종에서 빠져나온 구슬. 안에서 고운 모래가 끝없이 흘러내린다.' },
+  lost_letter: { name: '대상의 편지', kind: 'key', price: 0, desc: '사막에서 길을 잃은 대상 행렬이 남긴 구조 요청 편지.' },
   star: { name: '별조각', kind: 'key', price: 0, desc: '밤하늘에서 떨어졌다는 작은 별조각. 괴짜 수집가 피포가 모으고 있다.' },
 };
 for (const id in ITEMS) ITEMS[id].id = id;
@@ -3096,7 +3307,7 @@ const KIND_NAMES = { consumable: '소모품', weapon: '무기', armor: '갑옷',
 // ─────────────────────────────────────────────────────────────
 const ELEMENTS = { fire: '불', ice: '얼음', thunder: '번개', light: '빛', dark: '어둠' };
 const STATUS_NAMES = { poison: '독', sleep: '수면', paralyze: '마비', silence: '침묵' };
-const BUFF_NAMES = { atk: '공격력', def: '방어력', spd: '민첩', hit: '명중률', mag: '마력', eva: '회피율' };
+const BUFF_NAMES = { atk: '공격력', def: '방어력', spd: '민첩', hit: '명중률', mag: '마력', eva: '회피율', regen: '재생' };
 
 const SKILLS = {
   attack: { name: '공격', kind: 'basic', target: 'enemy', type: 'physical', mult: 1, anim: 'slash' },
@@ -3110,6 +3321,8 @@ const SKILLS = {
   starfall: { name: '별똥별', kind: 'spell', mp: 10, target: 'enemies', type: 'magic', element: 'light', power: 34, scale: 0.7, anim: 'light', desc: '하늘에서 별똥별을 쏟아붓는다. 적 전체에 빛 속성 피해.' },
   resolve: { name: '각오', kind: 'skill', mp: 4, target: 'self', type: 'buff', buff: { atk: 1.4, def: 1.3 }, turns: 4, anim: 'buff', desc: '마음을 다잡는다. 자신의 공격력과 방어력이 오른다. (4턴)' },
   meteor_slash: { name: '유성 베기', kind: 'skill', mp: 9, target: 'enemy', type: 'physical', mult: 2.1, element: 'light', anim: 'starslash', desc: '유성처럼 내리꽂는 일격. 강력한 빛 속성 물리 공격.' },
+  insight: { name: '통찰', kind: 'skill', mp: 6, target: 'enemies', type: 'analyze', priority: true, anim: 'scan', desc: '이방인의 눈으로 적 전체를 한꺼번에 꿰뚫어 본다. 가장 먼저 행동한다.' },
+  stellar_blade: { name: '성운 가르기', kind: 'skill', mp: 14, target: 'enemy', type: 'physical', mult: 2.7, element: 'light', anim: 'starslash', desc: '별의 열쇠의 힘을 칼끝에 모은 일격. 매우 강력한 빛 속성 물리 공격.' },
   thunder: { name: '번개', kind: 'spell', mp: 5, target: 'enemy', type: 'magic', element: 'thunder', power: 26, scale: 0.6, anim: 'thunder', desc: '하늘에서 번개를 내리꽂는다. 번개 속성.' },
 
   // ── 브란 ──
@@ -3123,6 +3336,10 @@ const SKILLS = {
   guardian: { name: '수호의 맹세', kind: 'skill', mp: 6, target: 'allies', type: 'coverAll', priority: true, anim: 'guard', desc: '이번 턴, 동료 전원이 받을 단일 물리 공격을 대신 맞는다. 자신의 방어력도 오른다. 가장 먼저 행동한다.' },
   earthsplit: { name: '대지 분쇄', kind: 'skill', mp: 8, target: 'enemies', type: 'physical', mult: 1.25, anim: 'quake', desc: '도끼를 내리꽂아 대지를 부순다. 강력한 전체 공격.' },
   knight_oath: { name: '기사의 서약', kind: 'skill', mp: 8, target: 'allies', type: 'buff', buff: { atk: 1.25, def: 1.25 }, turns: 4, anim: 'buff', desc: '기사의 서약을 외친다. 아군 전체의 공격력과 방어력이 오른다. (4턴)' },
+
+  provoke: { name: '도발', kind: 'skill', mp: 4, target: 'self', type: 'buff', buff: { def: 1.6 }, turns: 2, taunt: true, priority: true, anim: 'guard', desc: '적을 도발해 공격을 끌어들인다. 2턴 동안 방어력이 오른다. 가장 먼저 행동한다.' },
+  axe_storm: { name: '도끼 폭풍', kind: 'skill', mp: 12, target: 'enemies', type: 'physical', mult: 1.55, anim: 'quake', desc: '도끼를 휘몰아쳐 적 전체를 벤다. 대지 분쇄보다 강하다.' },
+  unbroken: { name: '불굴', kind: 'skill', mp: 8, target: 'self', type: 'buff', buff: { atk: 1.6, def: 1.3 }, turns: 4, anim: 'buff', desc: '쓰러지지 않겠다는 각오. 자신의 공격력과 방어력이 크게 오른다. (4턴)' },
 
   // ── 리네트 ──
   fire: { name: '불꽃', kind: 'spell', mp: 3, target: 'enemy', type: 'magic', element: 'fire', power: 14, scale: 0.7, anim: 'fire', desc: '불덩이를 날린다. 불 속성.' },
@@ -3138,6 +3355,10 @@ const SKILLS = {
   ice_lance: { name: '빙창', kind: 'spell', mp: 9, target: 'enemy', type: 'magic', element: 'ice', power: 55, scale: 1.1, anim: 'ice', desc: '거대한 얼음 창을 꽂는다. 강력한 얼음 속성 단일 공격.' },
   inferno: { name: '업화', kind: 'spell', mp: 9, target: 'enemy', type: 'magic', element: 'fire', power: 55, scale: 1.1, anim: 'fire', desc: '모든 것을 태우는 불길. 강력한 불 속성 단일 공격.' },
 
+  thunder_lance: { name: '뇌창', kind: 'spell', mp: 10, target: 'enemy', type: 'magic', element: 'thunder', power: 62, scale: 1.15, anim: 'thunder', desc: '번개로 된 창을 꽂는다. 강력한 번개 속성 단일 공격.' },
+  shadow_flare: { name: '그림자 불꽃', kind: 'spell', mp: 12, target: 'enemies', type: 'magic', element: 'dark', power: 32, scale: 0.7, anim: 'dark', desc: '검은 불꽃으로 적 전체를 태운다. 어둠 속성.' },
+  meteor: { name: '유성우', kind: 'spell', mp: 20, target: 'enemies', type: 'magic', element: null, power: 52, scale: 0.85, anim: 'fire', desc: '하늘에서 유성을 떨어뜨린다. 속성 없는 강력한 전체 공격.' },
+
   // ── 미오 ──
   cure: { name: '정화', kind: 'spell', mp: 2, target: 'ally', type: 'cure', cures: ['poison', 'sleep', 'paralyze', 'silence'], anim: 'heal', field: true, desc: '아군 한 명의 독·수면·마비·침묵을 치료한다.' },
   protect: { name: '수호의 기도', kind: 'spell', mp: 4, target: 'allies', type: 'buff', buff: { def: 1.35 }, turns: 4, anim: 'buff', desc: '아군 전체의 방어력을 높인다. (4턴)' },
@@ -3148,6 +3369,10 @@ const SKILLS = {
   chime_cleanse: { name: '정화의 방울', kind: 'spell', mp: 6, target: 'allies', type: 'cure', cures: ['poison', 'sleep', 'paralyze', 'silence'], anim: 'heal', field: true, desc: '별빛 방울을 울려 아군 전체의 독·수면·마비·침묵을 치료한다.' },
   holy_burst: { name: '성광', kind: 'spell', mp: 10, target: 'enemies', type: 'magic', element: 'light', power: 30, scale: 0.7, anim: 'light', desc: '눈부신 빛을 터뜨려 적 전체에 빛 속성 피해.' },
   sanctuary: { name: '성역', kind: 'spell', mp: 10, target: 'allies', type: 'buff', buff: { def: 1.4, mag: 1.2 }, turns: 4, anim: 'buff', desc: '빛의 결계를 펼친다. 아군 전체의 방어력과 마력이 오른다. (4턴)' },
+
+  regen: { name: '생명의 물결', kind: 'spell', mp: 8, target: 'allies', type: 'buff', buff: { regen: 1.08 }, turns: 4, anim: 'heal', desc: '아군 전체에 치유의 물결을 두른다. 4턴 동안 턴이 끝날 때마다 HP가 조금씩 회복된다.' },
+  full_heal: { name: '완전 치유', kind: 'spell', mp: 14, target: 'ally', type: 'heal', power: 9999, scale: 0, anim: 'heal', field: true, desc: '아군 한 명의 HP를 모두 회복한다.' },
+  mother_song: { name: '어머니의 자장가', kind: 'spell', mp: 24, target: 'allies', type: 'heal', power: 140, scale: 1.0, regenAfter: 4, anim: 'heal', field: true, desc: '어머니에게 배운 노래. 아군 전체를 크게 회복하고 생명의 물결을 두른다.' },
 
   // ── 넬 ──
   steal: { name: '훔치기', kind: 'skill', mp: 0, target: 'enemy', type: 'steal', anim: 'steal', desc: '적이 가진 물건을 훔친다. 민첩이 높을수록 성공하기 쉽다.' },
@@ -3160,6 +3385,9 @@ const SKILLS = {
   shadow_step: { name: '그림자 걸음', kind: 'skill', mp: 4, target: 'self', type: 'buff', buff: { spd: 1.5, eva: 1.45 }, turns: 4, priority: true, anim: 'buff', desc: '그림자에 녹아든다. 민첩과 회피율이 크게 오른다. (4턴)' },
   poison_cloud: { name: '독안개', kind: 'skill', mp: 6, target: 'enemies', type: 'status', status: { poison: 0.65 }, anim: 'mist', desc: '독안개를 퍼뜨려 적 전체를 중독시킨다. (확률)' },
   assassinate: { name: '암살', kind: 'skill', mp: 8, target: 'enemy', type: 'physical', mult: 1.6, crit: 0.45, anim: 'slash', desc: '그림자에서 급소를 꿰뚫는다. 강력하고 회심이 나오기 쉽다.' },
+
+  shadow_twin: { name: '그림자 분신', kind: 'skill', mp: 7, target: 'enemy', type: 'physical', mult: 1.0, hits: 2, randomTargets: true, crit: 0.2, anim: 'slash', desc: '분신과 함께 두 번 벤다. (무작위 대상, 회심이 나오기 쉽다)' },
+  death_mark: { name: '사신의 표식', kind: 'skill', mp: 10, target: 'enemy', type: 'physical', mult: 2.0, status: { poison: 0.6, paralyze: 0.3 }, anim: 'slash', desc: '급소에 표식을 새긴다. 강력한 일격에 독과 마비를 노린다.' },
 
   // ── 적 기술 ──
   tackle: { name: '몸통박치기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.25, hit: -0.05, msg: '{A|이} 몸을 날려 부딪쳐 왔다!' },
@@ -3222,6 +3450,35 @@ const SKILLS = {
   shatter_hour: { name: '부서지는 시각', kind: 'enemy', target: 'enemies', type: 'magic', element: 'dark', power: 16, scale: 0.35, anim: 'dark', msg: '{A|이} 시곗바늘을 휘두르자 시간의 파편이 쏟아졌다!' },
   hour_hand: { name: '시침 찌르기', kind: 'enemy', target: 'enemy', type: 'magic', element: 'light', power: 26, scale: 0.4, anim: 'light', msg: '{A|이} 거대한 시침을 {T|에게} 꽂았다!' },
 
+  // ── 제3장 적 기술 ──
+  sting: { name: '독침', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.15, status: { poison: 0.5 }, msg: '{A|이} 꼬리의 독침을 꽂았다!' },
+  pincer: { name: '집게 조이기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.35, msg: '{A|이} 거대한 집게로 조였다!' },
+  sand_spray: { name: '모래 뿜기', kind: 'enemy', target: 'enemies', type: 'debuff', buff: { hit: 0.7 }, turns: 3, chance: 0.6, anim: 'mist', msg: '{A|이} 모래를 사방에 뿜었다!' },
+  burrow_bite: { name: '땅속 습격', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.5, hit: -0.05, msg: '{A|이} 모래 속에서 솟구쳐 물었다!' },
+  wrap: { name: '붕대 감기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 0.9, status: { paralyze: 0.35 }, msg: '{A|이} 낡은 붕대로 휘감았다!' },
+  curse_word: { name: '저주의 말', kind: 'enemy', target: 'enemies', type: 'magic', element: 'dark', power: 30, scale: 0.45, status: { silence: 0.25 }, anim: 'dark', msg: '{A|이} 알 수 없는 저주를 중얼거렸다…' },
+  needle_rain: { name: '가시 비', kind: 'enemy', target: 'enemies', type: 'physical', mult: 0.7, anim: 'slash', msg: '{A|이} 온몸의 가시를 쏘아 댔다!' },
+  heat_wave: { name: '열풍', kind: 'enemy', target: 'enemies', type: 'magic', element: 'fire', power: 30, scale: 0.4, anim: 'fire', msg: '{A|이} 이글거리는 열풍을 일으켰다!' },
+  dive: { name: '급강하', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.4, msg: '{A|이} 하늘에서 내리꽂혔다!' },
+  stone_beam: { name: '석안 광선', kind: 'enemy', target: 'enemy', type: 'magic', element: 'light', power: 46, scale: 0.5, anim: 'light', msg: '{A|의} 눈에서 빛줄기가 뿜어져 나왔다!' },
+  plunder: { name: '약탈', kind: 'enemy', target: 'enemy', type: 'pilfer', msg: '{A|이} 칼을 휘두르며 주머니를 노렸다!' },
+  // 보스: 전갈 여왕
+  dig_in: { name: '모래 잠행', kind: 'enemy', target: 'enemy', type: 'charge', next: 'queen_strike', buffSelf: { def: 2.2 }, msg: '{A|이} 모래 속으로 파고들었다… 발밑이 꿈틀거린다.', hint: '[y]모래 속에서 무언가 노리고 있다…[/]' },
+  queen_strike: { name: '여왕의 독침', kind: 'enemy', target: 'enemy', type: 'physical', mult: 2.3, status: { poison: 0.9 }, anim: 'impact', msg: '{A|이} 모래를 뚫고 솟아올라 {T|에게} 독침을 박았다!' },
+  brood_call: { name: '새끼 부르기', kind: 'enemy', target: 'none', type: 'summon', summon: ['sand_scorpion', 'sand_scorpion'], msg: '{A|이} 집게를 부딪치자 모래 속에서 전갈들이 기어 나왔다!' },
+  tail_lash: { name: '꼬리 후려치기', kind: 'enemy', target: 'enemies', type: 'physical', mult: 0.8, status: { poison: 0.25 }, anim: 'quake', msg: '{A|이} 거대한 꼬리로 일행을 후려쳤다!' },
+  // 보스: 베인 (재전)
+  blood_scythe: { name: '피의 낫', kind: 'enemy', target: 'enemies', type: 'physical', mult: 0.9, anim: 'bigslash', msg: '{A|이} 낫을 크게 휘둘러 붉은 반원을 그렸다!' },
+  // 보스: 자히르
+  mirage: { name: '신기루', kind: 'enemy', target: 'none', type: 'summon', summon: ['zahir_mirage', 'zahir_mirage'], shuffle: true, msg: '{A|의} 모습이 아지랑이처럼 일렁이더니… 여러 개로 갈라졌다!' },
+  sandstorm: { name: '모래 폭풍', kind: 'enemy', target: 'enemies', type: 'magic', element: null, power: 24, scale: 0.32, debuffAll: { hit: 0.75 }, anim: 'mist', msg: '{A|이} 지팡이를 들자 사원 안에 모래 폭풍이 휘몰아쳤다!' },
+  hourglass_flip: { name: '모래시계 뒤집기', kind: 'enemy', target: 'none', type: 'charge', next: 'falling_sand', msg: '{A|이} 커다란 모래시계를 뒤집었다… 모래가 흘러내리기 시작한다.', hint: '[y]모래가 다 떨어지는 순간, 무언가 쏟아질 것이다…[/]' },
+  falling_sand: { name: '쏟아지는 모래', kind: 'enemy', target: 'enemies', type: 'magic', element: 'dark', power: 54, scale: 0.5, anim: 'wave', msg: '쏴아아──! 천장에서 모래가 폭포처럼 쏟아졌다!' },
+  dune_spear: { name: '사구의 창', kind: 'enemy', target: 'enemy', type: 'magic', element: 'light', power: 44, scale: 0.55, anim: 'light', msg: '{A|이} 모래를 굳혀 만든 창을 {T|에게} 날렸다!' },
+  spirit_call: { name: '모래 정령 부르기', kind: 'enemy', target: 'none', type: 'summon', summon: ['sand_spirit'], msg: '{A|이} 기도하자 모래가 일어나 정령의 모습이 되었다!' },
+  mirage_spear: { name: '사구의 창', kind: 'enemy', target: 'enemy', type: 'magic', element: 'light', power: 14, scale: 0, anim: 'light', msg: '{A|이} 모래를 굳혀 만든 창을 {T|에게} 날렸다!' },
+  idle_shimmer: { name: '일렁임', kind: 'enemy', target: 'none', type: 'none', msg: '{A|의} 모습이 아지랑이처럼 일렁인다…' },
+
   // ── 보스: 철엄니 ──
   tusk: { name: '엄니 찌르기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.2, msg: '{A|이} 쇠 같은 엄니로 들이받았다!' },
   paw: { name: '돌진 준비', kind: 'enemy', target: 'enemy', type: 'charge', next: 'rampage', msg: '{A|이} 앞발로 땅을 긁으며 {T|을} 노려본다!', hint: '[y]땅을 긁는 소리… 곧 돌진이 올 것이다![/]' },
@@ -3251,7 +3508,7 @@ const CHARACTERS = {
     name: '하루', job: '이방인', look: 'hero', color: '#7cc4ff',
     base: { hp: 30, mp: 6, atk: 10, def: 6, mag: 6, spd: 8 },
     grow: { hp: 6, mp: 2.2, atk: 2.2, def: 1.6, mag: 1.5, spd: 1.5 },
-    learn: { 1: ['analyze'], 3: ['heal'], 5: ['star_slash'], 7: ['thunder'], 9: ['twin_slash'], 11: ['heal_more'], 13: ['resolve'], 15: ['starfall'], 17: ['meteor_slash'] },
+    learn: { 1: ['analyze'], 3: ['heal'], 5: ['star_slash'], 7: ['thunder'], 9: ['twin_slash'], 11: ['heal_more'], 13: ['resolve'], 15: ['starfall'], 17: ['meteor_slash'], 19: ['insight'], 22: ['stellar_blade'] },
     equip: { weapon: 'umbrella', armor: 'hoodie' },
     bio: '어느 밤 막차 버스에서 잠들었다가 이세계의 들판에서 눈을 뜬 사람. 손등에 별 모양의 낙인이 새겨져 있다. 균형 잡힌 능력과 적을 꿰뚫어 보는 「분석」이 특기.',
   },
@@ -3259,7 +3516,7 @@ const CHARACTERS = {
     name: '브란', job: '수호기사 지망생', look: 'bran', color: '#ff9a5a',
     base: { hp: 38, mp: 3, atk: 12, def: 8, mag: 1, spd: 5 },
     grow: { hp: 8, mp: 1, atk: 2.6, def: 2.0, mag: 0.4, spd: 1.0 },
-    learn: { 1: ['bash'], 3: ['cover'], 5: ['warcry'], 7: ['quake'], 9: ['ironwall'], 11: ['shield_bash'], 13: ['guardian'], 15: ['earthsplit'], 17: ['knight_oath'] },
+    learn: { 1: ['bash'], 3: ['cover'], 5: ['warcry'], 7: ['quake'], 9: ['ironwall'], 11: ['shield_bash'], 13: ['guardian'], 15: ['earthsplit'], 17: ['knight_oath'], 19: ['provoke'], 21: ['axe_storm'], 23: ['unbroken'] },
     equip: { weapon: 'club', armor: 'leather_armor', shield: 'pot_lid' },
     bio: '대장장이 드른의 아들. 대장간을 물려받기보다 왕국의 수호기사가 되기를 꿈꾼다. 힘세고 우직하지만 유령 이야기에는 약하다. 동료를 지키는 기술이 특기.',
   },
@@ -3267,7 +3524,7 @@ const CHARACTERS = {
     name: '리네트', job: '마도학자', look: 'linette', color: '#d59bff',
     base: { hp: 22, mp: 14, atk: 5, def: 4, mag: 12, spd: 7 },
     grow: { hp: 4.2, mp: 3.6, atk: 0.9, def: 1.0, mag: 2.5, spd: 1.3 },
-    learn: { 1: ['fire'], 2: ['ice'], 3: ['sleep'], 5: ['slow'], 6: ['firestorm'], 8: ['seal'], 10: ['blizzard'], 12: ['thunderstorm'], 14: ['mana_amp'], 16: ['ice_lance', 'inferno'] },
+    learn: { 1: ['fire'], 2: ['ice'], 3: ['sleep'], 5: ['slow'], 6: ['firestorm'], 8: ['seal'], 10: ['blizzard'], 12: ['thunderstorm'], 14: ['mana_amp'], 16: ['ice_lance', 'inferno'], 19: ['thunder_lance'], 21: ['shadow_flare'], 23: ['meteor'] },
     equip: { weapon: 'oak_staff', armor: 'mage_robe', helm: 'wizard_hat' },
     bio: '왕립 마도학원의 젊은 연구자. 실종된 스승 알드윈 교수의 흔적을 좇아 종의 유적을 조사하고 있다. 말투는 날카롭지만 정이 많다. 속성 공격 주문의 전문가.',
   },
@@ -3275,7 +3532,7 @@ const CHARACTERS = {
     name: '미오', job: '종의 무녀', look: 'mio', color: '#ff8aa8',
     base: { hp: 25, mp: 12, atk: 6, def: 5, mag: 9, spd: 6 },
     grow: { hp: 4.8, mp: 3.2, atk: 1.0, def: 1.2, mag: 2.0, spd: 1.2 },
-    learn: { 1: ['heal'], 2: ['cure'], 4: ['protect'], 5: ['holy_lance'], 6: ['revive'], 8: ['heal_all'], 11: ['heal_more'], 13: ['chime_cleanse'], 15: ['holy_burst'], 17: ['sanctuary'] },
+    learn: { 1: ['heal'], 2: ['cure'], 4: ['protect'], 5: ['holy_lance'], 6: ['revive'], 8: ['heal_all'], 11: ['heal_more'], 13: ['chime_cleanse'], 15: ['holy_burst'], 17: ['sanctuary'], 19: ['regen'], 21: ['full_heal'] },
     equip: { weapon: 'oak_staff', armor: 'vestment' },
     bio: '리벨 신전의 무녀. 들판에 쓰러진 주인공을 처음 발견했다. 상냥하지만 한번 정하면 물러서지 않는다. 가끔 아무도 듣지 못하는 「종의 노래」를 듣는다.',
   },
@@ -3283,7 +3540,7 @@ const CHARACTERS = {
     name: '넬', job: '떠돌이 도적', look: 'nell', color: '#7cf08a',
     base: { hp: 26, mp: 6, atk: 9, def: 5, mag: 3, spd: 13 },
     grow: { hp: 5, mp: 1.6, atk: 1.9, def: 1.3, mag: 0.6, spd: 2.2 },
-    learn: { 1: ['steal', 'venom_strike'], 4: ['smoke'], 6: ['vital_strike'], 8: ['numb_needle'], 10: ['mug'], 12: ['shadow_step'], 14: ['poison_cloud'], 16: ['assassinate'] },
+    learn: { 1: ['steal', 'venom_strike'], 4: ['smoke'], 6: ['vital_strike'], 8: ['numb_needle'], 10: ['mug'], 12: ['shadow_step'], 14: ['poison_cloud'], 16: ['assassinate'], 19: ['shadow_twin'], 22: ['death_mark'] },
     equip: { weapon: 'hunting_knife', armor: 'thief_garb' },
     bio: '리벨 마을에 숨어들었던 좀도둑. 날렵한 몸놀림과 독·마비 기술, 훔치기가 특기. 일행에 있으면 숨겨진 보물이 반짝여 보인다.',
   },
@@ -3700,6 +3957,162 @@ const MONSTERS = {
     },
     extraActions(self) { return self.mem.phase === 2 && self.mem.turn % 2 === 1 ? 1 : 0; },
   },
+
+  // ════════ 제3장 ════════
+  // ── 붉은 협곡 · 타는 모래 사막 ──
+  sand_scorpion: {
+    name: '모래전갈', art: 'scorpion', pal: { body: '#c8904a', dark: '#8a5a2a', light: '#e8b878', sting: '#5a1a2a', eye: '#ff4040' },
+    hp: 230, mp: 0, atk: 72, def: 40, mag: 0, spd: 14, exp: 120, gold: 60,
+    elem: { ice: 1.5, fire: 0.5 }, resist: { poison: 1 }, drops: [{ item: 'antidote', p: 0.2 }, { item: 'hi_potion', p: 0.05 }], steal: { item: 'hi_potion', p: 0.3 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'sting', w: 4 }, { s: 'pincer', w: 2 }],
+    desc: '모래 속에 숨어 지나가는 것을 노리는 전갈. 독침에 찔리면 독에 걸린다. 차가운 것을 싫어한다.',
+  },
+  dune_worm: {
+    name: '사구 지렁이', art: 'worm', pal: { body: '#b87a5a', dark: '#7a4a3a', light: '#d89a7a', sand: '#d8b878' },
+    hp: 320, mp: 0, atk: 78, def: 30, mag: 0, spd: 8, exp: 150, gold: 70,
+    elem: { ice: 1.5, thunder: 1.25, fire: 0.75 }, resist: { sleep: 0.5 }, drops: [{ item: 'mega_potion', p: 0.05 }], steal: { item: 'potion', p: 0.5 },
+    actions: [{ s: 'attack', w: 3 }, { s: 'burrow_bite', w: 4 }, { s: 'sand_spray', w: 2 }],
+    desc: '모래 언덕 아래를 헤엄치는 거대한 지렁이. 모래를 뿜어 시야를 가린다.',
+  },
+  cactus_man: {
+    name: '가시선인장', art: 'cactus', pal: { body: '#5a9a4a', dark: '#3a6a2a', light: '#7aba6a', spine: '#f0e8c0', flower: '#ff6b8a', sand: '#d8b878' },
+    hp: 200, mp: 0, atk: 64, def: 36, mag: 30, spd: 12, exp: 110, gold: 50,
+    elem: { fire: 2.0, ice: 0.75 }, resist: { poison: 0.5 }, drops: [{ item: 'hi_ether', p: 0.04 }], steal: { item: 'hi_ether', p: 0.12 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'needle_rain', w: 3 }],
+    desc: '사막을 걸어 다니는 선인장. 온몸의 가시를 일행 전체에 쏘아 댄다. 불을 보면 질색한다.',
+  },
+  desert_hawk: {
+    name: '사막매', art: 'crow', pal: { body: '#a87a4a', dark: '#6a4a2a', light: '#e8c890', eye: '#ffe040' },
+    hp: 170, mp: 0, atk: 70, def: 26, mag: 0, spd: 30, evade: 0.15, exp: 105, gold: 50,
+    elem: { thunder: 1.5, ice: 1.25 }, resist: {}, drops: [{ item: 'feather', p: 0.04 }], steal: { item: 'feather', p: 0.15 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'dive', w: 3 }, { s: 'peck', w: 2 }],
+    desc: '모래 위를 낮게 나는 사나운 매. 아주 빠르고 피하기를 잘한다.',
+  },
+  sand_raider: {
+    name: '모래 약탈자', art: 'bandit', pal: { skin: '#c88a5a', cloth: '#8a3a2a', pants: '#4a3a2a', sash: '#d8b040', wrap: '#e8dcc0', blade: '#d8dce8' },
+    hp: 260, mp: 0, atk: 74, def: 32, mag: 0, spd: 20, exp: 130, gold: 140,
+    elem: { light: 1.25 }, resist: {}, drops: [{ item: 'mega_potion', p: 0.06 }, { item: 'turban', p: 0.03 }], steal: { item: 'sand_bomb', p: 0.35 },
+    actions: [{ s: 'attack', w: 5 }, { s: 'plunder', w: 3 }, { s: 'tackle', w: 2 }],
+    desc: '대상 행렬을 노리는 사막의 도적. 주머니를 노린다. 쓰러뜨리면 빼앗긴 돈을 되찾을 수 있다.',
+  },
+  heat_lizard: {
+    name: '열기도마뱀', art: 'lizard', pal: { body: '#d8a040', dark: '#9a6a2a', light: '#f0c870', flame: '#ff7020' },
+    hp: 240, mp: 0, atk: 70, def: 34, mag: 40, spd: 14, exp: 125, gold: 60,
+    elem: { ice: 2.0, fire: 0 }, resist: {}, drops: [{ item: 'firebomb', p: 0.15 }], steal: { item: 'sand_bomb', p: 0.2 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'heat_wave', w: 3 }],
+    desc: '모래 열기를 머금은 도마뱀. 일행 전체에 열풍을 일으킨다.',
+  },
+  // ── 전갈 굴의 주인 ──
+  scorpion_queen: {
+    name: '모래전갈 여왕', art: 'scorpion', boss: true, artScale: 1.9, pal: { body: '#8a4a6a', dark: '#5a2a44', light: '#c87aa0', sting: '#ffd040', eye: '#ff3a3a', crown: '#ffd75e' },
+    hp: 3600, mp: 0, atk: 84, def: 42, mag: 30, spd: 16, exp: 2600, gold: 1200,
+    elem: { ice: 1.5, fire: 0.5 }, resist: { poison: 1, sleep: 0.7, paralyze: 0.5, silence: 1 }, drops: [{ item: 'mega_potion', p: 1 }],
+    desc: '오래된 우물 동굴을 차지한 전갈들의 여왕. 모래 속으로 사라질 때가 가장 위험하다.',
+    ai(self, B) {
+      const m = self.mem;
+      m.turn = (m.turn || 0) + 1;
+      if (m.next) { const n = m.next; m.next = null; return { skill: n, target: m.mark }; }
+      if (self.hp / self.maxhp < 0.6 && !m.brood) { m.brood = true; return { skill: 'brood_call' }; }
+      if (m.turn % 4 === 0) { m.next = 'queen_strike'; m.mark = B.pickTarget('party', 'fragile'); return { skill: 'dig_in' }; }
+      if (m.turn % 4 === 2) return { skill: 'tail_lash' };
+      return { skill: Util.chance(0.55) ? 'sting' : 'pincer', target: B.pickTarget('party', Util.chance(0.4) ? 'fragile' : 'random') };
+    },
+  },
+  // ── 모래시계 사원 ──
+  mummy: {
+    name: '사원의 미라', art: 'mummy', pal: { wrap: '#e0d4b0', dark: '#a89870', loose: '#c8bc98', eye: '#7cf0ff' },
+    hp: 300, mp: 30, atk: 76, def: 34, mag: 34, spd: 10, exp: 150, gold: 70, undead: true,
+    elem: { fire: 2.0, light: 1.5, dark: 0 }, resist: { poison: 1, sleep: 1 }, drops: [{ item: 'panacea', p: 0.12 }], steal: { item: 'panacea', p: 0.4 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'wrap', w: 3 }, { s: 'curse_word', w: 2 }],
+    desc: '사원을 지키다 잠든 신관의 미라. 붕대로 휘감아 마비시키고 저주를 중얼거린다.',
+  },
+  temple_guardian: {
+    name: '사암 수호상', art: 'sentry', pal: { stone: '#c8a070', dark: '#8a6a40', light: '#e8c898', eye: '#ffd040' },
+    hp: 360, mp: 0, atk: 80, def: 70, mag: 36, spd: 8, exp: 170, gold: 80,
+    elem: { thunder: 1.5, ice: 1.25, fire: 0.5 }, resist: { poison: 1, sleep: 1, silence: 1 }, drops: [{ item: 'hi_ether', p: 0.05 }], steal: { item: 'hi_ether', p: 0.15 },
+    actions: [{ s: 'attack', w: 3 }, { s: 'stone_beam', w: 3 }, { s: 'stone_fist', w: 2 }, { s: 'guard_stance', w: 1 }],
+    desc: '사암을 깎아 만든 사원의 수호상. 매우 단단하고, 눈에서 빛줄기를 쏜다.',
+  },
+  sand_spirit: {
+    name: '모래 정령', art: 'echo', pal: { body: '#d8b070', dark: '#9a7040', light: '#f8e0a0', eye: '#ff8a40' },
+    hp: 220, mp: 40, atk: 40, def: 30, mag: 50, spd: 22, exp: 140, gold: 60,
+    elem: { ice: 1.5, light: 0.5, dark: 1.25 }, resist: { poison: 1, sleep: 0.5 }, drops: [{ item: 'hi_ether', p: 0.05 }], steal: { item: 'sand_bomb', p: 0.3 },
+    actions: [{ s: 'heat_wave', w: 3 }, { s: 'sand_spray', w: 2 }, { s: 'attack', w: 2 }],
+    desc: '사막의 모래가 뭉쳐 생긴 정령. 열풍과 모래로 일행을 괴롭힌다.',
+  },
+  cursed_chest: {
+    name: '황금 탐욕상자', art: 'mimic', pal: { wood: '#c8a040', dark: '#8a6a20', gold: '#fff0a0', mouth: '#5a1020', tongue: '#e05a7a' },
+    hp: 420, mp: 30, atk: 86, def: 40, mag: 40, spd: 18, exp: 300, gold: 400,
+    elem: { light: 1.25, ice: 1.25 }, resist: { poison: 1, sleep: 0.5 }, drops: [{ item: 'hi_ether', p: 1 }],
+    actions: [{ s: 'gnaw', w: 5 }, { s: 'attack', w: 3 }, { s: 'curse_word', w: 2 }],
+    desc: '황금으로 치장한 탐욕상자. 사원의 보물 사이에 숨어 있다.',
+  },
+  // ── 베인 (재전) ──
+  vane2: {
+    name: '집행자 베인', art: 'cultist', boss: true, artScale: 1.35, pal: { robe: '#3a1420', dark: '#1a0a10', trim: '#d8b040', eye: '#ff2040', skin: '#c8b0a0', blade: '#ff8a8a', scythe: true },
+    hp: 3800, mp: 999, atk: 92, def: 36, mag: 56, spd: 18, exp: 2400, gold: 900,
+    elem: { light: 1.5, dark: 0 }, resist: { poison: 0.5, sleep: 1, paralyze: 0.5, silence: 0.5 }, drops: [],
+    desc: '잿빛 성가대의 집행자. 왕도에서의 패배 이후 낫이 붉게 물들었다. 처형 선고는 여전하다.',
+    ai(self, B) {
+      const m = self.mem;
+      m.turn = (m.turn || 0) + 1;
+      if (m.next) { const n = m.next; m.next = null; return { skill: n, target: m.mark }; }
+      if (m.turn % 3 === 0) { const t = B.pickTarget('party', 'weakest'); m.next = 'execution'; m.mark = t; return { skill: 'mark_doom', target: t }; }
+      if (m.turn % 3 === 2) return { skill: Util.chance(0.5) ? 'blood_scythe' : 'dark_wave' };
+      return { skill: 'attack', target: B.pickTarget('party', Util.chance(0.4) ? 'fragile' : 'random') };
+    },
+    extraActions(self) { return self.hp / self.maxhp < 0.4 && self.mem.turn % 2 === 0 ? 1 : 0; },
+  },
+  // ── 보스: 제3성부 자히르 ──
+  zahir: {
+    name: '제3성부 자히르', art: 'prophet', boss: true, pal: { robe: '#e8dcc0', dark: '#a89870', trim: '#d8b040', sash: '#3a6ab0', cloth: '#f4f0e0', skin: '#a8704a', beard: '#2a2a2a', eye: '#40c0ff', glass: '#c8e8f8', sand: '#e8c070' },
+    hp: 4200, mp: 999, atk: 60, def: 36, mag: 64, spd: 22, exp: 4000, gold: 2000,
+    elem: { ice: 1.25, thunder: 1.25, fire: 0.5, light: 0.75 }, resist: { poison: 0.5, sleep: 1, paralyze: 0.7, silence: 0.3 }, drops: [],
+    desc: '오아시스 사미라의 물의 사제였던 남자. 지금은 잿빛 성가대의 「제3성부」. 아지랑이처럼 모습을 흐린다. 진짜를 꿰뚫어 볼 눈이 있다면…',
+    phases: [{ key: 'p2', below: 0.5 }],
+    onPhase(self, B, key) {
+      if (key !== 'p2') return [];
+      self.mem.phase = 2;
+      self.mem.turn = 0;
+      const ev = [
+        { type: 'shake', mag: 6 },
+        { type: 'msg', text: '자히르가 지팡이 끝의 모래시계를 높이 들었다!' },
+        { type: 'msg', text: '[p]"모래가 다 떨어지기 전에… 바다를 돌려받겠다!"[/]' },
+      ];
+      const mio = B.party.find((a) => a.id === 'mio' && a.alive);
+      if (mio) {
+        for (const a of B.alivePartyList) a.buffs.regen = { mult: 1.08, turns: 99 };
+        ev.push({ type: 'msg', text: '…그때, 종 안쪽에서 노랫소리가 흘러나왔다. 미오의 목소리와 똑같은, 그러나 조금 더 낮은 목소리.' });
+        ev.push({ type: 'buff', target: mio, up: true });
+        ev.push({ type: 'msg', text: '[g]일행이 따뜻한 노랫소리에 감싸였다! (생명의 물결)[/]' });
+      }
+      return ev;
+    },
+    ai(self, B) {
+      const m = self.mem;
+      m.turn = (m.turn || 0) + 1;
+      if (m.next) { const n = m.next; m.next = null; return { skill: n }; }
+      const mirages = B.enemies.filter((e) => e.alive && e.def.mirage).length;
+      if ((m.phase || 1) === 1) {
+        if (m.turn === 1 || (!mirages && m.turn % 4 === 0)) return { skill: 'mirage' };
+        if (m.turn % 4 === 2) return { skill: 'sandstorm' };
+        return { skill: 'dune_spear', target: B.pickTarget('party', Util.chance(0.4) ? 'fragile' : 'random') };
+      }
+      if (m.turn === 1) return { skill: 'spirit_call' };
+      if (m.turn % 4 === 0) { m.next = 'falling_sand'; return { skill: 'hourglass_flip' }; }
+      if (!mirages && m.turn % 4 === 2) return { skill: 'mirage' };
+      if (m.turn % 4 === 3) return { skill: 'sandstorm' };
+      return { skill: 'dune_spear', target: B.pickTarget('party', Util.chance(0.5) ? 'fragile' : 'random') };
+    },
+    extraActions(self) { return self.mem.phase === 2 && self.mem.turn % 3 === 1 ? 1 : 0; },
+  },
+  zahir_mirage: {
+    name: '제3성부 자히르', art: 'prophet', boss: true, mirage: true, knownAs: 'zahir', pal: { robe: '#e8dcc0', dark: '#a89870', trim: '#d8b040', sash: '#3a6ab0', cloth: '#f4f0e0', skin: '#a8704a', beard: '#2a2a2a', eye: '#40c0ff', glass: '#c8e8f8', sand: '#e8c070' },
+    hp: 4400, mp: 0, atk: 20, def: 36, mag: 10, spd: 22, exp: 0, gold: 0,
+    elem: { ice: 1.25, thunder: 1.25, fire: 0.5, light: 0.75 }, resist: { poison: 1, sleep: 1, paralyze: 1, silence: 1 }, drops: [],
+    desc: '…',
+    actions: [{ s: 'idle_shimmer', w: 3 }, { s: 'mirage_spear', w: 2 }],
+  },
 };
 for (const id in MONSTERS) MONSTERS[id].id = id;
 
@@ -3776,6 +4189,37 @@ const ENCOUNTERS = {
       { w: 3, e: ['clock_soldier', 'clock_soldier'] }, { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
     ],
   },
+  canyon: {
+    bg: 'canyon', rate: [14, 22],
+    groups: [
+      { w: 7, e: ['sand_scorpion', 'sand_scorpion'] }, { w: 6, e: ['desert_hawk', 'desert_hawk'] }, { w: 5, e: ['sand_raider'] },
+      { w: 5, e: ['cactus_man', 'sand_scorpion'] }, { w: 4, e: ['sand_raider', 'desert_hawk'] }, { w: 3, e: ['sand_scorpion', 'sand_scorpion', 'desert_hawk'] },
+      { w: 1, e: ['glimmer_jelly'] },
+    ],
+  },
+  desert: {
+    bg: 'desert', rate: [14, 22],
+    groups: [
+      { w: 7, e: ['dune_worm'] }, { w: 6, e: ['cactus_man', 'cactus_man'] }, { w: 6, e: ['heat_lizard', 'sand_scorpion'] },
+      { w: 5, e: ['sand_raider', 'sand_raider'] }, { w: 4, e: ['desert_hawk', 'heat_lizard'] }, { w: 4, e: ['dune_worm', 'cactus_man'] },
+      { w: 3, e: ['heat_lizard', 'heat_lizard', 'desert_hawk'] }, { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
+    ],
+  },
+  sandcave: {
+    bg: 'sandcave', rate: [12, 20],
+    groups: [
+      { w: 7, e: ['sand_scorpion', 'sand_scorpion', 'sand_scorpion'] }, { w: 6, e: ['dune_worm', 'sand_scorpion'] }, { w: 5, e: ['heat_lizard', 'heat_lizard'] },
+      { w: 4, e: ['dune_worm', 'dune_worm'] }, { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
+    ],
+  },
+  temple: {
+    bg: 'temple', rate: [12, 20],
+    groups: [
+      { w: 6, e: ['mummy', 'mummy'] }, { w: 6, e: ['temple_guardian'] }, { w: 5, e: ['sand_spirit', 'mummy'] },
+      { w: 5, e: ['choir_knight', 'choir_acolyte'] }, { w: 4, e: ['temple_guardian', 'sand_spirit'] }, { w: 3, e: ['mummy', 'mummy', 'sand_spirit'] },
+      { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
+    ],
+  },
   cellar: {
     bg: 'cave', rate: [10, 18],
     groups: [{ w: 5, e: ['toxic_shroom'] }, { w: 4, e: ['toxic_shroom', 'toxic_shroom'] }, { w: 3, e: ['moss_jelly', 'toxic_shroom'] }],
@@ -3805,6 +4249,13 @@ const PARTY_TALK = {
     14: '수로 냄새가 아직도 코에서 안 빠져… 견습 기사의 첫 임무가 하수도 청소라니…',
     15: '{H}. 그 병원 얘기… 돌아가고 싶으면 돌아가. 근데 그 전까진, 내 방패 뒤에 있어.',
     16: '「별의 수호대」의 방패 담당, 견습 기사 브란! …크으, 소리 내서 말하니까 더 멋있다!',
+    17: '사막이라니! 낙타 타 볼 수 있을까? …갑옷 입고 타면 낙타가 화내려나.',
+    18: '물 한 바가지에 줄을 서는 마을… 기사는 이런 사람들을 지키라고 있는 거야.',
+    20: ['…지키겠다고 했는데. 바로 옆방에 있었는데.', '이번엔 안 놓쳐. 절대로.'],
+    21: '전갈 여왕이 땅속에 숨었을 때, 무작정 내려치니까 손목만 아프더라. 숨 고르면서 기다리는 것도 기사의 일이야.',
+    22: '미오, 다신 그런 일 없을 거야. 내 방패 뒤가 제일 안전하다고!',
+    23: '{H}, 아까 그 「이번 주」라는 거… 아니다. 네가 말할 때까지 기다릴게.',
+    24: '사막의 은인이래! 「별의 수호대」 이름이 점점 유명해지는 것 같아. 헤헤.',
     dungeon: '어두운 곳은 질색이야… 아, 아니! 질색이 아니라 경계 중인 거야!',
   },
   linette: {
@@ -3820,6 +4271,13 @@ const PARTY_TALK = {
     14: '엘리에게 쓴 편지… 「이번 축제에는 꼭 데리러 가마」. 20년 동안, 교수님은 그 축제를 기다린 거예요.',
     15: ['교수님은 틀렸어요. 죽은 사람은 돌아오지 않아요.', '…그런데 왜 이렇게 마음이 아플까요.'],
     16: '다음은 사막이에요. 모래 종에 관한 문헌을 학장님께 잔뜩 빌려 왔어요. …무겁죠? 미안해요.',
+    17: '모래 폭풍은 종이 울부짖는 소리라는 기록이 있어요. 그렇다면 종이 잠들면 폭풍도 멎겠죠.',
+    18: '샘이 마른 건 십 년 전부터래요. 무녀가 사원에 들어간 때와 같아요. …우연일까요.',
+    20: ['「같은 목소리」… 그 사람은 미오의 목소리가 필요했던 거예요. 왜 하필 미오일까요.', '…지금은 생각보다 움직일 때죠. 미안해요.'],
+    21: '사원의 모래는 시간처럼 흐른다고 했어요. 흐름을 거꾸로 돌릴 수 있다면, 길도 바뀌지 않을까요.',
+    22: '미오 말로는, 자히르는 아지랑이처럼 모습을 흐린대요. 겉모습으로 구분이 안 된다면… 「보는 눈」이 있어야겠죠.',
+    23: ['교수님은 처음부터 기다리고 있었던 거예요. 우리가 심장을 모으기를.', '…그래도 멈추지 않을 거예요. 마지막에 열쇠를 쥐는 건 {H}니까.'],
+    24: '북해의 파도 종… 바다에 잠긴 종이라니, 배를 구해야겠네요. 저 배멀미 하는데…',
     dungeon: '여기 마물들, 저마다 싫어하는 게 다른 것 같아요. 반응을 잘 살피면 MP를 아낄 수 있을지도요.',
   },
   mio: {
@@ -3832,6 +4290,11 @@ const PARTY_TALK = {
     14: '탑 위에서 누가 노래하고 있어요. 슬픈 자장가예요. …넬, 괜찮아요?',
     15: ['{H} 님이 쓰러졌을 때, 정말 무서웠어요.', '…돌아가셔도 괜찮아요. 하지만 말없이 사라지면 안 돼요. 약속해 주세요.'],
     16: '시간의 종이 고맙다고 했어요. 다시 흐를 수 있어서. …저도 언젠가 다른 종들의 노래를 다 들어 보고 싶어요.',
+    17: '모래 종의 노래는… 이상해요. 슬픈데 따뜻해요. 누가 자장가를 부르는 것 같아요.',
+    18: '이 마을, 처음 오는데 왠지 그리워요. 이상하죠?',
+    22: ['자히르 님은 나쁜 사람이 아니에요. 노래하라고 하면서 계속 울고 계셨어요.', '…그리고 종 안의 그 목소리. 빨리 가야 해요.'],
+    23: ['엄마의 노래, 이제 기억나요. 끝까지요.', '…헤헤. 울어서 눈이 부었어요. 보지 마세요.'],
+    24: ['엄마는 노래가 되어서 기다렸대요. 십 년 동안.', '{H} 님을 기다리는 사람도… 분명 그렇게 기다리고 있을 거예요.'],
     dungeon: 'HP가 줄면 망설이지 말고 말해 주세요. 치유는 제 일이에요!',
   },
   nell: {
@@ -3845,6 +4308,12 @@ const PARTY_TALK = {
     14: '언니가 이 위에 있어. 노래로 알아. …무서워. 만나는 게.',
     15: ['언니는 엄마를 데려온대. 오스릭 아저씨는 딸을 데려온대.', '…다들 누군가를 데려오고 싶어 해. 나는 언니를 데려오고 싶고.'],
     16: '「별의 수호대」면 사막 가는 통행증도 공짜겠지? 언니 찾으러 가는 데 돈 들면 곤란하거든.',
+    17: '사막엔 훔칠 게 없어. 대신 모래 속에 묻힌 건 많대. 나한텐 반짝이는 게 보이니까 맡겨.',
+    20: '……미오 없으니까 조용하네. 싫어, 이런 조용함.',
+    21: '사원 안 모래, 아무리 봐도 그냥은 못 건너. 뭔가 장치가 있을 거야. 장치 찾는 건 도둑의 특기지.',
+    22: '미오. …아니, 그냥. 돌아와서 다행이라고.',
+    23: '언니는 이번에도 없었어. 근데… 자히르 아저씨 보니까 알 것 같아. 언니도 그냥, 길을 잃은 거야.',
+    24: '샘물 진짜 맛있다. 공짜 물이 이렇게 맛있는 줄 몰랐어.',
     dungeon: '보물 상자 중에 이빨 달린 놈이 있대. 빨간 상자는 조심해.',
   },
 };
@@ -4179,6 +4648,14 @@ const Game = (() => {
   //  9 2장 출발 · 10 베인 격파 · 11 왕도 도착 · 12 학장 면담 · 13 브란 입단 · 14 늙은 이빨 격파 · 15 카산드라 격파 · 16 2장 완료
   function progress() {
     const f = state.flags;
+    if (f.chapter3_done) return 24;
+    if (f.zahir_defeated) return 23;
+    if (f.mio_rescued) return 22;
+    if (f.queen_defeated) return 21;
+    if (f.mio_taken) return 20;
+    if (f.met_hakim) return 19;
+    if (f.reached_samira) return 18;
+    if (f.ch3_started) return 17;
     if (f.chapter2_done) return 16;
     if (f.cassandra_defeated) return 15;
     if (f.croc_defeated) return 14;
@@ -4315,6 +4792,40 @@ const QUESTS = {
     ],
     reward: { gold: 1500, items: [['warden_badge', 1]] },
   },
+  main4: {
+    name: '사막의 종', type: 'main', giver: '사미라의 사자 라시드',
+    desc: '사막 너머 오아시스 사미라의 샘이 말라 가고, 물의 사제가 사라졌다. 사막 남쪽의 사원 근처에서 잿빛 옷의 무리가 목격되었다고 한다.',
+    stages: [
+      { goal: '은빛 가도 남쪽의 붉은 협곡을 지나 오아시스 사미라로 간다', hint: '사자가 걸어온 길을 거슬러, 가도의 남쪽으로', target: { map: 'highway', x: 48, y: 31 } },
+      { goal: '사미라 북쪽의 큰 집에서 족장 하킴을 만난다', hint: '사자를 보낸 마을의 우두머리를 찾아가자', target: { map: 'samira', x: 17, y: 4 } },
+      { goal: '여관 「사막의 별」에서 하룻밤 묵는다', hint: '긴 여정이었다. 오늘 밤은 쉬어 가자', target: { map: 'samira', x: 5, y: 5 } },
+      { goal: '족장 하킴에게 미오가 사라진 일을 알린다', hint: '밤사이 일어난 일을 마을의 우두머리에게 알리자', target: { map: 'samira', x: 17, y: 4 } },
+      { goal: '사막 동쪽의 옛 우물 동굴(전갈 굴)에서 태양의 열쇠를 찾는다', hint: '닫힌 문을 여는 열쇠는 말라 버린 옛 우물 어딘가에 잠들어 있다고 한다', target: { map: 'desert', x: 48, y: 9 } },
+      { goal: '사막 남쪽의 모래시계 사원에서 해의 문을 연다', hint: '열쇠를 들고, 모래 바다의 남쪽으로', target: { map: 'desert', x: 30, y: 35 } },
+      { goal: '흐르는 모래의 회랑을 지나 미오를 구한다', hint: '흐르는 모래 너머, 미오의 노래가 들리는 곳으로', target: { map: 'temple2', x: 12, y: 8 } },
+      { goal: '사원 가장 아래, 모래 종의 방으로 향한다', hint: '종의 노래가 더 아래에서 들린다', target: { map: 'temple3', x: 9, y: 5 } },
+      { goal: '사미라의 족장 하킴에게 돌아간다', hint: '물소리가 돌아온 마을로 돌아가자', target: { map: 'samira', x: 17, y: 4 } },
+    ],
+    reward: { gold: 3000, items: [['sand_badge', 1]] },
+  },
+  s_diary: {
+    name: '무녀의 일기', type: 'sub', giver: '모래에 묻힌 일기장',
+    desc: '사막에서 낡은 일기장의 찢어진 페이지를 발견했다. 단정한 글씨의 주인은 십 년 전 사미라에 왔던 사람인 듯하다.',
+    stages: [
+      { goal: '사막 곳곳에 흩어진 일기 조각을 모은다', hint: '모래 속에 흩어진 이야기의 나머지를 찾아보자', count: () => Math.min(3, Game.count('aria_page')), max: 3 },
+      { goal: '사미라 동쪽, 무녀가 머물던 집의 나디아에게 일기를 보여 준다 (미오와 함께)', hint: '일기의 주인이 머물던 곳을 찾아가자. 일기가 부르는 사람과 함께', target: { map: 'samira', x: 30, y: 19 } },
+    ],
+    reward: { items: [['aria_chime', 1]] },
+  },
+  s_caravan: {
+    name: '길 잃은 대상', type: 'sub', giver: '바자르의 상인 알리',
+    desc: '알리의 대상 행렬이 사막에서 모래 도적에게 둘러싸였다. 매가 물어 온 편지에는 「동남쪽 바위 야영지」라고 적혀 있다.',
+    stages: [
+      { goal: '사막 동남쪽 바위 야영지에서 대상 행렬을 구한다', hint: '사막의 동남쪽, 바위 언덕 아래 야영지를 찾아가자', target: { map: 'desert', x: 50, y: 33 } },
+      { goal: '바자르의 상인 알리에게 알린다', hint: '기다리는 사람에게 소식을 전하자', target: { map: 'samira', x: 5, y: 19 } },
+    ],
+    reward: { gold: 1000, items: [['oasis_ring', 1], ['mega_potion', 3]] },
+  },
   s_bounty: {
     name: '회색갈기 현상수배', type: 'sub', giver: '수호기사단 게시판',
     desc: '은빛 가도 북동쪽 숲에 늑대 우두머리 「회색갈기」가 나타나 상인 마차를 습격하고 있다. 토벌하면 상금 600G.',
@@ -4397,8 +4908,9 @@ const Quests = (() => {
     },
     // 현재 화면에 띄울 대표 목표 (메인 우선)
     currentGoal() {
-      for (const id of ['main1', 'main2', 'main3']) if (this.isActive(id)) return { id, text: this.goal(id), target: this.target(id) };
-      if (Game.flag('chapter2_done')) return { id: null, text: '자유 탐험 — 다음 이야기를 기다리며 남은 일을 정리해 보자', target: null };
+      for (const id of ['main1', 'main2', 'main3', 'main4']) if (this.isActive(id)) return { id, text: this.goal(id), target: this.target(id) };
+      if (Game.flag('chapter3_done')) return { id: null, text: '자유 탐험 — 다음 이야기를 기다리며 남은 일을 정리해 보자', target: null };
+      if (Game.flag('chapter2_done')) return { id: null, text: detailed() ? '마도학원의 오필리아 학장을 찾아가 다음 여정에 대해 듣자' : '왕도에서 쉬는 동안, 학원에서 새 소식이 기다리고 있을지도 모른다', target: detailed() ? { map: 'capital', x: 7, y: 10 } : null };
       if (Game.flag('chapter1_done')) return { id: null, text: detailed() ? '리벨의 하르도 장로에게 작별 인사를 하고 왕도로 떠나자' : '새로운 여정을 앞두고, 마을의 어른께 인사를 드리자', target: detailed() ? { map: 'rivel', x: 18, y: 5 } : null };
       return null;
     },
@@ -4419,6 +4931,10 @@ const Quests = (() => {
       if (itemId === 'star_candy' && this.isActive('s_candy') && this.stage('s_candy') === 0 && Game.count('star_candy') >= 3) {
         this.setStage('s_candy', 1);
         return '[y]「축제의 별사탕」 별사탕을 3개 모두 찾았다! 광장의 루나에게 가져가자.[/]';
+      }
+      if (itemId === 'aria_page' && this.isActive('s_diary') && this.stage('s_diary') === 0 && Game.count('aria_page') >= 3) {
+        this.setStage('s_diary', 1);
+        return null; // 안내는 일기 장면(Story.ariaPage)에서
       }
       if (itemId === 'veil_book' && this.isActive('s_book') && this.stage('s_book') === 0) {
         this.setStage('s_book', 1);
@@ -4462,7 +4978,7 @@ const Save = (() => {
       time: s.playTime,
       party: s.party.slice(),
       date: Date.now(),
-      chapter: Game.flag('chapter1_done') ? '제1장 완료' : '제1장',
+      chapter: Game.flag('chapter3_done') ? '제3장 완료' : Game.flag('ch3_started') ? '제3장' : Game.flag('chapter2_done') ? '제2장 완료' : Game.flag('ch2_started') ? '제2장' : Game.flag('chapter1_done') ? '제1장 완료' : '제1장',
     };
   }
 
@@ -4608,6 +5124,8 @@ class Actor {
     return this.elem[el] !== undefined ? this.elem[el] : 1;
   }
   get disabled() { return !!(this.status.sleep || this.status.paralyze); }
+  // 도감·상성 기억에 쓰는 ID (신기루는 본체와 같은 마물로 기억한다)
+  get knownId() { return this.def ? this.def.knownAs || this.defId : null; }
 }
 Actor.next = 1;
 
@@ -4642,11 +5160,12 @@ class BattleCore {
     return a;
   }
   renameEnemies() {
+    // 같은 이름끼리 A·B·C (신기루는 본체와 이름이 같아 함께 묶인다)
     const groups = {};
-    for (const e of this.enemies) (groups[e.defId] = groups[e.defId] || []).push(e);
-    for (const id in groups) {
-      const g = groups[id];
-      g.forEach((e, i) => { e.name = g.length > 1 ? `${MONSTERS[id].name} ${SUFFIX[i] || i + 1}` : MONSTERS[id].name; });
+    for (const e of this.enemies) (groups[e.def.name] = groups[e.def.name] || []).push(e);
+    for (const nm in groups) {
+      const g = groups[nm];
+      g.forEach((e, i) => { e.name = g.length > 1 ? `${nm} ${SUFFIX[i] || i + 1}` : nm; });
     }
   }
   get alivePartyList() { return this.party.filter((a) => a.alive); }
@@ -4814,6 +5333,14 @@ class BattleCore {
       case 'magic':
       case 'damage':
         for (const t of targets) { if (t.alive) ev.push(...this.magicHit(a, t, sk)); }
+        if (sk.debuffAll) {
+          for (const t of targets) {
+            if (!t.alive) continue;
+            for (const k in sk.debuffAll) t.buffs[k] = { mult: sk.debuffAll[k], turns: 3 };
+            ev.push({ type: 'buff', target: t, up: false });
+          }
+          ev.push({ type: 'msg', text: `모래가 눈에 들어가 ${BUFF_NAMES[Object.keys(sk.debuffAll)[0]]}${Util.josa(BUFF_NAMES[Object.keys(sk.debuffAll)[0]], '이')} 떨어졌다!` });
+        }
         break;
       case 'heal': {
         for (const t of targets) {
@@ -4824,7 +5351,9 @@ class BattleCore {
           t.hp = Math.min(t.mhp, t.hp + amt);
           ev.push({ type: 'heal', target: t, amount: t.hp - before, hpAfter: t.hp });
           ev.push({ type: 'msg', text: `${t.name}의 HP가 ${t.hp - before} 회복되었다!` });
+          if (sk.regenAfter) t.buffs.regen = { mult: 1.08, turns: sk.regenAfter };
         }
+        if (sk.regenAfter) ev.push({ type: 'msg', text: '부드러운 노랫소리가 일행을 감싸 안았다…' });
         break;
       }
       case 'mp':
@@ -4866,7 +5395,10 @@ class BattleCore {
           for (const k in sk.buff) t.buffs[k] = { mult: sk.buff[k], turns: sk.turns || 3 };
           if (sk.taunt) t.taunt = true;
           ev.push({ type: 'buff', target: t, up: true });
-          for (const k in sk.buff) ev.push({ type: 'msg', text: `${t.name}의 ${BUFF_NAMES[k]}${Util.josa(BUFF_NAMES[k], '이')} ${sk.buff[k] >= 1.6 ? '크게 ' : ''}올랐다!` });
+          for (const k in sk.buff) {
+            if (k === 'regen') ev.push({ type: 'msg', text: `${t.name}${Util.josa(t.name, '은')} 생명의 물결에 감싸였다!` });
+            else ev.push({ type: 'msg', text: `${t.name}의 ${BUFF_NAMES[k]}${Util.josa(BUFF_NAMES[k], '이')} ${sk.buff[k] >= 1.6 ? '크게 ' : ''}올랐다!` });
+          }
         }
         break;
       case 'debuff':
@@ -4885,7 +5417,7 @@ class BattleCore {
         for (const t of targets) { if (t.alive) ev.push(...this.inflict(t, sk.status, true)); }
         break;
       case 'analyze':
-        ev.push(...this.analyze(targets[0]));
+        for (const t of targets) if (t.alive) ev.push(...this.analyze(t));
         break;
       case 'steal':
         ev.push(...this.trySteal(a, targets[0]));
@@ -4924,7 +5456,9 @@ class BattleCore {
       }
       case 'summon': {
         const added = [];
-        for (const id of sk.summon) { const n = this.addEnemy(id); if (n) added.push(n); }
+        for (const id of sk.summon) { const n = this.addEnemy(id); if (n) { added.push(n); if (n.def.mirage) n.mirrorOf = a; } }
+        // 신기루: 본체와 섞여 어느 쪽이 진짜인지 모르게 자리를 뒤섞는다
+        if (sk.shuffle && added.length) { Util.shuffle(this.enemies); this.renameEnemies(); }
         if (added.length) { ev.push({ type: 'sfx', name: a.defId === 'ironfang' ? 'roar' : 'summon' }); ev.push({ type: 'summon', actors: added }); }
         else ev.push({ type: 'msg', text: '…그러나 아무것도 나타나지 않았다.' });
         break;
@@ -5035,6 +5569,8 @@ class BattleCore {
 
   damage(t, dmg, info = {}) {
     const ev = [];
+    // 신기루는 맞는 순간 흩어진다
+    if (!t.isParty && t.def.mirage) return this.dispelMirage(t, '공격이 그대로 통과했다…');
     t.hp = Math.max(0, t.hp - dmg);
     ev.push({ type: 'damage', target: t, amount: dmg, crit: info.crit, weak: info.em > 1, resist: info.em < 1, hpAfter: t.hp });
     let txt = t.isParty ? `${t.name}${Util.josa(t.name, '은')} [r]${dmg}[/]의 피해를 입었다!` : `${t.name}에게 [y]${dmg}[/]의 피해!`;
@@ -5045,6 +5581,11 @@ class BattleCore {
     if (t.hp <= 0) ev.push(...this.kill(t));
     else if (!t.isParty && t.def.phases) ev.push(...this.checkPhases(t));
     return ev;
+  }
+
+  dispelMirage(t, why) {
+    t._hp = 0; t.buffs = {}; t.charging = null;
+    return [{ type: 'die', target: t }, { type: 'msg', text: `${why} [y]${t.name}${Util.josa(t.name, '은')} 신기루였다![/] 모래가 되어 흩어졌다.` }];
   }
 
   kill(t) {
@@ -5058,6 +5599,7 @@ class BattleCore {
       ev.push({ type: 'msg', text: `[r]${t.name}${Util.josa(t.name, '은')} 쓰러졌다…[/]` });
     } else {
       this.killed.push(t);
+      for (const m of this.enemies) if (m.mirrorOf === t && m.alive) { m._hp = 0; ev.push({ type: 'die', target: m, silent: true }); }
       if (t.pilfered) { Game.addGold(t.pilfered); this.recoveredGold += t.pilfered; }
       ev.push({ type: 'die', target: t });
       ev.push({ type: 'msg', text: `${t.name}${Util.josa(t.name, '을')} 쓰러뜨렸다!` + (t.pilfered ? ` [y](${t.pilfered}G를 되찾았다)[/]` : '') });
@@ -5096,7 +5638,7 @@ class BattleCore {
   // 속성 상성이 드러나면 도감에 영구 기록 (다음에 만나도 표시된다)
   discover(t, el, em) {
     if (t.isParty || !el || !ELEMENTS[el]) return [];
-    if (!Game.learnElem(t.defId, el, em) || em === 1) return [];
+    if (!Game.learnElem(t.knownId, el, em) || em === 1) return [];
     const kind = em > 1 ? '약점' : em === 0 ? '무효' : '내성';
     return [{ type: 'msg', text: `[g]〈기억〉 ${t.def.name}의 ${kind}: ${ELEMENTS[el]}[/]`, quick: true }];
   }
@@ -5104,8 +5646,9 @@ class BattleCore {
   analyze(t) {
     const ev = [];
     const d = t.def;
-    Game.state.seen[t.defId] = true;
-    for (const k in ELEMENTS) Game.learnElem(t.defId, k, t.elemMult(k));
+    if (d.mirage) { ev.push({ type: 'analyze', target: t }); return ev.concat(this.dispelMirage(t, '이방인의 눈이 아지랑이를 꿰뚫었다!')); }
+    Game.state.seen[t.knownId] = true;
+    for (const k in ELEMENTS) Game.learnElem(t.knownId, k, t.elemMult(k));
     const weak = [], res = [], immune = [];
     for (const k in ELEMENTS) {
       const m = t.elemMult(k);
@@ -5145,6 +5688,12 @@ class BattleCore {
           ev.push({ type: 'status', target: a });
           ev.push({ type: 'msg', text: `${a.name}${Util.josa(a.name, '은')} ${{ sleep: '잠에서 깨어났다!', paralyze: '마비가 풀렸다!', silence: '다시 주문을 외울 수 있게 되었다!' }[s]}` });
         }
+      }
+      if (a.buffs.regen && a.buffs.regen.turns > 0 && a.hp < a.mhp) {
+        const before = a.hp;
+        a.hp = Math.min(a.mhp, a.hp + Math.max(1, Math.round(a.mhp * (a.buffs.regen.mult - 1))));
+        ev.push({ type: 'heal', target: a, amount: a.hp - before, hpAfter: a.hp });
+        ev.push({ type: 'msg', text: `${a.name}의 HP가 ${a.hp - before} 회복되었다. [g](생명의 물결)[/]` });
       }
       for (const k in a.buffs) {
         const b = a.buffs[k];
@@ -5250,6 +5799,20 @@ const TILES = {
   '@': { name: 'fountain', solid: true },
   'J': { name: 'statue', solid: true },
   'd': { name: 'stall', solid: true },
+  // 사막
+  '2': { name: 'dune' },
+  '3': { name: 'palm', solid: true },
+  '4': { name: 'cactus', solid: true },
+  '5': { name: 'wallSand', solid: true },
+  '6': { name: 'tent', solid: true },
+  '[': { name: 'roofSand', solid: true },
+  '?': { name: 'iconOasis' },
+  '(': { name: 'iconTemple' },
+  ')': { name: 'iconCave' },
+  '7': { name: 'wallTemple', solid: true },
+  '8': { name: 'floorTemple' },
+  '9': { name: 'quicksand', solid: true },
+  '/': { name: 'cliffRed', solid: true },
   // 실내
   'I': { name: 'wallIn', solid: true },
   'w': { name: 'floorWood' },
@@ -6787,7 +7350,7 @@ const Story = {
     await new Promise((res) => { const iv = setInterval(() => { if (card.done) { clearInterval(iv); res(); } }, 50); });
     await Engine.fadeOut(500);
     Engine.remove(card);
-    Sound.bgm('town');
+    Sound.bgm(o.bgm || 'town');
     await Engine.fadeIn(500);
   },
 };
@@ -6822,21 +7385,21 @@ defMap('highway', {
     'T.....;.....S.:..........s~~~............:....,.."..,TTT', // 14
     'T.S.;.......,.:.........S.~~~........"...:.....""""..TTT', // 15
     '::::::::::::::::::::::::::===:::::::::::::::::::::::CTTT', // 16
-    'T.."..:.................,s~~~.....""...."..,..."""S".TTT', // 17
-    'T.....:..........;........~~~......".,.......;.......TTT', // 18
-    'T..TT.:,T.T...TTT.T.YTT...~~~s......Y.T"Y..TT.YTYT.T.T.T', // 19
-    'TTYY.,:....TT.YT.T"TY....s~~~....T....T."....Y.....T...T', // 20
-    'TT...,:.T..YY.TT..T..YY.s~~~..."....;.T~~~~~~~....,.Y.TT', // 21
-    'T,T...:,.Y,TYT.Y.T.TTT...~~~..Y...,..T~~~~~~~~~.....YY.T', // 22
-    'TTY..,:..T...TYTTTTTY....~~~s...T..T..~~~~~~~~~Y.Y.....T', // 23
-    'T...T,:,."TT....TTTTTTT.s~~~.......;Y.~~~~~~~~~.Y.Y....T', // 24
-    'TTTY.....T....TT.TYTY....~~~..,.r.r...~~~~~~~~~...,...YT', // 25
-    'TYT......YTTTT,..YT.T.T..s~~~....r..".~~~~~~~~~...Y,...T', // 26
-    'TY.,.....T..Y.TYT.,.,.T.".~~~"Y,...,Y,..~~~~~..Y.T.Y,TTT', // 27
-    'TY..YTTYYTYT..T..YYTY.Y...~~~s.,...TYY.,...........Y.".T', // 28
-    'T"...".,.....;...........s~~~.Y,.....T.............Y.".T', // 29
-    'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT', // 30
-    'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT', // 31
+    'T.."..:.................,s~~~.....""...."..,...":"S".TTT', // 17
+    'T.....:..........;........~~~......".,.......;..:....TTT', // 18
+    'T..TT.:,T.T...TTT.T.YTT...~~~s......Y.T"Y..TT.YT:T.T.T.T', // 19
+    'TTYY.,:....TT.YT.T"TY....s~~~....T....T."....Y..:..T...T', // 20
+    'TT...,:.T..YY.TT..T..YY.s~~~..."....;.T~~~~~~~..:.,.Y.TT', // 21
+    'T,T...:,.Y,TYT.Y.T.TTT...~~~..Y...,..T~~~~~~~~~.:...YY.T', // 22
+    'TTY..,:..T...TYTTTTTY....~~~s...T..T..~~~~~~~~~Y:Y.....T', // 23
+    'T...T,:,."TT....TTTTTTT.s~~~.......;Y.~~~~~~~~~.:.Y....T', // 24
+    'TTTY.....T....TT.TYTY....~~~..,.r.r...~~~~~~~~~.:.,...YT', // 25
+    'TYT......YTTTT,..YT.T.T..s~~~....r..".~~~~~~~~~.:.Y,...T', // 26
+    'TY.,.....T..Y.TYT.,.,.T.".~~~"Y,...,Y,..~~~~~..Y:T.Y,TTT', // 27
+    'TY..YTTYYTYT..T..YYTY.Y...~~~s.,...TYY.,........:..Y.".T', // 28
+    'T"...".,.....;...........s~~~.Y,.....T..........:S.Y.".T', // 29
+    'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT:TTTTTTT', // 30
+    'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT:TTTTTTT', // 31
   ],
   enc: {
     default: 'highway',
@@ -6851,6 +7414,10 @@ defMap('highway', {
     { x: 0, y: 16, to: 'field', tx: 62, ty: 30, dir: 'left' },
     { x: 14, y: 12, to: 'waystation', tx: 6, ty: 8, dir: 'up', sfx: 'door' },
     { x: 52, y: 16, to: 'capital', tx: 23, ty: 38, dir: 'up', cond: () => Game.flag('vane_defeated') },
+    {
+      x: 48, y: 31, to: 'canyon', tx: 15, ty: 1, dir: 'down', cond: () => Game.flag('ch3_started'),
+      blocked: async () => { await S.say(null, '(협곡 쪽에서 모래 섞인 바람이 사납게 몰아친다. 눈을 뜨기도 힘들다.)\n…지금은 이 너머로 갈 수 없을 것 같다.'); },
+    },
   ],
   triggers: [
     { x: 23, y: 15, w: 2, h: 3, when: () => !Game.flag('vane_defeated'), run: () => Story.vane() },
@@ -6891,10 +7458,11 @@ defMap('highway', {
     { type: 'sign', x: 12, y: 14, text: '역참 「쉬어 가는 말」\n「따뜻한 수프와 푹신한 침대. 여행자의 친구」' },
     { type: 'sign', x: 24, y: 15, text: '은빛 다리\n「이 다리를 건너면 왕국의 심장, 아스테리온의 땅」' },
     { type: 'sign', x: 50, y: 17, text: '왕도 아스테리온\n「별이 내리는 도시에 오신 것을 환영합니다」 ─ 별내림 축제 개최 중!' },
+    { type: 'sign', x: 49, y: 29, text: '↓ 붉은 협곡 · 사막 너머 오아시스 사미라\n「모래 폭풍이 잦을 때는 통행을 삼가시오」' },
     { type: 'chest', id: 'hw_sw', x: 5, y: 26, item: 'hi_potion', n: 2 },
     { type: 'chest', id: 'hw_nw', x: 21, y: 4, item: 'thunder_flask', n: 2 },
     { type: 'chest', id: 'hw_den', x: 49, y: 4, item: 'buckler' },
-    { type: 'chest', id: 'hw_lake', x: 48, y: 26, gold: 300 },
+    { type: 'chest', id: 'hw_lake', x: 49, y: 26, gold: 300 },
     { type: 'chest', id: 'hw_ne', x: 52, y: 13, item: 'ether', n: 2 },
     { type: 'search', id: 'hw_rocks', x: 33, y: 25, item: 'feather', hidden: true, msg: '바위 틈에 깃털 하나가 끼어 있다. 은은하게 빛난다…!' },
     { type: 'search', id: 'hw_bridge', x: 29, y: 18, gold: 120, hidden: true, msg: '다리 아래 모래 속에 누군가 떨어뜨린 지갑이 묻혀 있다.' },
@@ -7104,7 +7672,7 @@ defMap('academy', {
   npcs: [
     {
       id: 'ophelia', x: 12, y: 3, look: 'dean', dir: 'down',
-      mark: () => P() === 11 || P() === 15,
+      mark: () => P() === 11 || P() === 15 || P() === 16,
       talk: () => Story.dean(),
     },
     {
@@ -7708,11 +8276,13 @@ Object.assign(Story, {
       return;
     }
     if (p === 15) { await Story.chapter2Ending(); return; }
+    if (p === 16) { await Story.beginChapter3(); return; }
     await S.say('오필리아 학장', byP({
       12: '라인하르트는 기사단 본부에 있을 걸세. 그 고집쟁이를 설득하는 건 자네들 몫이야.',
       13: ['탑 문이 열리지 않는다고? …그렇겠지. 탑 안의 시간이 멈춰 있으니까.', '길이 없는 건 아닐세. 탑은 원래 거대한 물시계였지. 물이 드나들던 길이 어딘가에 남아 있을 게야.', '그 길을 아는 사람이 이 도시 어딘가에 있을 걸세. …신분을 증명할 만한 것을 들고 가야 말을 들어 주겠지만.'],
       14: '시계탑 위층으로 갈수록 시간의 흐름이 이상해질 거야. 조심하게.',
-      16: ['남은 세 개의 종… 사막, 북해, 그리고 하늘섬. 길은 멀지만, 자네들이라면 갈 수 있을 걸세.', '리네트, 가끔은 편지를 보내렴. 이번엔 꼭.'],
+      17: ['사막의 모래 종… 옛 기록은 많지 않아. 다녀와서 자네들이 직접 들려주게.', '리네트, 가끔은 편지를 보내렴. 이번엔 꼭.'],
+      24: ['모래 종의 심장까지… 이제 남은 건 북해와 하늘섬이로군.', '북해로 가는 배편은 지금 알아보는 중이야. 조금만 기다려 주게.'],
     }));
     if (p === 13 && Quests.isActive('main3') && Quests.stage('main3') === 5) {
       S.stage('main3', 6);
@@ -8035,7 +8605,1030 @@ Object.assign(Story, {
     await S.completeQuest('main3');
     Game.setFlag('chapter2_done');
     await Story.chapterCard({ num: '제2장', title: '왕도로 가는 길', next: 'To be continued ─ 제3장 「사막의 종」' });
-    await S.say('오필리아 학장', ['사막으로 가는 길은 아직 모래 폭풍으로 막혀 있어. 길이 열리면 알려 주마.', '그때까지 왕도에서 쉬어 가렴. 축제도 아직 끝나지 않았으니까.']);
+    await S.say('오필리아 학장', ['사막으로 가는 길은 아직 모래 폭풍으로 막혀 있어. 폭풍이 잦아들면 소식이 오겠지.', '그때까지 왕도에서 쉬어 가렴. 축제도 아직 끝나지 않았으니까. …숨 좀 돌리고 나서 다시 들러 주게.']);
+    if (await S.yesno(null, '여기까지의 모험을 기록할까요?')) await Menu.saveScreen();
+  },
+});
+
+
+// ── src/maps/chapter3.js ──
+'use strict';
+// ─────────────────────────────────────────────────────────────
+// 제3장 「사막의 종」 맵: 붉은 협곡 · 타는 모래 사막 · 오아시스 사미라(+실내) · 전갈 굴 · 모래시계 사원
+//  진행도(Game.progress): 17 출발 · 18 사미라 도착 · 19 족장 면담 · 20 미오 납치
+//                         21 전갈 여왕 격파 · 22 미오 구출 · 23 자히르 격파 · 24 3장 완료
+// ─────────────────────────────────────────────────────────────
+const SAND_WEATHER = () => (Game.flag('chapter3_done') ? null : 'sand');
+
+// ── 붉은 협곡 ──
+defMap('canyon', {
+  name: '붉은 협곡', kind: 'field', bgm: 'desert', base: 's', weather: SAND_WEATHER,
+  tiles: [
+    '//////////sssss:2ssss/////////', // 0
+    '//////////sssss:s2ss2/////////', // 1
+    '//////////s2sss:sssss/////////', // 2
+    '///////////ss2s:ssss//////////', // 3
+    '///////////ssss:ssss//////////', // 4
+    '///////////2rs2:ssss//////////', // 5
+    '///////////ssss::22s//////////', // 6
+    '///////////2ss2::sssss////////', // 7
+    '//////////s224::sssss/////////', // 8
+    '/////////4s2s::ssss2//////////', // 9
+    '/////////ssss:sss2////////////', // 10
+    '/////////sss::s2ss////////////', // 11
+    '////////sss2:s2ss/////////////', // 12
+    '////////s4s::ssss/////////////', // 13
+    '//////s42s::sss4s/////////////', // 14
+    '/////s2sss::ss2s//////////////', // 15
+    '//////ss2ss::ssss/////////////', // 16
+    '//////2ssss::ssss22///////////', // 17
+    '/////sssssssssssssssss////////', // 18
+    '/////ss22ss6s6ssssssss////////', // 19
+    '////22sssssssss::sssss////////', // 20
+    '////2sss2ssssssssssrss////////', // 21
+    '///22s2sssssssssssssss////////', // 22
+    '//ss22sss:sssssss/////////////', // 23
+    '/////ss4::ss2s////////////////', // 24
+    '////2sss::sss/////////////////', // 25
+    '/////rss::s2ss////////////////', // 26
+    '////ssss:ssss/////////////////', // 27
+    '///2sss::ss22s////////////////', // 28
+    '//2ss2s:sssrs/////////////////', // 29
+    '//sssss:sssss/////////////////', // 30
+    '///sss2::s2s//////////////////', // 31
+    '////ssss:s22s/////////////////', // 32
+    '////sss::ssss/////////////////', // 33
+    '///ssss:ssss//////////////////', // 34
+    '//ssrss:ssss2/////////////////', // 35
+    '//sssss:sss4s/////////////////', // 36
+    '//sssss:ss4ss/////////////////', // 37
+    '///sss2:ss2s//////////////////', // 38
+    '///s2sr:2ss2//////////////////', // 39
+    '///222s:ssss//////////////////', // 40
+    '///ssrs:s2s2//////////////////', // 41
+    '//rssss:22sss/////////////////', // 42
+    '//sssss:s2sss/////////////////', // 43
+  ],
+  enc: { default: 'canyon', zones: [{ x: 9, y: 17, w: 14, h: 6, enc: null }, { x: 0, y: 0, w: 30, h: 3, enc: null }] },
+  warps: [
+    { x: 15, y: 0, to: 'highway', tx: 48, ty: 30, dir: 'up' },
+    { x: 7, y: 43, to: 'desert', tx: 30, ty: 1, dir: 'down' },
+  ],
+  onEnter: async () => {
+    if (!Game.flag('canyon_first')) {
+      Game.setFlag('canyon_first');
+      await S.say(null, '(붉은 바위 절벽 사이로 뜨거운 바람이 불어온다. 발밑의 흙이 점점 모래로 바뀌어 간다.)');
+      await Story.line('bran', '덥다… 갑옷 안이 찜통이야. 기사는 원래 이런 데서도 갑옷을 입는 거겠지…?');
+      await Story.line('linette', '협곡 끝이 사막이에요. 물은 아껴 마셔요.');
+      await Story.line('mio', '…노래가 들려요. 모래가 흘러내리는 소리 같은 노래. 그리고… 이상해요. 어딘가 익숙한 목소리예요.');
+    }
+  },
+  npcs: [
+    {
+      id: 'nomad_rest', x: 12, y: 20, look: 'desertM', dir: 'down', move: 'turn',
+      talk: async () => {
+        await S.say('유목민 카림', byP({
+          17: ['협곡을 넘어 사막으로 가는 건가? 모래 폭풍이 잦아든 건 열흘 만이라네.', '사막에선 신기루를 조심하게. 눈에 보이는 게 다 진짜는 아니거든. …사람이든, 길이든.'],
+          20: '오아시스의 무녀 이야기를 들었네. 사원 쪽 모래가 요즘 이상하게 흘러. 마치 누가 모래시계를 뒤집은 것처럼.',
+          24: '모래 폭풍이 그쳤어! 이렇게 맑은 사막 하늘은 십 년 만이야.',
+        }));
+      },
+    },
+  ],
+  objects: [
+    { type: 'chest', id: 'cn_mid', x: 20, y: 21, item: 'mega_potion', n: 2 },
+    { type: 'chest', id: 'cn_low', x: 3, y: 29, item: 'hi_ether' },
+    { type: 'search', id: 'cn_rock', x: 4, y: 22, gold: 400, hidden: true, msg: '바위 그늘의 모래 속에 낡은 돈주머니가 묻혀 있다.' },
+  ],
+});
+
+// ── 타는 모래 사막 ──
+defMap('desert', {
+  name: '타는 모래 사막', kind: 'field', bgm: 'desert', base: 's', weather: SAND_WEATHER,
+  tiles: [
+    '//////////////////////////////://///////////////////////////', // 0
+    '/s4sr2s2sss222ss2sssssssss2sss:2sss22sssssssrss2sssssr2s2ss/', // 1
+    '/4ssss2ssss2ssss2ssssss4sssssS:ssss2ssssssss2s2ssssss24ssss/', // 2
+    '/sssss2sss2ss2ss2sssssrsssssss:ssssss2s2r2sssss2ssss2ssssss/', // 3
+    '/s22rsssssss22ssssssss2ssss4sr:s4ssssssrssssss2ssss2sss2ss2/', // 4
+    '/sssssssssssssss2ss22sssss2sss:s2sssss2srssssssss2s22s2ss22/', // 5
+    '/2ss2ss6sssss22sssss2s2sssr2s2:2ssrsssrsssr22222222r22sssss/', // 6
+    '/sss2sssssssssssssss2sssssssss:ssssrsss2ss2222/r///222sssss/', // 7
+    '/2s2ssss:srsssss2ssssss4ss2ss2:2ss42s2sss2222/r2222222sssss/', // 8
+    '/2rsssXs:ssssss2s2ssssssssssss:ssss2ssss2s2r2rss)ss22222sss/', // 9
+    '/sssssss:sssssssssssssss2ss2r4:ssss2ss2s222/22sssss222sssss/', // 10
+    '/s2sssss:4s2sssrsss2ssss22s2ss:422ss22s2ss2/22sssssr22ss2ss/', // 11
+    '/2sssss2:ssssrs2s222s22sssss2s:::::::::::::::::::ss222ssss2/', // 12
+    '/2ssssss:sss22s2ss4ssrssrss2s::2s222sss42s222222222222sssss/', // 13
+    '/s2sssss:sssss2ssssssssss2ss:::4224sss2s4s22/222rr/222sssss/', // 14
+    '/ss22sss:sss2ss2ss2sss2sss2::s:s2ss22sssssssss4s22sssssssss/', // 15
+    '/ss2ssss:::4ssss2sssssssss::ss:ssssss22ss2s2ssrssssss2s2sss/', // 16
+    '/sssssssrs:::ssssssssss22::ss2:ss42s22ss2ssssssssss22rsssss/', // 17
+    '/ssss2ss42ss:::sssss3ss2::sss2:sssssssssss2sssssss2sssss2ss/', // 18
+    '/4sssssssss2ss:::ssss3s::s2s2s:ssss2sssssssssssssssssss2s2s/', // 19
+    '/ssss2ssssssssss::::::::sssss2:22ss2sss4ssssssssssss2sssss2/', // 20
+    '/sss2ss22s2ss2ssss?sssssss2sss:22222sssrssss2ssss2sssssssss/', // 21
+    '/222ss22ss2ssssssssssssss2ss24:s:sssss2ssssss2sss2s2sss2sss/', // 22
+    '/ss4ssss2srsssssssssssssrsss22:s:::2s2ssssssssssss22222ss2s/', // 23
+    '/4s2sssssssssss3sssss3sss2ssss:222:::s222sssss2sss4sss4ssss/', // 24
+    '/2ssssssss22sssss3ssssssss222s:sssss:::s22sssss2s22ssssssss/', // 25
+    '/ss2sssss4sssssss22sss22sss42s:sssssss:::s22ssss22ssssss22s/', // 26
+    '/2s2ssss2sssss2sssssssssss22ss:s2s2s4ss2:::ssssssss2sssssss/', // 27
+    '/ssssssssss4s2sss2s22sss2sssss:ssssss2ssss:::ss2sssss4ss2ss/', // 28
+    '/s2ssss2s22ss22ssssssr2sss4s2r:s2s4ssss4ssss:::2ssss2sssss2/', // 29
+    '/ssss2ssssssss22ssssssss999999:999999ss2ssssss:::ssssssss2s/', // 30
+    '/4ssssss2sss22ssssss22ss999999:999999ss2s22sssss::ss6ssssss/', // 31
+    '/ssssssrsss4sssss2sssss299sssssssss99ssrrssssssss:ssssss2ss/', // 32
+    '/2sss2sssssss24ss2ss2ssr99sPsssssPs99sss4ssssssss:sssssssss/', // 33
+    '/s2sssss2ss2ssssssssss4299sssssssss9922ss2ssssssssxssXsss2s/', // 34
+    '/s422ss2ssssssssssssssss99ssss(ssss99ssssss2sssssssssssssss/', // 35
+    '/ssss2ss2ss4ssss2sssssss99ssss:ssss99ss22r2ssssssssssssssss/', // 36
+    '/ss2ss2ssssss2s2sss22sss99sPss:ssPs99ssss2s22ssssssssssssss/', // 37
+    '/ss2ss2s2sssssssss2sssr299ssss:ssss992s2sssss2sss2s2sss2sss/', // 38
+    '/ssss4ss242ssss2s2s22sss999999:999999s4s2ssss222ssssss22sss/', // 39
+    '/2s42s222rsss2s22sssssss999999:9999992ssrssssssss2s2ss22s42/', // 40
+    '/42s2ss442sssssssrsssrs22srss2s2s2ssrs242s22sssssss24sss4ss/', // 41
+    '/2ss22ssssssss2ssss42sssss2r422s2ss2s22sssssss24s2s2sssss22/', // 42
+    '////////////////////////////////////////////////////////////', // 43
+  ],
+  enc: {
+    default: 'desert',
+    zones: [
+      { x: 27, y: 0, w: 7, h: 4, enc: null },        // 협곡 출구
+      { x: 13, y: 17, w: 11, h: 10, enc: null },     // 오아시스 주변
+      { x: 25, y: 31, w: 11, h: 9, enc: null },      // 사원 앞마당
+      { x: 45, y: 29, w: 12, h: 9, enc: null },      // 대상 야영지
+    ],
+  },
+  warps: [
+    { x: 30, y: 0, to: 'canyon', tx: 7, ty: 42, dir: 'up' },
+    { x: 18, y: 21, to: 'samira', tx: 17, ty: 26, dir: 'up' },
+    { x: 48, y: 9, to: 'sandcave', tx: 4, ty: 19, dir: 'right', sfx: 'stairs', cond: () => Game.flag('cave_told'), blocked: async () => { await S.say(null, '모래에 반쯤 묻힌 동굴 입구다. 안쪽에서 무언가 딸깍거리는 소리가 난다.\n…지금은 들어갈 이유가 없다.'); } },
+    { x: 30, y: 35, to: 'temple1', tx: 12, ty: 18, dir: 'up', sfx: 'stairs', cond: () => Game.flag('sun_gate_open'), blocked: () => Story.sunGate() },
+  ],
+  onEnter: async () => {
+    if (!Game.flag('desert_first')) {
+      Game.setFlag('desert_first');
+      await S.say(null, '(협곡을 빠져나오자 끝없는 모래 언덕이 펼쳐졌다. 하늘과 땅의 경계가 열기 속에 일렁인다.)');
+      await Story.line('nell', '…넓다. 그리고 아무것도 없어. 훔칠 것도.');
+      await Story.line('linette', '저 멀리 야자나무가 보여요. 오아시스예요. 사자가 말한 사미라일 거예요.');
+    }
+  },
+  npcs: [
+    {
+      id: 'caravan_lead', x: 50, y: 33, look: 'caravan', dir: 'left',
+      show: () => Quests.isActive('s_caravan') && Quests.stage('s_caravan') === 0,
+      talk: () => Story.lostCaravan(),
+    },
+    { id: 'raider1', x: 49, y: 33, look: 'raider', dir: 'right', show: () => Quests.isActive('s_caravan') && Quests.stage('s_caravan') === 0 && !Game.flag('raiders_beaten'), talk: () => Story.lostCaravan() },
+  ],
+  objects: [
+    { type: 'sign', x: 29, y: 2, text: '← 오아시스 사미라\n→ 오래된 우물 동굴 (출입 주의)\n↓ 모래시계 사원' },
+    { type: 'search', id: 'ds_tent', x: 6, y: 9, item: 'aria_page', msg: '무너진 천막 옆 나무 상자 안에, 모래에 바랜 일기장 조각이 끼어 있다.', empty: '빈 상자다. 모래만 가득하다.', after: () => Story.ariaPage() },
+    { type: 'chest', id: 'ds_nw', x: 3, y: 3, item: 'sand_garb' },
+    { type: 'chest', id: 'ds_ne', x: 57, y: 2, item: 'hi_ether', n: 2 },
+    { type: 'chest', id: 'ds_sw', x: 2, y: 40, item: 'desert_helm' },
+    { type: 'chest', id: 'ds_se', x: 57, y: 41, gold: 800 },
+    { type: 'chest', id: 'ds_mid', x: 40, y: 22, item: 'sand_bomb', n: 3 },
+    { type: 'search', id: 'ds_oasis', x: 22, y: 22, item: 'mega_potion', hidden: true, msg: '야자나무 뿌리 근처, 모래 속에 병 하나가 묻혀 있다.' },
+    { type: 'search', id: 'ds_dune', x: 44, y: 38, item: 'starwater', hidden: true, msg: '모래 언덕 꼭대기에서 별빛 한 방울이 반짝인다…!' },
+  ],
+});
+
+// ── 오아시스 사미라 ──
+defMap('samira', {
+  name: '오아시스 사미라', kind: 'town', bgm: 'oasis', base: 's',
+  tiles: [
+    '////////////////////////////////////', // 0
+    '/ss3sssssssss[[[[[[[[[[sssssssss3ss/', // 1
+    '/ssssssssssss[[[[[[[[[[ssssssssssss/', // 2
+    '/s[[[[[[[[sss[[[[[[[[[[sss[[[[[[[[s/', // 3
+    '/s[[[[[[[[sss5555D55555sss[[[[[[[[s/', // 4
+    '/s555D5555sssssss::sssssss555D5555s/', // 5
+    '/ssss:sssss3sssss::sssss3ssss:sssss/', // 6
+    '/ssss:sssssssssss::ssssssssss:sssss/', // 7
+    '/ssss:ssssssFFFFFFFFFFFFsssss:sssss/', // 8
+    '/ssss:ssssssF2222~~2222Fsssss:sssss/', // 9
+    '/ssss:ssssssF2222~~2222Fsssss:ssss3/', // 10
+    '/ssss:ssssssF2222~~2222Fsssss:sssss/', // 11
+    '/ssss:ssssssFFFFFFFFFFFFsssss:sssss/', // 12
+    '/ssss:sssssssssss::ssssssssss:sssss/', // 13
+    '/ss::::::::::::::::::::::::::::::ss/', // 14
+    '/ss::::::::::::::::::::::::::::::ss/', // 15
+    '/ssssssssssssssss::ssssssssssssssss/', // 16
+    '/s[[[[[[[[ddsssss::ssssddss[[[[[[[s/', // 17
+    '/s[[[[[[[[sssssss::ssssssss[[[[[[[s/', // 18
+    '/s555D5555sssssss::ssssssss555D555s/', // 19
+    '/ssssssssssssssss::ssssssssssssssss/', // 20
+    '/ssssssssssssssss::sss6ssssssssssss/', // 21
+    '/ssssssss6sssssss::ssssssssssssssss/', // 22
+    '/ssssssssssssssss::ssssss6sssssssss/', // 23
+    '/ss3ssssssssss3sS::ss3ssssssssss3ss/', // 24
+    '/ssssssssssssssss::ssssssssssssssss/', // 25
+    '/ssssssssssssssss::ssssssssssssssss/', // 26
+    '/////////////////:://///////////////', // 27
+  ],
+  edge: { map: 'desert', x: 18, y: 22, dir: 'down' },
+  warps: [
+    { x: 17, y: 4, to: 'chief_house', tx: 6, ty: 8, dir: 'up' },
+    { x: 5, y: 5, to: 'samira_inn', tx: 6, ty: 8, dir: 'up' },
+    { x: 29, y: 5, to: 'water_shrine', tx: 5, ty: 7, dir: 'up' },
+    { x: 5, y: 19, to: 'bazaar', tx: 6, ty: 7, dir: 'up' },
+    { x: 30, y: 19, to: 'aria_house', tx: 4, ty: 5, dir: 'up' },
+  ],
+  tileFlags: [{ flag: 'spring_restored', at: [[13, 9], [14, 9], [15, 9], [16, 9], [19, 9], [20, 9], [21, 9], [22, 9], [13, 10], [14, 10], [15, 10], [16, 10], [19, 10], [20, 10], [21, 10], [22, 10], [13, 11], [14, 11], [15, 11], [16, 11], [19, 11], [20, 11], [21, 11], [22, 11]], tile: '~' }],
+  onEnter: async () => {
+    if (!Game.flag('reached_samira')) await Story.arriveSamira();
+  },
+  npcs: [
+    {
+      id: 'gate_guard', x: 16, y: 25, look: 'desertM', dir: 'down',
+      talk: async () => {
+        await S.say('오아시스 문지기', byP({
+          17: '바깥사람이군. 사미라에 온 걸 환영한다. …물은 귀하니 아껴 쓰도록.',
+          18: '족장님은 북쪽 큰 집에 계신다. 왕도에서 온 손님이라면 기다리고 계실 거다.',
+          20: '어젯밤 모래 폭풍이 마을을 휩쓸었다. 그 와중에 사제님을 봤다는 사람도 있어… 설마.',
+          24: '샘이 다시 솟았다! 내 평생 이렇게 물이 넘치는 건 처음 본다!',
+        }));
+      },
+    },
+    {
+      id: 'well_girl', x: 14, y: 14, look: 'desertKid', dir: 'down', move: 'wander', radius: 2,
+      talk: async () => {
+        await S.say('물 긷는 아이', byP({
+          17: '샘물이 매일 조금씩 줄어들어. 엄마는 물 긷는 줄이 매일 길어진대.',
+          20: '사제님이… 무녀 언니를 데려갔대. 사제님은 좋은 분이었는데. 우리한테 물을 나눠 주던…',
+          24: '언니 오빠들이 샘을 살렸다며? 이제 물놀이 해도 된대! 헤헤.',
+        }));
+      },
+    },
+    {
+      id: 'teller', x: 23, y: 21, look: 'teller', dir: 'left', move: 'turn',
+      talk: async () => {
+        await S.say('점쟁이 사하라', byP({
+          17: ['…별의 손님이로구나. 네 손등에서 별 냄새가 나.', '모래는 흐르고, 흐르면 다시 쌓이지. 위가 아래가 되고, 아래가 위가 되는 법.'],
+          20: ['잃어버린 것을 찾는 얼굴이로군.', '모래시계는 뒤집어야 흐른다. 막힌 길은, 거꾸로 보면 열린 길이지.'],
+          21: ['아지랑이는 칼로 벨 수 없단다. 꿰뚫어 보는 눈만이 진짜를 가려내지.', '…네게는 그런 눈이 있지 않니, 별의 손님?'],
+          24: '네 별은 아직 다 타지 않았다. 하지만 서둘러야 할 거야. 저편의 시계는 이편보다 빠르게 흐르니까.',
+        }));
+      },
+    },
+    { id: 'samira_m1', x: 9, y: 15, look: 'desertM', dir: 'down', move: 'wander', radius: 3, talk: async () => { await S.say('오아시스 주민', byP({ 17: '십 년 전에도 바깥에서 무녀님이 왔었지. 아리아 님. 사원에 들어가서는 다시 나오지 않았어. 그 뒤로 모래 폭풍이 잦아들었지만, 샘은 조금씩 말라 갔어.', 24: '아리아 님의 딸이 샘을 살렸다며! 십 년 만에 은혜를 갚았어.' })); } },
+    { id: 'samira_f1', x: 26, y: 15, look: 'desertF', dir: 'down', move: 'wander', radius: 3, talk: async () => { await S.say('오아시스 주민', byP({ 17: '자히르 사제님이 사라진 지 한 달이야. 떠나기 전에 「바다를 되찾겠다」고 중얼거렸다던데… 이 사막에 바다라니.', 20: '사제님이 잿빛 옷의 사람들과 함께 있었대. 그 사람들, 무슨 짓을 하려는 걸까.', 23: '사제님이 돌아오셨대. 사당에서 꼼짝 않고 기도만 하고 계신다더라.' })); } },
+  ],
+  objects: [
+    { type: 'sign', x: 16, y: 24, text: '오아시스 사미라\n「모래 바다의 마지막 물방울」' },
+    { type: 'event', x: 17, y: 8, solid: true, run: async () => { await S.say(null, Game.flag('spring_restored') ? '맑은 샘물이 울타리 너머까지 넘실거린다. 물속에서 작은 물고기가 반짝인다.' : '사미라의 샘. 울타리 안쪽 바닥이 갈라져 있다. 가운데에만 손바닥만 한 물웅덩이가 남아 있다.'); } },
+    { type: 'event', x: 10, y: 17, solid: true, run: async () => { await S.say('과일 장수', '대추야자 사세요! …오늘 몫은 다 팔렸어요. 내일 또 오세요!'); } },
+    { type: 'event', x: 23, y: 17, solid: true, run: async () => { await S.say('천 장수', '사막 천은 햇빛을 막아 주지요. …지금은 구경만 하세요. 바자르 안에 더 좋은 게 있어요.'); } },
+    { type: 'search', id: 'sm_tent', x: 9, y: 22, item: 'hi_ether', msg: '천막 그늘에 누군가 두고 간 이슬병이 있다. 「목마른 여행자에게」.', empty: '천막 그늘이 시원하다.' },
+  ],
+});
+
+// ── 사미라 실내 ──
+defMap('chief_house', {
+  name: '족장의 집', kind: 'interior', bgm: 'oasis', base: 'w',
+  tiles: [
+    'IIIIIIIIIIIIII', // 0
+    'IIIIIIIIIIIIII', // 1
+    'ILLzwccccwzLLI', // 2
+    'IwwwwccccwwwwI', // 3
+    'IpwwwcttcwwwpI', // 4
+    'IwwwwccccwwwwI', // 5
+    'IhtwwccccwwthI', // 6
+    'IwwwwccccwwwwI', // 7
+    'IpwwwccccwwwpI', // 8
+    'IIIIIIEIIIIIII', // 9
+  ],
+  warps: [{ x: 6, y: 9, to: 'samira', tx: 17, ty: 5, dir: 'down' }],
+  npcs: [
+    {
+      id: 'hakim', x: 7, y: 3, look: 'hakim', dir: 'down',
+      mark: () => P() === 18 || (P() === 20 && !Game.flag('cave_told')) || P() === 23,
+      talk: () => Story.hakim(),
+    },
+    { id: 'hakim_guard', x: 2, y: 5, look: 'desertM', dir: 'right', talk: async () => { await S.say('족장의 호위', byP({ 18: '족장님은 하루에 한 잔의 물만 드신다. 마을 사람들 몫을 줄일 수 없다면서.', 21: '태양의 열쇠를 찾았다고? …그럼 이제 사원의 문이 열리는 건가.', 24: '족장님이 웃으시는 걸 십 년 만에 봤다.' })); } },
+  ],
+  objects: [
+    { type: 'event', x: 1, y: 2, solid: true, run: async () => { await S.say(null, ['벽에 오래된 지도가 걸려 있다. 지금의 사막 자리에 커다란 바다가 그려져 있다.', '바다 한가운데에 「종의 섬」이라고 적혀 있다.']); } },
+    { type: 'search', id: 'ch_dresser', x: 3, y: 2, item: 'mega_potion', msg: '서랍장 안에 「손님 대접용」이라고 적힌 물병이 있다.', empty: '서랍장 안은 비어 있다.' },
+  ],
+});
+
+defMap('samira_inn', {
+  name: '여관 「사막의 별」', kind: 'interior', bgm: 'oasis', base: 'w',
+  tiles: [
+    'IIIIIIIIIIIIII', // 0
+    'IIIIIIIIIIIIII', // 1
+    'IfwLLwpIbcbczI', // 2
+    'IwwwwwwIcccccI', // 3
+    'IkkkkwwwcccccI', // 4
+    'IwwwwwwIcccccI', // 5
+    'IwthwthIIccIII', // 6
+    'IwwwwwwwwwwwpI', // 7
+    'IpwwwwwwwwwwwI', // 8
+    'IIIIIIEIIIIIII', // 9
+  ],
+  warps: [{ x: 6, y: 9, to: 'samira', tx: 5, ty: 6, dir: 'down' }],
+  npcs: [
+    {
+      id: 'layla', x: 2, y: 3, look: 'desertF', dir: 'down',
+      mark: () => P() === 19,
+      talk: async () => {
+        if (P() === 19) { await Story.innNight(); return; }
+        await S.say('여관 주인 라일라', byP({ 17: '사막의 별에 어서 와요. 사막에선 물 한 잔도 귀하지만, 잠자리만큼은 넉넉하답니다.', 20: '어젯밤엔… 정말 미안해요. 우리 여관에서 그런 일이…', 24: '샘이 돌아왔어요! 오늘은 목욕물도 데워 드릴게요!' }));
+        await S.inn(Math.max(15, Game.state.party.length * 8), '여관 주인 라일라');
+      },
+    },
+    { id: 'inn_trader', x: 3, y: 7, look: 'merchant', dir: 'right', talk: async () => { await S.say('행상인', byP({ 17: '왕도에서 사막까지 오다니, 별난 사람들이로군. 나도 마찬가지지만.', 21: '전갈 굴의 여왕을 쓰러뜨렸다고? 그 굴엔 옛날 우물이 있었어. 사미라 사람들이 처음 물을 길었던 곳이지.' })); } },
+  ],
+  objects: [{ type: 'search', id: 'si_dresser', x: 12, y: 2, item: 'sand_bomb', n: 2, msg: '서랍 안에 모래 폭탄이 들어 있다. 「도적 퇴치용 ─ 라일라」', empty: '서랍 안은 비어 있다.' }],
+});
+
+defMap('water_shrine', {
+  name: '물의 사당', kind: 'interior', bgm: 'shrine', base: 'w',
+  tiles: [
+    'IIIIIIIIIIII', // 0
+    'IIIIIIIIIIII', // 1
+    'IpwwwAAwwwpI', // 2
+    'IwwwwccwwwwI', // 3
+    'IwwwwccwwwwI', // 4
+    'IjwwwccwwwjI', // 5
+    'IwwwwccwwwwI', // 6
+    'IpwwwccwwwpI', // 7
+    'IIIIIEIIIIII', // 8
+  ],
+  warps: [{ x: 5, y: 8, to: 'samira', tx: 29, ty: 6, dir: 'down' }],
+  npcs: [
+    { id: 'zahir_pray', x: 6, y: 3, look: 'zahir', dir: 'up', noTurn: true, show: () => Game.flag('zahir_defeated'), talk: () => Story.zahirAfter() },
+    { id: 'acolyte_water', x: 3, y: 5, look: 'desertF', dir: 'right', show: () => !Game.flag('zahir_defeated'), talk: async () => { await S.say('사당지기', byP({ 17: ['이곳은 물의 사당. 자히르 사제님이 지키던 곳이에요.', '사제님은 매일 밤 지도를 보며 「바다가 있었다」고 하셨어요. 이 사막이 옛날엔 바다였다고.'], 20: '사제님이 무녀님을 데려갔다니… 믿을 수 없어요. 사제님은 누구보다 이 마을을 사랑했는데.' })); } },
+  ],
+  objects: [
+    { type: 'event', x: 5, y: 2, solid: true, run: async () => { await S.say(null, ['제단 위에 낡은 석판이 놓여 있다.', '「모래는 바다의 기억. 종이 노래하면 물은 돌아오고, 종이 울부짖으면 모래가 일어나리라.」']); } },
+    { type: 'event', x: 6, y: 2, solid: true, run: async () => { await S.say(null, Game.flag('spring_restored') ? '제단의 물그릇이 찰랑찰랑 차 있다.' : '제단의 물그릇이 바싹 말라 있다.'); } },
+    { type: 'note', id: 'zahir_note', x: 1, y: 5, text: '항아리 옆에 쪽지가 끼워져 있다.\n「모래 아래에는 바다가 잠들어 있다. 장막 너머에는 잃어버린 모든 것이 있다. 오스릭 님은 약속했다. 무녀의 목소리가 종을 깨우면, 바다가 돌아온다고. ─ 자히르」' },
+  ],
+});
+
+defMap('bazaar', {
+  name: '바자르', kind: 'interior', bgm: 'oasis', base: 'w',
+  tiles: [
+    'IIIIIIIIIIIIII', // 0
+    'IIIIIIIIIIIIII', // 1
+    'IiaXwpwwiiijwI', // 2
+    'IwwwwwwwwwwwwI', // 3
+    'IkkkkkwwkkkkkI', // 4
+    'IwwwwwwwwwwwwI', // 5
+    'IxwwwwwwwwwwxI', // 6
+    'IpwwwwwwwwwwpI', // 7
+    'IIIIIIEIIIIIII', // 8
+  ],
+  warps: [{ x: 6, y: 8, to: 'samira', tx: 5, ty: 20, dir: 'down' }],
+  npcs: [
+    { id: 'baz_weapon', x: 3, y: 3, look: 'capsmith', dir: 'down', talk: async () => { await S.say('대장장이 오마르', byP({ 17: '사막의 칼은 휘어져 있지. 모래를 베려면 그래야 하거든.', 24: '샘을 살린 손님들에게는… 흠, 할인은 못 해 주지만 칼은 정성껏 갈아 주마.' })); await Shop.open('bazaar_arms'); } },
+    {
+      id: 'baz_item', x: 10, y: 3, look: 'merchant', dir: 'down',
+      mark: () => (!Quests.get('s_caravan') && P() >= 19) || (Quests.isActive('s_caravan') && Quests.stage('s_caravan') === 1),
+      talk: () => Story.ali(),
+    },
+  ],
+  objects: [{ type: 'search', id: 'bz_jar', x: 11, y: 2, item: 'sand_bomb', msg: '항아리 안에 모래 폭탄이 하나 굴러다닌다.', empty: '향신료 냄새가 난다.' }],
+});
+
+defMap('aria_house', {
+  name: '나디아의 집', kind: 'interior', bgm: 'oasis', base: 'w',
+  tiles: [
+    'IIIIIIIIII', // 0
+    'IIIIIIIIII', // 1
+    'IfwwzwwbwI', // 2
+    'IwwwwwwwwI', // 3
+    'IwhtthwwjI', // 4
+    'IwwwwwwwpI', // 5
+    'IIIIEIIIII', // 6
+  ],
+  warps: [{ x: 4, y: 6, to: 'samira', tx: 30, ty: 20, dir: 'down' }],
+  npcs: [
+    {
+      id: 'nadia', x: 6, y: 3, look: 'nadia', dir: 'down',
+      mark: () => Quests.isActive('s_diary') && Quests.stage('s_diary') === 1 && Game.inParty('mio'),
+      talk: () => Story.nadia(),
+    },
+  ],
+  objects: [
+    { type: 'event', x: 7, y: 2, solid: true, run: async () => { await S.say(null, '정갈하게 정돈된 침대. 머리맡에 시든 꽃 한 송이가 놓여 있다. 십 년 동안 매일 바꿔 놓은 듯하다.'); } },
+    { type: 'search', id: 'ah_jar', x: 8, y: 4, item: 'panacea', n: 2, msg: '항아리 안에 약병이 들어 있다. 「아리아 님이 두고 간 것」이라는 쪽지와 함께.', empty: '항아리 안은 비어 있다.' },
+  ],
+});
+
+// ── 전갈 굴 (오래된 우물 동굴) ──
+defMap('sandcave', {
+  name: '전갈 굴', kind: 'dungeon', bgm: 'cave', base: 'y',
+  tiles: [
+    '##############################', // 0
+    '#####yyyy#######yyyyyyyyyyy###', // 1
+    '###yyyyyyyy####yyyyyyyyyyyyy##', // 2
+    '##yyyy##yyyy##yyyyyPyyyyPyyy##', // 3
+    '##yyy####yyyyyyyy##yyyyyyyyy##', // 4
+    '##yyy####yyyyyyy####yyyyyyy###', // 5
+    '##yy2yy##yyy##yy####yyyyyy####', // 6
+    '###yyyy###yy####yyy##yy#######', // 7
+    '####yyyy##yyy##yyyyy#yyy######', // 8
+    '#####yyy###yyyyyyyyyyyyyy#####', // 9
+    '#####yy####yyy2yy####yyyyyy###', // 10
+    '####yyyy##yyyyyyy######yyyyy##', // 11
+    '###yyyyyyyyy####yy######yyyy##', // 12
+    '##yyyyy##yyy####yyyy####yy2y##', // 13
+    '##yy2yy##yyyy##yyyyyyyyyyyyy##', // 14
+    '##yyyyy###yyyyyyy##yyyyyyyyy##', // 15
+    '###yyy######yyyy####yyyyy#####', // 16
+    '##yyyyy######yy#######yyy#####', // 17
+    '##yyyyyyy#####y######yyyyy####', // 18
+    '##y<yyyyyyyyyyyyyyyyyyyyyyy###', // 19
+    '###yyyyyy#####yyyy####yyyy####', // 20
+    '##############################', // 21
+  ],
+  enc: { default: 'sandcave', zones: [{ x: 1, y: 17, w: 6, h: 4, enc: null }, { x: 15, y: 1, w: 13, h: 6, enc: null }] },
+  warps: [{ x: 3, y: 19, to: 'desert', tx: 48, ty: 10, dir: 'down', sfx: 'stairs' }],
+  triggers: [{ x: 15, y: 2, w: 13, h: 4, when: () => !Game.flag('queen_defeated'), run: () => Story.scorpionQueen() }],
+  onEnter: async () => {
+    if (!Game.flag('cave3_first')) {
+      Game.setFlag('cave3_first');
+      await S.say(null, '(서늘한 공기. 바닥 곳곳에 무너진 돌우물의 흔적이 있다. 어둠 속에서 딸깍, 딸깍… 무언가 집게를 부딪치는 소리.)');
+      await Story.line('linette', '옛날 우물이에요. 사미라 사람들이 처음 물을 길던 곳… 지금은 완전히 말랐네요.');
+      await Story.line('nell', '…미오가 있었으면 「조심하세요」라고 했겠지. 다들 조심해.');
+    }
+  },
+  npcs: [
+    { id: 'queen', x: 22, y: 2, look: 'monster:scorpion_queen', scale: 0.32, dir: 'down', noTurn: true, show: () => !Game.flag('queen_defeated'), talk: () => Story.scorpionQueen() },
+  ],
+  objects: [
+    { type: 'chest', id: 'sc_key', x: 26, y: 1, item: 'sun_key', after: () => Story.sunKeyFound() },
+    { type: 'chest', id: 'sc_page', x: 2, y: 6, item: 'aria_page', after: () => Story.ariaPage() },
+    { type: 'chest', id: 'sc_w', x: 3, y: 12, item: 'scorpion_dagger' },
+    { type: 'chest', id: 'sc_e', x: 27, y: 13, item: 'mega_potion', n: 2 },
+    { type: 'chest', id: 'sc_mid', x: 14, y: 10, item: 'sun_staff' },
+    { type: 'chest', id: 'sc_s', x: 24, y: 18, gold: 900 },
+    { type: 'search', id: 'sc_sand', x: 4, y: 14, item: 'hi_ether', hidden: true, msg: '모래 속에서 단단한 무언가가 손에 걸렸다. 깨지지 않은 이슬병이다!' },
+  ],
+});
+
+// ── 모래시계 사원 ──
+const HOURGLASS = {
+  A: [[5,16],[12,13],[20,5]],
+  B: [[19,16],[4,11],[14,8]],
+};
+defMap('temple1', {
+  name: '모래시계 사원 · 흐르는 모래의 회랑', kind: 'dungeon', bgm: 'sandtemple', base: '8',
+  tiles: [
+    '7777&77777&7777&77777&777', // 0
+    '7888888888888888888888887', // 1
+    '788888P88888>88888P888887', // 2
+    '7888888888888888888888887', // 3
+    '7888888888888888888888887', // 4
+    '7999999999999999999999997', // 5
+    '7888888888888898888888887', // 6
+    '7888888888888898888888887', // 7
+    '788888888P888898888888887', // 8
+    '7888888888888898888P88887', // 9
+    '7888888888888898888888887', // 10
+    '7999999999999999999999997', // 11
+    '7888888888889888888888887', // 12
+    '788888P888889888888888887', // 13
+    '788888888888988888P888887', // 14
+    '7888888888889888888888887', // 15
+    '7999999999999999999999997', // 16
+    '7888888888888888888888887', // 17
+    '788888P88888888888P888887', // 18
+    '788888888888<888888888887', // 19
+    '7777777777777777777777777', // 20
+    '7777777777777777777777777', // 21
+  ],
+  enc: { default: 'temple', zones: [{ x: 1, y: 17, w: 23, h: 3, enc: null }] },
+  warps: [
+    { x: 12, y: 19, to: 'desert', tx: 30, ty: 36, dir: 'down', sfx: 'stairs' },
+    { x: 12, y: 2, to: 'temple2', tx: 12, ty: 15, dir: 'up' },
+  ],
+  tileFlags: [
+    { flag: () => !!Game.flag('hg_flip'), at: HOURGLASS.A, tile: '8' },
+    { flag: () => !Game.flag('hg_flip'), at: HOURGLASS.B, tile: '8' },
+  ],
+  onEnter: async () => {
+    await Story.enterTemple();
+    if (!Game.flag('temple1_first')) {
+      Game.setFlag('temple1_first');
+      await S.say(null, '(사원 안은 고요하다. 바닥 곳곳의 구덩이에서 모래가 소리 없이 소용돌이친다. 회랑 여기저기에 커다란 모래시계가 놓여 있다.)');
+      await Story.line('linette', '흐르는 모래예요. 빠지면 끝이에요. …모래시계랑 무슨 관계가 있는 것 같은데.');
+      await Story.line('bran', '미오… 기다려. 금방 갈게.');
+    }
+  },
+  objects: [
+    { type: 'hourglass', x: 2, y: 17 },
+    { type: 'hourglass', x: 22, y: 13 },
+    { type: 'hourglass', x: 2, y: 13 },
+    { type: 'hourglass', x: 2, y: 7 },
+    { type: 'hourglass', x: 22, y: 8 },
+    { type: 'chest', id: 't1_page', x: 9, y: 9, item: 'aria_page', after: () => Story.ariaPage() },
+    { type: 'chest', id: 't1_e', x: 23, y: 10, item: 'mirage_robe' },
+    { type: 'chest', id: 't1_w', x: 1, y: 15, item: 'hi_ether', n: 2 },
+    { type: 'chest', id: 't1_top', x: 23, y: 1, item: 'sun_shield' },
+    { type: 'chest', id: 't1_mimic', x: 1, y: 1, item: 'turban', color: 'red', mimic: true, monster: 'cursed_chest' },
+    { type: 'event', x: 12, y: 17, art: 'plaque', solid: true, run: async () => { await S.say(null, ['바닥에 새겨진 글귀.', '「흐르는 모래는 시간을 따른다. 시간을 뒤집는 자만이 길을 걷는다.」']); } },
+  ],
+});
+
+defMap('temple2', {
+  name: '모래시계 사원 · 침묵의 제단', kind: 'dungeon', bgm: 'sandtemple', base: '8',
+  tiles: [
+    '777&7777777&7777777&7777', // 0
+    '78888888888888887777>777', // 1
+    '78888888888888887888|887', // 2
+    '788888877cccccc778888887', // 3
+    '788888878cccccc878888887', // 4
+    '78888P878888888878P88887', // 5
+    '788888878888888878888887', // 6
+    '788888877778877778888887', // 7
+    '788888888888888888888887', // 8
+    '7888P8888888888888888P87', // 9
+    '777787778888888877787777', // 10
+    '788888888888888888888887', // 11
+    '78888P888888888888P88887', // 12
+    '788888888888888888888887', // 13
+    '788888888888888888888887', // 14
+    '788888888888888888888887', // 15
+    '788888888888<88888888887', // 16
+    '777777777777777777777777', // 17
+  ],
+  enc: { default: 'temple', zones: [{ x: 7, y: 1, w: 17, h: 9, enc: null }] },
+  warps: [
+    { x: 12, y: 16, to: 'temple1', tx: 12, ty: 3, dir: 'down' },
+    { x: 20, y: 1, to: 'temple3', tx: 9, ty: 12, dir: 'up', sfx: 'stairs' },
+  ],
+  tileFlags: [{ flag: 'mio_rescued', at: [[20, 2]], tile: '8' }],
+  triggers: [{ x: 9, y: 8, w: 6, h: 2, when: () => !Game.flag('mio_rescued'), run: () => Story.vaneRematch() }],
+  npcs: [
+    { id: 'vane_t2', x: 12, y: 7, look: 'vane', dir: 'down', noTurn: true, show: () => !Game.flag('mio_rescued'), talk: () => Story.vaneRematch() },
+    { id: 'mio_caged', x: 11, y: 4, look: 'mio', dir: 'down', noTurn: true, show: () => !Game.flag('mio_rescued') },
+  ],
+  objects: [
+    { type: 'event', x: 20, y: 2, solid: true, show: () => !Game.flag('mio_rescued'), run: async () => { await S.say(null, '아래로 내려가는 계단을 모래빛 철창이 막고 있다. 철창에 종 모양의 자물쇠가 달려 있다.'); } },
+    { type: 'chest', id: 't2_w', x: 1, y: 1, item: 'desert_mail' },
+    { type: 'chest', id: 't2_sw', x: 1, y: 15, item: 'mega_potion', n: 2 },
+    { type: 'chest', id: 't2_se', x: 22, y: 15, item: 'oasis_ring' },
+    { type: 'chest', id: 't2_e', x: 22, y: 8, item: 'flame_saber' },
+    { type: 'search', id: 't2_sand', x: 6, y: 12, item: 'starwater', hidden: true, msg: '바닥의 모래 무늬 사이에서 별빛이 새어 나온다…!' },
+  ],
+});
+
+defMap('temple3', {
+  name: '모래 종의 방', kind: 'dungeon', bgm: () => (Game.flag('zahir_defeated') ? 'shrine' : 'sandtemple'), base: '8',
+  tiles: [
+    '777777777777777777', // 0
+    '77777777OO77777777', // 1
+    '777&777OOOO777&777', // 2
+    '7778888cccc8888777', // 3
+    '7778888cccc8888777', // 4
+    '7778P88cccc88P8777', // 5
+    '7778888cccc8888777', // 6
+    '7778888cccc8888777', // 7
+    '77&8888cccc8888&77', // 8
+    '7778888cccc8888777', // 9
+    '7778P88cccc88P8777', // 10
+    '7778888cccc8888777', // 11
+    '7778888cccc8888777', // 12
+    '7778888cc<c8888777', // 13
+    '777777777777777777', // 14
+  ],
+  warps: [{ x: 9, y: 13, to: 'temple2', tx: 20, ty: 3, dir: 'down' }],
+  triggers: [{ x: 3, y: 3, w: 12, h: 7, when: () => !Game.flag('zahir_defeated'), run: () => Story.zahir() }],
+  npcs: [
+    { id: 'zahir_boss', x: 9, y: 5, look: 'zahir', dir: 'up', noTurn: true, show: () => !Game.flag('zahir_defeated'), talk: () => Story.zahir() },
+    { id: 'zahir_down', x: 9, y: 5, look: 'zahir', dir: 'down', show: () => false },
+    { id: 'aria_spirit', x: 9, y: 3, look: 'aria', dir: 'down', show: () => false },
+    { id: 'osric_sand', x: 9, y: 12, look: 'osric', dir: 'up', show: () => false },
+  ],
+  objects: [
+    { type: 'deco', x: 9, y: 2, draw: 'sandbell' },
+    {
+      type: 'event', x: 12, y: 12, art: 'circle', show: () => Game.flag('zahir_defeated'),
+      run: async () => { if (await S.yesno(null, '모래 종이 남긴 마법진이 빛나고 있다. 오아시스 사미라로 돌아갈까?')) await S.warp('samira', 17, 25, 'up', { sfx: 'chime', slow: true }); },
+    },
+  ],
+});
+
+// 모래시계: 뒤집으면 흐르는 모래의 길이 바뀐다
+const Hourglass = {
+  async flip() {
+    const p = Field.player;
+    const on = !Game.flag('hg_flip');
+    const willSink = (on ? HOURGLASS.B : HOURGLASS.A).some(([x, y]) => x === p.x && y === p.y);
+    if (willSink) { Sound.sfx('buzzer'); await S.say(null, '발밑이 모래로 꺼질 것 같다. 여기서는 뒤집을 수 없다.'); return; }
+    Game.setFlag('hg_flip', on);
+    Sound.sfx('mist'); Engine.shake(3, 0.5);
+    Field.refreshTiles();
+    await S.say(null, on ? '커다란 모래시계를 뒤집었다. 쏴아아── 사원 곳곳에서 모래가 반대로 흐르기 시작했다.' : '모래시계를 다시 뒤집었다. 모래의 흐름이 원래대로 돌아왔다.');
+  },
+};
+
+
+// ── src/maps/story3.js ──
+'use strict';
+// ─────────────────────────────────────────────────────────────
+// 제3장 「사막의 종」 스토리 이벤트
+//  세 번째 종은 모래 바다 한가운데 「모래시계 사원」에 잠든 모래 종.
+//  미오는 성가대에 납치되고, 종 안에서 노래하던 목소리의 주인을 만난다.
+//  그리고 오스릭이 심장을 빼앗지 않는 이유가 드러난다.
+// ─────────────────────────────────────────────────────────────
+Object.assign(Story, {
+  // ── 3장 시작: 사미라의 사자 ──
+  async beginChapter3() {
+    if (Quests.get('main4')) return;
+    await S.say('오필리아 학장', ['마침 잘 왔네. 손님이 와 있어.', '사막 너머, 오아시스 사미라에서 온 사자일세. 모래 폭풍을 뚫고 열흘을 걸어왔다는군.']);
+    await S.say('사자 라시드', ['별의 수호대 분들이시군요. 사미라의 족장 하킴 님의 부탁을 전하러 왔습니다.', '사미라의 샘이 말라 가고 있습니다. 한 달 전에는 샘을 지키던 물의 사제님이 사라졌고요.', '그 뒤로 사막 남쪽의 낡은 사원 근처에서 잿빛 옷을 입은 자들을 봤다는 사람이 있습니다.']);
+    await Story.line('linette', '잿빛 옷… 성가대예요. 모래 종이 다음 표적이에요.');
+    await Story.line('mio', '…노래가 들려요. 아주 멀리서. 모래가 흘러내리는 소리 같은 노래예요.');
+    await S.say('사자 라시드', ['이것을 받아 주십시오. 족장님의 통행패입니다. 사미라 사람들이 길을 열어 줄 겁니다.', '은빛 가도 남쪽, 붉은 협곡을 지나면 사막입니다. 다행히 폭풍이 잠시 잦아들었습니다.']);
+    await S.give('canyon_pass', 1);
+    await S.say('오필리아 학장', ['사막의 종은 「모래 종」이라 불리지. 옛 기록에는 종이 울부짖던 날 바다가 모래가 되었다고 적혀 있어.', '…그리고 십 년 전, 그 종을 달래러 사막으로 간 무녀가 있었다는 이야기도 있고.']);
+    await Story.line('mio', '무녀가…?');
+    await S.say('오필리아 학장', '자세한 건 나도 모른다네. 조심해서 다녀오렴.');
+    Game.setFlag('ch3_started');
+    await S.startQuest('main4');
+  },
+
+  // ── 오아시스 사미라 도착 ──
+  async arriveSamira() {
+    Game.setFlag('reached_samira');
+    Game.state.respawn = { map: 'samira_inn', x: 9, y: 7, dir: 'up', who: '여관 주인 라일라' };
+    Sound.sfx('chime');
+    await S.say(null, ['(야자나무 그늘 아래 흙벽 집들이 옹기종기 모여 있다. 마을 한가운데의 울타리 안에는… 거의 말라 버린 샘이 있다.)', '(물동이를 든 사람들이 샘 앞에 길게 줄을 서 있다.)']);
+    await Story.line('bran', '물 한 바가지에 저렇게 줄을 서다니…');
+    await Story.line('nell', '…목마른 건 배고픈 거보다 더 괴로워. 알아.');
+    await Story.line('linette', '족장님은 북쪽의 큰 집에 계실 거예요. 통행패를 보여 드려요.');
+    S.stage('main4', 1);
+    await S.goalUpdate('main4', '\n[d](쓰러지면 이제 사미라의 여관에서 깨어난다.)[/]');
+  },
+
+  // ── 족장 하킴 ──
+  async hakim() {
+    const p = Game.progress();
+    if (p === 18) {
+      await S.say('족장 하킴', ['…그 통행패. 왕도의 손님들이구려. 사막 끝까지 와 줘서 고맙소.', '나는 사미라의 족장 하킴. 먼저 물 한 잔 드시오. 이 마을에서 내놓을 수 있는 가장 귀한 대접이라오.']);
+      await S.say('족장 하킴', ['샘은 십 년째 조금씩 말라 가고 있소.', '십 년 전, 바깥에서 온 무녀 한 분이 모래 종을 달래겠다며 남쪽 사원에 들어갔소. 그날 뒤로 모래 폭풍은 잦아들었지만… 무녀님은 돌아오지 않았고, 샘은 그때부터 마르기 시작했지.']);
+      await S.say('족장 하킴', ['그리고 한 달 전, 샘을 지키던 물의 사제 자히르가 사라졌소.', '자히르는 누구보다 이 마을을 아끼던 사람이오. 매일 밤 옛 지도를 들여다보며 「바다가 있었다」고 중얼거리곤 했지.']);
+      await Story.line('mio', '저… 족장님. 그 무녀님 성함이…');
+      await S.say('족장 하킴', ['아리아 님이오. …음?', '(하킴은 한참 동안 미오의 얼굴을 바라보았다.)', '…아니, 실례했소. 노인네 눈이 침침해서 그런가 보오.']);
+      await Story.line('linette', '사원에는 들어갈 수 없나요?');
+      await S.say('족장 하킴', ['사원의 정문 「해의 문」은 아리아 님이 들어간 뒤로 굳게 닫혀 버렸소.', '…오늘은 이만 쉬시오. 사막의 밤은 춥고 길다오. 여관의 라일라에게 말해 두겠소.']);
+      Game.setFlag('met_hakim');
+      S.stage('main4', 2);
+      await S.goalUpdate('main4');
+      return;
+    }
+    if (p === 20 && !Game.flag('cave_told')) {
+      await S.say('족장 하킴', '어젯밤의 모래 폭풍… 마을 한가운데까지 들이닥친 건 처음이오. 다들 무사하오?');
+      await Story.line('bran', ['미오가… 미오가 끌려갔어요!', '모래 속에서 누가 「무녀의 목소리를 빌려 가겠다」고 했어요!']);
+      await S.say('족장 하킴', ['…무녀의 목소리. 그렇다면 자히르일 거요.', '그는 물의 사제요. 모래와 물의 노래를 다룰 줄 알지. 그가 왜 그런 짓을…']);
+      await S.say('족장 하킴', ['자히르가 무녀를 데려갔다면 갈 곳은 하나뿐이오. 모래시계 사원.', '해의 문을 여는 열쇠는 우리 조상이 사막 동쪽의 옛 우물에 숨겨 두었다고 전해지오. 마을 사람들이 처음 물을 길었던 곳이지.', '하지만 우물이 마른 뒤로 전갈들이 둥지를 틀었소. 특히 가장 깊은 곳의 「여왕」은… 마을의 사냥꾼들도 돌아오지 못했소.']);
+      await Story.line('nell', '…전갈이든 여왕이든 상관없어. 미오를 데려올 거야.');
+      await S.say('족장 하킴', '동굴 입구는 모래에 반쯤 묻혀 있소. 사막의 동쪽, 바위 언덕 사이를 살펴보시오.');
+      Game.setFlag('cave_told');
+      S.stage('main4', 4);
+      await S.goalUpdate('main4');
+      return;
+    }
+    if (p === 23) { await Story.chapter3Ending(); return; }
+    await S.say('족장 하킴', byP({
+      19: '라일라에게 말해 두었소. 오늘은 여관에서 쉬시오.',
+      20: ['전갈 굴은 사막의 동쪽에 있소. 독을 조심하시오.', '여왕은 모래 속에 몸을 숨겼다가 단숨에 덮친다고 하오. 숨어 있을 때는 섣불리 덤비지 말고, 숨을 고르는 게 좋을 거요.'],
+      21: '태양의 열쇠를 찾았구려…! 사원은 사막의 남쪽이오. 아리아 님도 그 길로 갔소.',
+      22: ['무녀를 되찾았구려! …그런데 사원 깊은 곳의 모래가 아직도 울고 있소.', '자히르를… 부탁하오. 그는 악인이 아니오. 길을 잃었을 뿐이지.'],
+      24: ['샘이 넘쳐흐르는 소리를 들으며 잠드는 게 이렇게 행복한 일인 줄 몰랐소.', '북쪽 바다로 가는 길은 왕도의 학장이 알 거요. 언제든 사미라에 들르시오. 그대들의 물은 늘 준비해 두겠소.'],
+    }));
+  },
+
+  // ── 여관의 밤: 미오 납치 ──
+  async innNight() {
+    await S.say('여관 주인 라일라', ['족장님께 이야기 들었어요. 오늘 숙박비는 마을에서 낸대요.', '안쪽 방을 쓰세요. 창문은 꼭 닫고 자요. 밤에는 모래가 들어오거든요.']);
+    await Engine.fadeOut(600);
+    Sound.stop();
+    Game.healAll(true);
+    await Sound.jingle('inn');
+    await Engine.wait(400);
+    await S.say(null, ['(…한밤중.)', '(바람 소리가 점점 거세진다. 닫아 둔 창문 틈으로 모래가 사르르 흘러들어 온다.)', '(바람 소리에 섞여… 낮은 노랫소리가 들린다.)']);
+    await Story.line('mio', ['……이 노래.', '어디서 들어 본 노래예요. 아주 오래전에… 누가 불러 줬던…']);
+    Sound.sfx('thunder'); Engine.shake(6, 0.6);
+    await Engine.fadeIn(400);
+    await S.say(null, '(콰아아앙! 창문이 부서지며 모래 폭풍이 방 안으로 쏟아져 들어왔다!)');
+    await S.say('???', '무녀의 목소리를… 잠시 빌려 가겠소.');
+    const r = await S.battle(['sand_spirit', 'choir_knight', 'sand_spirit'], { bg: 'desert', bgm: 'battle', canEscape: false, loseOk: true });
+    Sound.sfx('mist'); Engine.shake(5, 0.8);
+    if (r === 'win') await S.say(null, '(모래 정령들이 흩어졌다. 그러나 모래 폭풍은 멈추지 않는다!)');
+    else await S.say(null, '(모래가 눈과 입을 막는다. 몸이 움직이지 않는다…!)');
+    await Story.line('mio', '{H} 님──!');
+    await S.say('???', ['미안하오, 별의 열쇠. 바다를 되찾으려면 이 목소리가 필요하오.', '종의 노래를 끝까지 부를 수 있는 건… 같은 목소리뿐이니까.']);
+    await Engine.fadeOut(500, '#e8c070');
+    const slot = Game.state.party.indexOf('mio');
+    Game.leave('mio');
+    // 비어 버린 자리는 대기 멤버가 채운다 (구출 뒤 미오가 같은 자리로 돌아올 수 있게 기억해 둔다)
+    if (slot >= 0 && Game.state.reserve.length && Game.state.party.length < Game.MAX_PARTY) {
+      const sub = Game.state.reserve.shift();
+      Game.state.party.splice(slot, 0, sub);
+      Game.setFlag('mio_sub', sub);
+    }
+    Field.resetFollowers();
+    Game.healAll(true);
+    Game.setFlag('mio_taken');
+    Sound.bgm('sad');
+    await Engine.fadeIn(800, '#e8c070');
+    await S.say(null, '(…폭풍이 지나간 아침. 부서진 창문 아래 모래가 수북이 쌓여 있다. 미오의 침대는 비어 있다.)');
+    await Story.line('bran', '미오!! …젠장, 젠장! 바로 옆에 있었는데!');
+    await Story.line('nell', '모래 위에 발자국이 없어. 걸어서 나간 게 아니야. 모래랑 같이… 사라졌어.');
+    await Story.line('linette', ['「무녀의 목소리」라고 했어요. 「같은 목소리」라고도.', '…족장님께 가요. 이 사막에서 일어나는 일이라면 그분이 알 거예요.']);
+    S.stage('main4', 3);
+    await S.goalUpdate('main4');
+    Sound.bgm('oasis');
+  },
+
+  // ── 전갈 굴: 전갈 여왕 ──
+  async scorpionQueen() {
+    if (Game.flag('queen_defeated')) return;
+    S.facePlayer('up');
+    Sound.stop();
+    S.sfx('roar');
+    await S.say(null, ['(동굴 가장 깊은 곳, 말라 버린 돌우물 위에 거대한 전갈이 웅크리고 있다.)', '(머리 위로 왕관처럼 솟은 껍데기. 그 뒤편에서 무언가가 금빛으로 반짝인다.)']);
+    await Story.line('linette', '저 뒤예요. 태양 문양…! 열쇠는 저 너머에 있어요.');
+    await Story.line('bran', '미오 몫까지 싸운다! 덤벼라, 왕관 전갈!');
+    const r = await S.battle(['scorpion_queen'], { bg: 'sandcave', bgm: 'boss', boss: true, canEscape: false, intro: '옛 우물의 주인 전갈 여왕' });
+    if (r !== 'win') return;
+    Game.setFlag('queen_defeated');
+    S.hideNpc('queen');
+    Sound.bgm('cave');
+    await S.say(null, '(여왕이 쓰러지자, 말라 버린 돌우물 바닥에서 서늘하고 축축한 바람이 올라왔다.)');
+    await Story.line('linette', '…물 냄새. 이 아래엔 아직 물이 흐르고 있어요. 샘이 마른 건 물이 사라져서가 아니에요.');
+    await Story.line('nell', '상자다. 저기, 안쪽.');
+  },
+  async sunKeyFound() {
+    await Story.line('linette', '태양의 열쇠예요! 이걸로 해의 문을 열 수 있어요.');
+    await Story.line('bran', '기다려, 미오. 금방 간다!');
+    S.stage('main4', 5);
+    await S.goalUpdate('main4');
+  },
+
+  // ── 모래시계 사원: 해의 문 ──
+  async sunGate() {
+    if (!Game.count('sun_key')) {
+      await S.say(null, '거대한 석문에 둥근 홈이 파여 있다. 홈 둘레에 햇살 무늬가 새겨져 있다. 문은 꿈쩍도 하지 않는다.');
+      if (Game.flag('mio_taken')) await Story.line('linette', '이 홈… 무언가를 끼워 넣는 자리예요. 문을 여는 「무언가」가 따로 있는 거예요.');
+      return;
+    }
+    await S.say(null, '태양의 열쇠를 둥근 홈에 끼워 넣었다…');
+    Sound.sfx('door'); Engine.shake(4, 0.8);
+    Game.setFlag('sun_gate_open');
+    Field.refreshTiles();
+    await S.say(null, '(그르르르릉──! 모래를 쏟아내며 해의 문이 천천히 열렸다.)');
+    await Story.line('nell', '…안에서 노래가 들려. 나한테도 들려. 미오 목소리야.');
+  },
+  async enterTemple() {
+    if (Quests.isActive('main4') && Quests.stage('main4') === 5) {
+      S.stage('main4', 6);
+      await S.goalUpdate('main4');
+    }
+  },
+
+  // ── 침묵의 제단: 베인 재전 ──
+  async vaneRematch() {
+    if (Game.flag('mio_rescued')) return;
+    S.facePlayer('up');
+    Sound.stop();
+    await S.say(null, '(제단 앞에 붉은 낫을 든 사내가 서 있다. 그 뒤, 모래빛 철창 안에… 미오가 있다.)');
+    await Story.line('bran', '미오!!');
+    await S.say('미오', ['모두…! {H} 님!', '오면 안 돼요, 이 사람──']);
+    await S.say('베인', ['…또 만났군, 열쇠. 왕도에서는 신세를 졌지.', '무녀는 제3성부께 필요하다. 모래 종을 깨울 목소리니까.']);
+    await S.say('베인', ['그리고 너. 오스릭 님은 너를 건드리지 말라 하셨다. 「심장을 모으게 두어라」고.', '…나는 기다리는 게 싫다. 열쇠에 필요한 건 그 손뿐이니까.']);
+    await Story.line('linette', '…심장을 모으게 둔다고요? 어째서…');
+    await Story.line('nell', '말 많네. 미오 돌려줘.');
+    const r = await S.battle(['choir_knight', 'vane2'], { bg: 'temple', bgm: 'boss', boss: true, canEscape: false, intro: '잿빛 성가대 집행자 베인' });
+    if (r !== 'win') return;
+    Game.setFlag('mio_rescued');
+    Sound.bgm('sandtemple');
+    await S.say('베인', ['크윽… 두 번이나…', '오스릭 님… 어째서 이런 녀석들을 내버려 두시는 겁니까…!']);
+    Engine.flash('#c040ff', 0.4); Sound.sfx('summon');
+    S.hideNpc('vane_t2');
+    await S.say(null, '(베인은 붉은 연기와 함께 사라졌다. 동시에 철창의 종 모양 자물쇠가 모래가 되어 부서졌다.)');
+    Sound.sfx('door');
+    Field.refreshTiles();
+    S.hideNpc('mio_caged');
+    // 다시 합류 (떨어져 있던 동안의 경험치를 채워 준다)
+    Game.join('mio');
+    // 대신 자리를 채웠던 동료와 다시 자리를 바꾼다
+    const sub = Game.flag('mio_sub'), st = Game.state;
+    if (sub && st.reserve.includes('mio') && st.party.includes(sub)) {
+      st.party[st.party.indexOf(sub)] = 'mio';
+      st.reserve[st.reserve.indexOf('mio')] = sub;
+    }
+    const m = Game.member('mio');
+    const want = Math.max(m.level, Game.member('hero').level - 1);
+    if (want > m.level) Game.addExp('mio', expForLevel(want) - m.exp);
+    Game.healAll(true);
+    Field.resetFollowers();
+    Sound.jingle('join');
+    await S.say(null, '[y]미오[/]가 다시 일행에 합류했다!');
+    await Story.line('mio', ['…와 줄 줄 알았어요.', '헤헤. 사실은 조금 무서웠어요. 아주 조금요.']);
+    await Story.line('nell', '…다신 혼자 끌려가지 마. 심장 떨어지는 줄 알았네.');
+    await Story.line('mio', ['자히르 님은… 나쁜 사람이 아니에요. 저한테 노래를 시키면서 계속 울고 계셨어요.', '가끔은 모습이 아지랑이처럼 여럿으로 흐려졌어요. 어느 쪽이 진짜인지, 저는 끝까지 몰랐어요.', '그리고 종 안에서, 누군가 같이 노래하고 있었어요. 그 목소리가…', '……아래로 가요. 종이 기다리고 있어요.']);
+    S.stage('main4', 7);
+    await S.goalUpdate('main4');
+  },
+
+  // ── 모래 종의 방: 제3성부 자히르 ──
+  async zahir() {
+    if (Game.flag('zahir_defeated')) return;
+    S.facePlayer('up');
+    Sound.stop();
+    await S.say(null, '(거대한 모래 종 아래, 한 사내가 모래시계가 달린 지팡이를 짚고 서 있다. 종에서는 고운 모래가 끝없이 흘러내린다.)');
+    await S.say('자히르', ['…무녀를 되찾아 갔군. 베인은 늘 서두르지.', '나는 물의 사제 자히르. 아니, 이제는 잿빛 성가대의 제3성부요.']);
+    await S.say('자히르', ['이 사막은 옛날에 바다였소. 이 종이 울부짖던 날, 바다는 모래가 되었지.', '나는 바다를 돌려받고 싶을 뿐이오. 장막 너머에는 잃어버린 모든 것이 있다고, 오스릭 님이 약속했소.']);
+    await Story.line('mio', '…자히르 님. 종 안에서 노래하는 사람. 그분은… 누구예요?');
+    await S.say('자히르', ['……십 년 전, 리벨에서 온 무녀. 아리아 님이오.', '아리아 님은 울부짖는 종을 잠재우려고 스스로 종의 노래가 되었소. 그 덕에 모래 폭풍은 멎었지만, 종과 함께 샘도 잠들어 버렸지.', '그분의 노래로는 종을 재울 수밖에 없소. 종을 깨우려면 같은 목소리가 필요하오. …그분의 딸의 목소리가.']);
+    await S.say('미오', '……딸.');
+    await Story.line('bran', '미오…?');
+    await Story.line('linette', '종을 깨우면 장막이 한 겹 더 찢어져요! 사막만의 일이 아니에요!');
+    await S.say('자히르', ['알고 있소. …그래도 나는 십 년 동안 보아 왔소. 모래만 남은 마을에서, 아이들이 물 한 바가지를 두고 줄을 서는 것을.', '비켜 주시오. 아니면… 모래 속에서 길을 잃게 될 거요.']);
+    const r = await S.battle(['zahir'], { bg: 'sandbell', bgm: 'boss', boss: true, canEscape: false, intro: '잿빛 성가대 제3성부 자히르' });
+    if (r !== 'win') return;
+    Game.setFlag('zahir_defeated');
+    await Story.afterZahir();
+  },
+  async afterZahir() {
+    Sound.stop();
+    S.hideNpc('zahir_boss');
+    const zd = Field.npc('zahir_down');
+    if (zd) zd.visible = true;
+    await S.say(null, '(자히르가 무릎을 꿇었다. 지팡이 끝의 모래시계가 산산이 부서지며 모래가 흩날렸다.)');
+    Sound.sfx('bell');
+    Engine.flash('#ffe9a0', 0.6);
+    await S.say(null, '──데에엥.\n(모래 종이 울렸다. 울부짖음이 아니라, 맑고 깊은 소리였다.)');
+    const ar = Field.npc('aria_spirit');
+    if (ar) ar.visible = true;
+    Sound.bgm('shrine');
+    await S.say(null, '(종 아래에 빛으로 된 여인의 모습이 떠올랐다. 미오와 꼭 닮은 얼굴이다.)');
+    await S.say('???', '…미오.');
+    await Story.line('mio', '……엄마?');
+    await S.say('아리아', ['많이 컸구나. 리벨에 너를 두고 와서 미안해.', '자장가도 끝까지 불러 주지 못하고.']);
+    await Story.line('mio', ['…기억 안 나요. 엄마 얼굴도, 목소리도.', '그런데… 노래는 기억나요. 종의 노래가 들릴 때마다, 어딘가 익숙했어요. 그게… 엄마 노래였어요.']);
+    await S.say('아리아', '그럼 같이 부르자. 이번엔 끝까지.');
+    Sound.sfx('chime');
+    await S.say(null, ['(두 사람의 노랫소리가 겹쳐졌다.)', '(종에서 흘러내리던 모래가 멈추었다. 그리고 종 안쪽에서… 똑, 똑. 물방울 소리가 들리기 시작했다.)']);
+    const m = Game.member('mio');
+    if (m && !m.skills.includes('mother_song')) m.skills.push('mother_song');
+    Sound.jingle('item');
+    await S.say(null, '[y]미오는 「어머니의 자장가」를 배웠다![/]');
+    await S.say('아리아', ['별의 열쇠님. 내 딸을 지켜 줘서 고마워요.', '종의 심장은 당신에게 맡길게요. 다른 누구도 아닌, 당신에게.']);
+    Engine.flash('#ffd890', 0.4);
+    Sound.jingle('item');
+    await S.say(null, '[y]모래의 심장[/]이 {H}의 손에 내려앉았다. 구슬 안에서 고운 모래가 끝없이 흘러내린다.');
+    Game.addItem('sand_heart', 1);
+    await S.say('아리아', ['자히르 님. 바다는 돌아오지 않아요. 하지만 샘은 돌아올 거예요.', '…이제 제가 노래하지 않아도 되니까요.']);
+    await S.say('자히르', '아리아 님… 저는…');
+    await S.say('아리아', '미오, 노래해. 네 목소리로. 엄마는 늘 그 노래 안에 있을게.');
+    Sound.sfx('heal');
+    S.hideNpc('aria_spirit');
+    await S.say(null, '(빛이 모래알처럼 흩어지며 사라졌다.)');
+    await Story.line('mio', '……네.');
+    // 오스릭 등장
+    Sound.sfx('hit'); await S.wait(250); Sound.sfx('hit');
+    const os = Field.npc('osric_sand');
+    if (os) { os.visible = true; os.x = os.fromX = 9; os.y = os.fromY = 12; }
+    await S.walkNpc('osric_sand', ['up', 'up'], 3);
+    await S.say('오스릭', '훌륭하군. 세 번째 심장도 열쇠의 손에 들어갔어.');
+    await Story.line('linette', ['…교수님. 왜 심장을 빼앗지 않는 거예요? 시계탑에서도, 지금도.', '베인이 그랬어요. 「심장을 모으게 두어라」. …교수님은 일부러 기다리고 있는 거죠?']);
+    await S.say('오스릭', ['역시 내 제자로군, 리네트.', '빼앗을 필요가 없다. 다섯 개의 심장은 열쇠에게 모인다. 그리고 다섯 개를 모두 쥔 열쇠는… 마지막 종 앞에서 스스로 문을 열게 될 거다.']);
+    await S.say('오스릭', '{H}. 시간이 많지 않다는 건 자네도 알고 있겠지.');
+    // 환영: 원래 세계
+    await Engine.fadeOut(600, '#ffffff');
+    Sound.stop();
+    await S.say(null, ['…삐─, 삐─, 삐─.', '「…선생님, 그게 무슨 말씀이세요. 이번 주를 넘기기 어렵다니…」', '「{H}, 엄마 여기 있어. 들리지? 손 꼭 잡고 있을게. 그러니까…」', '목소리가 모래처럼 흩어진다──']);
+    Sound.sfx('chime');
+    await Engine.fadeIn(600, '#ffffff');
+    await S.say('오스릭', ['저편의 시계는 이편보다 빠르게 흐른다.', '다음은 북해, 파도의 종이다. 자네가 오기를 기다리지.']);
+    await S.say('자히르', '오스릭 님… 저는…');
+    await S.say('오스릭', '자히르. 자네의 바다는 여기 없었던 모양이군. …쉬게.');
+    Engine.flash('#ffffff', 0.6); Sound.sfx('thunder');
+    S.hideNpc('osric_sand');
+    await S.say(null, '(눈부신 빛과 함께, 오스릭의 모습이 사라졌다.)');
+    await S.say('자히르', ['……무녀님. 아니, 미오 님.', '용서를 빌 자격은 없소. 하지만… 샘을 지켜보겠소. 남은 날 동안, 매일.']);
+    if (zd) zd.visible = false;
+    await S.say(null, '(자히르는 비틀거리며 계단 쪽으로 걸어 나갔다.)');
+    Game.setFlag('spring_restored');
+    Sound.bgm('shrine');
+    await Story.line('bran', '{H}… 아까 그 얼굴. 또 뭔가 본 거지? 「이번 주」가 어쩌고…');
+    const c = await S.ask(null, '(방금 들린 목소리는…)', ['…서둘러야 할 것 같아.', '…아무것도 아니야.'], 1);
+    if (c === 0) await Story.line('linette', '…알겠어요. 남은 종은 두 개. 서두를게요. 대신 혼자 짊어지지 마요.');
+    else await Story.line('nell', '…거짓말 못하는 거 알지? 얼굴에 다 써 있어.');
+    await Story.line('mio', ['{H} 님에게도 기다리는 엄마가 있는 거죠.', '…그럼 꼭 돌아가야 해요. 그 전까지는 제가 지켜 드릴게요.']);
+    S.stage('main4', 8);
+    await S.goalUpdate('main4', '\n[d](종 옆의 마법진으로 사미라까지 돌아갈 수 있다.)[/]');
+  },
+  async zahirAfter() {
+    await S.say('자히르', byP({
+      23: ['…샘이 돌아왔다고 들었소. 아리아 님의 노래 덕이오.', '나는 이 사당에서 물을 지키며 지내겠소. 그게 내가 할 수 있는 유일한 속죄요.'],
+      24: ['오스릭은 「바다」 이야기를 할 때면 늘 먼 곳을 보았소. 그에게도 잃어버린 바다가 있는 거겠지.', '…북해의 종은 등대 아래 잠들어 있다고 들었소. 파도가 노래를 삼키는 곳이라고.'],
+    }));
+  },
+
+  // ── 서브: 무녀의 일기 ──
+  async ariaPage() {
+    const n = Game.count('aria_page');
+    if (!Quests.get('s_diary')) await S.startQuest('s_diary');
+    const pages = [
+      ['(단정한 글씨가 적혀 있다.)', '「…사미라의 샘이 마르고 있다. 모래 종이 울부짖고 있다. 누군가 노래로 달래 줘야 해.」', '「나는 무녀니까, 가야겠지. 리벨에 두고 온 우리 아기에게는 미안하지만.」'],
+      ['(일기의 다음 장이다.)', '「종은 노래하는 사람의 목소리를 기억한다. 내가 종 안에서 계속 노래하면, 모래는 잠들어 있을 거야.」', '「대신 나는 돌아갈 수 없겠지. …자장가를 끝까지 불러 주지 못한 게 마음에 걸린다.」'],
+      ['(마지막 장이다. 글씨가 조금 떨리고 있다.)', '「미오에게. 엄마는 노래가 되어 너를 기다릴게.」', '「언젠가 네가 이 노래를 듣게 된다면, 그때는 같이 불러 주렴. ♪ 모래가 잠들면 바다가 꿈을 꾸고… ♪」'],
+    ];
+    await S.say(null, pages[Math.min(n, 3) - 1]);
+    if (n === 1) {
+      if (Game.inParty('mio')) await Story.line('mio', '…리벨에 두고 온 아기…? 리벨이면, 제가 자란 곳인데…');
+      else await Story.line('linette', '리벨에 두고 온 아기… 설마.');
+    } else if (n === 2) {
+      await Story.line('linette', '이 일기를 쓴 사람… 사미라에 머물렀던 것 같아요. 일기를 맡겨 둘 만한 사람이 있었을까요.');
+    } else if (n >= 3) {
+      if (Game.inParty('mio')) await Story.line('mio', '……미오에게.');
+      else await Story.line('bran', '「미오에게」…? 이거… 미오한테 보여 줘야 해.');
+      if (Quests.isActive('s_diary')) { S.stage('s_diary', 1); await S.goalUpdate('s_diary'); }
+    }
+  },
+  async nadia() {
+    if (Quests.isActive('s_diary') && Quests.stage('s_diary') === 1) {
+      if (!Game.inParty('mio')) {
+        await S.say('나디아', ['그 일기… 아리아 님의 글씨예요. 십 년 동안 찾아도 없더니.', '아리아 님은 밤마다 「미오」라는 이름을 부르며 노래했어요. 그 아이를… 데려와 줄 수 있나요?']);
+        return;
+      }
+      await S.say('나디아', ['…어머나.', '(나디아는 미오의 얼굴을 보자마자 입을 막았다.)', '그 눈매, 그 머리칼… 아리아 님을 꼭 닮았구나. 네가 미오로구나.']);
+      await Story.line('mio', '엄마를… 아세요?');
+      await S.say('나디아', ['아리아 님은 이 집에서 반년을 지냈단다. 매일 아침 우물가에서 아이들과 노래하셨지.', '사원으로 떠나던 날, 이걸 맡기셨어. 「언젠가 미오가 오면 전해 주세요」라고.']);
+      await S.completeQuest('s_diary');
+      await Story.line('mio', ['……방울. 엄마 방울.', '(미오가 방울을 흔들자, 맑은 소리가 방 안을 채웠다.)', '…고마워요, 나디아 할머니. 엄마 이야기, 더 들려주세요.']);
+      return;
+    }
+    if (Quests.isDone('s_diary')) {
+      await S.say('나디아', byP({ 0: '미오, 언제든 와서 쉬렴. 여긴 네 엄마의 집이기도 하니까.', 24: ['샘물 소리가 들리니? 아리아 님이 그토록 듣고 싶어 하던 소리야.', '미오, 언제든 와서 쉬렴. 여긴 네 엄마의 집이기도 하니까.'] }));
+      return;
+    }
+    await S.say('나디아', byP({
+      17: ['이 집에는 십 년 전 바깥에서 온 무녀님이 머물렀단다.', '노래를 참 좋아하는 분이었지. 떠나실 때 일기장을 들고 가셨는데… 사막 어딘가에 흩어져 버렸을까.'],
+      20: '…무녀가 또 사라졌다고? 아아, 모래는 왜 늘 노래하는 사람을 데려가는지.',
+      24: '샘이 돌아왔구나. 아리아 님… 이제 편히 쉬세요.',
+    }));
+  },
+
+  // ── 서브: 길 잃은 대상 ──
+  async ali() {
+    if (!Quests.get('s_caravan') && Game.progress() >= 18) {
+      await S.say('상인 알리', ['어서 오세요, 「모래 별 상회」입니다! …라고 말하고 싶지만, 지금은 그럴 기분이 아니에요.', '우리 대상 행렬이 닷새째 돌아오지 않아요. 오늘 아침 매가 이 편지를 물고 왔는데…']);
+      await S.give('lost_letter', 1);
+      await S.say(null, '「사막 동남쪽, 바위 야영지. 모래 도적들에게 둘러싸였다. 물은 사흘 치. ─ 카심」');
+      await S.say('상인 알리', '부탁이에요! 카심 형님을 구해 주세요. 사례는 꼭 할게요!');
+      await S.startQuest('s_caravan');
+    } else if (Quests.isActive('s_caravan') && Quests.stage('s_caravan') === 1) {
+      await S.say('상인 알리', ['형님이 돌아왔어요! 낙타도, 짐도 무사하고요!', '이건 약속한 사례예요. 그리고 앞으로 우리 상회에서 좋은 물건을 들여놓을게요!']);
+      Game.removeItem('lost_letter', 1);
+      await S.completeQuest('s_caravan');
+    } else if (Quests.isActive('s_caravan')) {
+      await S.say('상인 알리', '야영지는 사막 동남쪽이에요. 큰 바위 언덕 아래요. 서둘러 주세요…!');
+    }
+    await Shop.open('bazaar_items');
+  },
+  async lostCaravan() {
+    if (!Quests.isActive('s_caravan') || Quests.stage('s_caravan') !== 0) return;
+    if (!Game.flag('raiders_beaten')) {
+      await S.say('모래 도적', ['뭐야, 너희는? 이 대상의 짐은 우리가 먼저 찜했다고!', '얘들아, 손님이다!']);
+      const r = await S.battle(['sand_raider', 'sand_raider', 'sand_raider'], { bg: 'desert', canEscape: false });
+      if (r !== 'win') return;
+      Game.setFlag('raiders_beaten');
+      S.hideNpc('raider1');
+      await S.say(null, '(도적들은 모래 언덕 너머로 꽁지 빠지게 달아났다.)');
+    }
+    await S.say('대상 우두머리 카심', ['살았다…! 알리가 보냈소? 그 녀석, 매를 날리는 솜씨 하나는 일품이지.', '물은 바닥났지만 낙타도 짐도 무사하오. 우린 사미라로 돌아가겠소. 이 은혜는 잊지 않겠소!']);
+    S.stage('s_caravan', 1);
+    await S.goalUpdate('s_caravan');
+  },
+
+  // ── 3장 엔딩 ──
+  async chapter3Ending() {
+    await S.say('족장 하킴', ['돌아왔구려…! 샘이, 샘이 돌아왔소! 십 년 만이오!', '오늘 아침 마을 사람들이 울면서 물을 퍼 날랐다오. 아이들은 물장구를 치고.']);
+    await S.say(null, '(일행은 사원에서 있었던 일을 이야기했다. 자히르, 종 안에서 노래하던 아리아, 그리고 오스릭의 말.)');
+    await S.say('족장 하킴', ['…자히르는 사당에서 기도만 하고 있다더군. 그를 어찌할지는 마을 사람들과 의논하겠소.', '그는 이 마을을 누구보다 사랑했소. 사랑하는 방법을 잘못 골랐을 뿐이지.']);
+    await S.say('족장 하킴', ['그리고 미오 양. …아리아 님의 딸이었구려.', '처음 봤을 때 알아봤어야 했는데. 노인네 눈이 침침해서 말이오.']);
+    await Story.line('mio', '엄마는… 이 마을을 좋아했나요?');
+    await S.say('족장 하킴', ['그럼. 매일 아침 우물가에서 아이들과 노래하셨지.', '이제 그 우물에서 다시 물이 솟을 거요. 아리아 님의 노래가 돌아온 거지.']);
+    await Story.line('linette', ['다섯 개의 심장은 열쇠에게 모인다… 교수님은 처음부터 기다리고 있었던 거예요.', '…그래도 멈출 수는 없어요. 심장을 그냥 두면, 성가대가 종을 억지로 깨울 테니까.']);
+    await Story.line('nell', '…언니 소식은 이번에도 없네. 다음엔 있겠지.');
+    await Story.line('bran', '{H}. 「이번 주」든 뭐든, 끝까지 같이 간다. 기사의 약속이야.');
+    await S.say('족장 하킴', '사미라는 그대들을 잊지 않을 거요. 이건 사막의 은인에게만 주는 징표요.');
+    await S.completeQuest('main4');
+    Game.setFlag('chapter3_done');
+    await Story.chapterCard({ num: '제3장', title: '사막의 종', next: 'To be continued ─ 제4장 「파도의 종」', bgm: 'oasis' });
+    await S.say('족장 하킴', ['북쪽 바다로 가는 배편은 왕도의 학장이 수소문해 줄 거요.', '그 전까지는 쉬어 가시오. 사미라의 물은 이제 넉넉하다오.']);
     if (await S.yesno(null, '여기까지의 모험을 기록할까요?')) await Menu.saveScreen();
   },
 });
@@ -8262,7 +9855,7 @@ const Field = (() => {
     return true;
   }
   function objSolid(o) {
-    return ['chest', 'lever', 'dial', 'note-solid', 'block'].includes(o.type) || o.solid === true;
+    return ['chest', 'lever', 'dial', 'hourglass', 'note-solid', 'block'].includes(o.type) || o.solid === true;
   }
   const npcAt = (x, y) => npcs.find((n) => n.visible && ((n.x === x && n.y === y) || (n.moving && n.fromX === x && n.fromY === y)));
   function blocked(x, y, who) {
@@ -8538,10 +10131,10 @@ const Field = (() => {
         if (o.mimic) {
           await S.say(null, '상자를 열려고 하자 뚜껑이 저절로 덜컹거린다…!');
           Engine.shake(5, 0.4);
-          const r = await S.battle(['greed_chest'], { bg: map.kind === 'dungeon' ? 'ruins' : 'plains', ambushSafe: true });
+          const r = await S.battle([o.monster || 'greed_chest'], { bg: o.bg || (map.kind === 'dungeon' ? 'ruins' : 'plains'), ambushSafe: true });
           if (r !== 'win') break;
           Game.setFlag(key);
-          await S.say(null, '탐욕상자가 품고 있던 보물이 쏟아졌다!');
+          await S.say(null, `${Util.j(MONSTERS[o.monster || 'greed_chest'].name, '이')} 품고 있던 보물이 쏟아졌다!`);
         } else {
           Sound.sfx('chest');
           Game.setFlag(key);
@@ -8599,6 +10192,9 @@ const Field = (() => {
       }
       case 'dial':
         await Dials.turn(o);
+        break;
+      case 'hourglass':
+        await Hourglass.flip();
         break;
       case 'event':
       case 'block':
@@ -8821,6 +10417,8 @@ const Field = (() => {
       else if (o.type === 'rope') g.drawImage(ObjArt.rope(), sx, sy);
       else if (o.type === 'deco' && o.draw === 'windmill') ObjArt.windmill(g, sx + 8, sy + 6, T);
       else if (o.type === 'deco' && o.draw === 'bell') g.drawImage(ObjArt.bell(!!Game.flag('velgar_defeated')), sx - 24, sy - 30);
+      else if (o.type === 'deco' && o.draw === 'sandbell') g.drawImage(ObjArt.sandbell(!!Game.flag('zahir_defeated'), T), sx - 24, sy - 30);
+      else if (o.type === 'hourglass') g.drawImage(ObjArt.hourglass(!!Game.flag('hg_flip')), sx, sy);
       else if (o.type === 'search' && o.hidden && hasNell() && !Game.flag('got:' + o.id)) g.drawImage(ObjArt.sparkle(T + o.x), sx, sy);
       else if (o.art === 'circle') {
         // 귀환의 마법진
@@ -8867,6 +10465,16 @@ const Field = (() => {
         // 퀘스트 표시 (!)
         const by = sy - 12 + Math.sin(T * 5) * 1.5;
         g.fillStyle = '#ffd75e'; g.fillRect(sx + 7, by, 2, 5); g.fillRect(sx + 7, by + 6, 2, 2);
+      }
+    }
+    // 날씨: 모래바람
+    const weather = typeof map.weather === 'function' ? map.weather() : map.weather;
+    if (weather === 'sand') {
+      g.fillStyle = 'rgba(220,170,90,0.16)'; g.fillRect(0, 0, Engine.LW, Engine.LH);
+      g.fillStyle = 'rgba(250,220,160,0.55)';
+      for (let i = 0; i < 40; i++) {
+        const x = ((i * 53 + T * (120 + (i % 5) * 30)) % (Engine.LW + 40)) - 20, y = (i * 37 + Math.sin(T * 2 + i) * 6) % Engine.LH;
+        g.fillRect(Engine.LW - x, y, 6 + (i % 3) * 3, 1);
       }
     }
     Engine.blitLow(ctx);
@@ -9002,6 +10610,42 @@ const BattleBG = (() => {
       g.beginPath(); g.moveTo(160, 50); g.lineTo(160, 16); g.moveTo(160, 50); g.lineTo(184, 62); g.stroke();
       for (const x of [24, 282]) { p.rect(x, 0, 14, 112, '#3a3650'); p.rect(x, 0, 3, 112, '#4a465c'); }
       p.rect(0, 112, 320, 128, '#2a2438'); p.rect(110, 112, 100, 128, '#3a2a5a'); p.rect(110, 112, 3, 128, '#e8d080'); p.rect(207, 112, 3, 128, '#e8d080');
+    },
+    canyon(p, g) {
+      sky(p, '#e8905a', '#f8d0a0', 110);
+      g.fillStyle = '#a84a2a'; g.beginPath(); g.moveTo(0, 110); g.lineTo(0, 20); g.lineTo(40, 30); g.lineTo(70, 10); g.lineTo(100, 40); g.lineTo(110, 110); g.fill();
+      g.fillStyle = '#b8583a'; g.beginPath(); g.moveTo(320, 110); g.lineTo(320, 14); g.lineTo(280, 34); g.lineTo(250, 8); g.lineTo(215, 44); g.lineTo(205, 110); g.fill();
+      for (let y = 30; y < 110; y += 12) { p.rect(0, y, 100, 1, 'rgba(90,30,20,0.4)'); p.rect(210, y + 4, 110, 1, 'rgba(90,30,20,0.4)'); }
+      p.rect(0, 110, 320, 130, '#c8784a'); p.noise(['#b86a3a', '#d8905a'], 0.08, 201, [0, 110, 320, 130]);
+      for (let i = 0; i < 6; i++) p.ellipse(30 + i * 55, 150 + (i % 2) * 14, 20, 4, 'rgba(120,50,20,0.35)');
+    },
+    desert(p, g) {
+      sky(p, '#5aa8ec', '#f8e8c0', 110);
+      g.fillStyle = '#fff6c0'; g.beginPath(); g.arc(250, 30, 14, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#e8c88a'; g.beginPath(); g.moveTo(0, 110); for (let x = 0; x <= 320; x += 10) g.lineTo(x, 92 + Math.sin(x * 0.03) * 10); g.lineTo(320, 110); g.fill();
+      g.fillStyle = '#d8b070'; g.beginPath(); g.moveTo(0, 116); for (let x = 0; x <= 320; x += 10) g.lineTo(x, 104 + Math.sin(x * 0.05 + 2) * 6); g.lineTo(320, 240); g.lineTo(0, 240); g.fill();
+      p.rect(0, 118, 320, 122, '#e2cd90'); p.noise(['#cdb675', '#f0e0aa'], 0.06, 211, [0, 118, 320, 122]);
+      for (let i = 0; i < 5; i++) p.ellipse(40 + i * 64, 165, 28, 4, 'rgba(160,120,60,0.35)');
+    },
+    sandcave(p, g) {
+      p.rect(0, 0, 320, 240, '#3a2a18');
+      for (let i = 0; i < 12; i++) { const x = i * 30; g.fillStyle = '#5a4428'; g.beginPath(); g.moveTo(x, 0); g.lineTo(x + 15, 22 + (i * 13) % 20); g.lineTo(x + 30, 0); g.fill(); }
+      g.fillStyle = 'rgba(255,220,140,0.18)'; g.beginPath(); g.moveTo(140, 0); g.lineTo(180, 0); g.lineTo(230, 120); g.lineTo(90, 120); g.fill();
+      p.rect(0, 112, 320, 128, '#a88048'); p.noise(['#8a6a3a', '#c8a060'], 0.1, 221, [0, 112, 320, 128]);
+    },
+    temple(p, g) {
+      p.rect(0, 0, 320, 240, '#3a2a18');
+      for (let y = 0; y < 112; y += 8) for (let x = (y / 8) % 2 ? 0 : 12; x < 320; x += 24) { p.rect(x, y, 23, 7, '#8a6a40'); p.rect(x, y, 23, 1, '#a88a5a'); }
+      for (const x of [36, 268]) { p.rect(x, 14, 18, 98, '#c8a878'); p.rect(x, 14, 4, 98, '#e8d0a0'); p.rect(x - 4, 10, 26, 6, '#e8d0a0'); }
+      g.fillStyle = '#e8c070'; for (const x of [110, 210]) { g.beginPath(); g.moveTo(x - 6, 40); g.lineTo(x + 6, 40); g.lineTo(x, 52); g.fill(); g.beginPath(); g.moveTo(x - 6, 64); g.lineTo(x + 6, 64); g.lineTo(x, 52); g.fill(); }
+      p.rect(0, 112, 320, 128, '#b89868'); for (let x = 0; x < 320; x += 32) p.rect(x, 112, 1, 128, '#8a6a40'); for (let y = 112; y < 240; y += 16) p.rect(0, y, 320, 1, '#8a6a40');
+    },
+    sandbell(p, g) {
+      sky(p, '#2a1a10', '#6a4a2a', 112);
+      g.fillStyle = 'rgba(232,192,112,0.25)'; g.beginPath(); g.moveTo(130, 10); g.quadraticCurveTo(160, -4, 190, 10); g.lineTo(204, 96); g.lineTo(116, 96); g.fill();
+      g.fillStyle = 'rgba(232,192,112,0.5)'; for (let i = 0; i < 30; i++) g.fillRect((i * 37) % 320, (i * 23) % 110, 1, 3);
+      for (const x of [26, 280]) { p.rect(x, 10, 14, 102, '#8a6a40'); p.rect(x, 10, 3, 102, '#b89868'); }
+      p.rect(0, 112, 320, 128, '#a88048'); p.rect(110, 112, 100, 128, '#7a3a2a'); p.rect(110, 112, 3, 128, '#e8c070'); p.rect(207, 112, 3, 128, '#e8c070');
     },
   };
   function get(name) {
@@ -9213,7 +10857,9 @@ const Battle = (() => {
       let tx = cx - (tags.length * 34) / 2;
       for (const [t, c] of tags) { drawTag(ctx, tx, top - 4, t, c); tx += 34; }
       // 보스/분석된 적은 HP 막대
-      if (e.def.boss || Game.state.seen[e.defId]) UI.gauge(ctx, cx - 40, d.y * 2 + d.h * 2 + 4, 80, 5, e.hp / e.mhp, e.def.boss ? '#ff6060' : '#63e07a');
+      // 신기루는 본체의 체력을 그대로 비춰 보인다
+      const hpSrc = e.mirrorOf && e.mirrorOf.alive ? e.mirrorOf : e;
+      if (e.def.boss || Game.state.seen[e.knownId]) UI.gauge(ctx, cx - 40, d.y * 2 + d.h * 2 + 4, 80, 5, hpSrc.hp / hpSrc.mhp, e.def.boss ? '#ff6060' : '#63e07a');
     }
     // 아군 패널
     core.party.forEach((a, i) => drawPanel(ctx, a, i));
@@ -9279,9 +10925,12 @@ const Battle = (() => {
     if (dead) tags.push(['전투불능', Theme.red]);
     for (const s of ['poison', 'sleep', 'paralyze', 'silence']) if (a.status[s]) tags.push([STATUS_NAMES[s], { poison: '#c070ff', sleep: '#70a8ff', paralyze: '#ffd050', silence: '#a0a0b0' }[s]]);
     if (a.defending) tags.push(['방어', '#7cc4ff']);
-    if (a.buffs.atk) tags.push(['공↑', '#ff8a5a']);
+    if (a.buffs.atk) tags.push(a.buffs.atk.mult >= 1 ? ['공↑', '#ff8a5a'] : ['공↓', '#a0a0b0']);
     if (a.buffs.def && a.buffs.def.mult > 1) tags.push(['방↑', '#ffd050']);
     if (a.buffs.def && a.buffs.def.mult < 1) tags.push(['방↓', '#a0a0b0']);
+    if (a.buffs.regen) tags.push(['재생', '#63e07a']);
+    if (a.buffs.spd && a.buffs.spd.mult < 1) tags.push(['속↓', '#70a8ff']);
+    if (a.buffs.hit && a.buffs.hit.mult < 1) tags.push(['명↓', '#a0a0b0']);
     let tx = x + 4;
     for (const [t, c] of tags.slice(0, 4)) { const tw = Math.max(32, Text.width(ctx, t, 12) + 10); ctx.fillStyle = 'rgba(10,10,20,0.85)'; UI.roundRect(ctx, tx, y + h - 2, tw, 17, 4); ctx.fill(); Text.draw(ctx, t, tx + tw / 2, y + h - 1, { size: 12, align: 'center', color: c, bold: true, shadow: false }); tx += tw + 3; }
   }
@@ -9437,10 +11086,10 @@ const Battle = (() => {
           // 이번에 쓸 속성 (기술 속성 > 무기 속성)
           const el = skill ? skill.element || (skill.id === 'attack' && user.isParty ? user.st.element : null) : null;
           if (!all && !t0.isParty && el) {
-            const m = Game.knownElem(t0.defId, el);
+            const m = Game.knownElem(t0.knownId, el);
             extra = m === undefined ? ' [d](상성 ?)[/]' : m > 1 ? ' [y]약점![/]' : m === 0 ? ' [r]무효[/]' : m < 1 ? ' [b]내성[/]' : '';
           }
-          const sum = !all && !t0.isParty ? Game.knownSummary(t0.defId) : '';
+          const sum = !all && !t0.isParty ? Game.knownSummary(t0.knownId) : '';
           const w = Math.max(Text.width(ctx, label + Text.strip(extra), 18, true), sum ? Text.width(ctx, Text.strip(sum), 14) : 0) + 40;
           UI.drawWindow(ctx, Engine.W / 2 - w / 2, 100, w, sum ? 60 : 38);
           Text.draw(ctx, label + extra, Engine.W / 2, 109, { size: 18, bold: true, align: 'center' });
@@ -9929,6 +11578,7 @@ const Menu = (() => {
       // 가 본 마을 중 하나를 고른다
       const towns = [{ label: '리벨 마을', value: ['rivel', 19, 27, 'up'] }];
       if (Game.flag('reached_capital')) towns.push({ label: '왕도 아스테리온', value: ['capital', 23, 37, 'up'] });
+      if (Game.flag('reached_samira')) towns.push({ label: '오아시스 사미라', value: ['samira', 17, 25, 'up'] });
       let dest = towns[0].value;
       if (towns.length > 1) {
         const r = await UI.list({ x: 220, y: 160, w: 220, items: towns, title: '어디로 돌아갈까?', cancel: true });
@@ -10289,6 +11939,17 @@ const SHOPS = {
     stock: ['herb', 'potion', 'hi_potion', 'ether', 'antidote', 'smelling', 'panacea', 'feather', 'thunder_flask', 'firebomb', 'return_wing', 'incense', 'antidote_bangle'],
     bye: '다치지 마세요! 다쳤으면 또 오시고요.',
   },
+  bazaar_arms: {
+    name: '바자르 「휘어진 칼」', keeper: '오마르',
+    stock: ['flame_saber', 'sand_axe', 'scorpion_dagger', 'sun_staff', 'desert_mail', 'mirage_robe', 'sand_garb', 'sun_shield', 'turban', 'desert_helm', 'mythril_sword', 'war_axe', 'rune_staff', 'mythril_mail', 'knight_shield', 'silver_helm'],
+    bye: '칼날에 모래가 끼지 않게 잘 닦아 두게.',
+  },
+  bazaar_items: {
+    name: '바자르 「모래 별 상회」', keeper: '알리',
+    stock: ['potion', 'hi_potion', 'mega_potion', 'ether', 'hi_ether', 'antidote', 'smelling', 'panacea', 'feather', 'sand_bomb', 'return_wing', 'incense'],
+    extra: [{ when: () => Game.flag('raiders_beaten'), items: ['oasis_ring'] }],
+    bye: '사막에선 물과 약이 곧 목숨이에요. 넉넉히 챙겨 가세요!',
+  },
 };
 
 const Shop = (() => {
@@ -10443,7 +12104,10 @@ const Shop = (() => {
 const MapView = (() => {
   const LABELS = {
     field: [[31, 38, '리벨 마을'], [50, 30, '사냥꾼의 오두막'], [31, 13, '북쪽 고개'], [31, 4, '잠든 종의 유적'], [8, 26, '서쪽 숲'], [8, 42, '은빛 호수'], [54, 36, '동쪽 숲'], [60, 30, '은빛 가도 →']],
-    highway: [[3, 16, '← 평원'], [14, 11, '역참'], [27, 15, '은빛 다리'], [46, 4, '늑대 굴'], [51, 16, '왕도']],
+    highway: [[3, 16, '← 평원'], [14, 11, '역참'], [27, 15, '은빛 다리'], [46, 4, '늑대 굴'], [51, 16, '왕도'], [48, 29, '붉은 협곡 ↓']],
+    canyon: [[15, 1, '↑ 은빛 가도'], [7, 41, '↓ 사막']],
+    desert: [[30, 2, '↑ 협곡'], [18, 20, '사미라'], [48, 8, '옛 우물'], [30, 34, '모래시계 사원'], [50, 32, '바위 야영지']],
+    samira: [[17, 3, '족장의 집'], [5, 4, '여관'], [29, 4, '물의 사당'], [5, 18, '바자르'], [30, 18, '나디아의 집'], [17, 10, '샘']],
     capital: [[7, 8, '마도학원'], [23, 3, '왕성'], [40, 8, '기사단'], [6, 19, '여관'], [40, 19, '강철 사자'], [40, 32, '약방'], [6, 32, '보육원'], [16, 31, '음유시인'], [23, 18, '분수 광장'], [9, 37, '맨홀']],
     rivel: [[18, 3, '장로의 집'], [29, 3, '신전'], [6, 8, '여관'], [6, 15, '대장간'], [32, 9, '도구점'], [31, 15, '빵집'], [5, 21, '오웬의 집'], [12, 21, '풍차'], [32, 22, '피포의 집'], [19, 14, '우물']],
   };
@@ -10458,6 +12122,7 @@ const MapView = (() => {
   const ENTRY = {
     rivel: ['field', 31, 38], cellar: ['rivel', 19, 14], ruins1: ['field', 31, 5], ruins2: ['field', 31, 5], bell: ['field', 31, 5],
     capital: ['highway', 52, 16], sewer1: ['capital', 9, 37], sewer2: ['capital', 9, 37], tower1: ['capital', 7, 9], tower2: ['capital', 7, 9], tower3: ['capital', 7, 9],
+    canyon: ['highway', 48, 31], desert: ['canyon', 7, 43], samira: ['desert', 18, 21], sandcave: ['desert', 48, 9], temple1: ['desert', 30, 35], temple2: ['desert', 30, 35], temple3: ['desert', 30, 35],
   };
   // [지도, x, y] 를 바깥쪽으로 따라간 사슬
   function chain(mapId, x, y) {
@@ -10490,9 +12155,10 @@ const MapView = (() => {
   async function open() {
     const cur = Field.map.id;
     const views = chain(cur, Field.player.x, Field.player.y).filter(([m]) => MAPS[m].kind !== 'interior').map(([m, x, y]) => ({ map: m, at: [x, y] }));
-    // 다른 쪽 대지도도 볼 수 있게 (평원 ↔ 은빛 가도)
+    // 다른 쪽 대지도도 볼 수 있게 (평원 ↔ 은빛 가도 ↔ 사막)
     if (!views.some((v) => v.map === 'field')) views.push({ map: 'field', at: [62, 30] });
     if (Game.flag('highway_first') && !views.some((v) => v.map === 'highway')) views.push({ map: 'highway', at: [1, 16] });
+    if (Game.flag('desert_first') && !views.some((v) => v.map === 'desert')) views.push({ map: 'desert', at: [30, 1] });
 
     let vi = 0;
     Sound.sfx('menu');
@@ -10618,7 +12284,7 @@ const Title = (() => {
       Text.draw(ctx, '별빛 종의 이방인', 320, 92, { size: 50, bold: true, align: 'center', color: '#ffe9a8', shadow: false });
       ctx.restore();
       Text.draw(ctx, '─ Stranger of the Starlit Bell ─', 320, 156, { size: 17, align: 'center', color: '#bcd0ff' });
-      Text.draw(ctx, '제1장 잠든 종의 유적 · 제2장 왕도로 가는 길', 320, 184, { size: 15, align: 'center', color: Theme.dim });
+      Text.draw(ctx, '제1장 잠든 종의 유적 · 제2장 왕도로 가는 길 · 제3장 사막의 종', 320, 184, { size: 15, align: 'center', color: Theme.dim });
       ctx.globalAlpha = 1;
       if (!pressed && t > 0.8 && Math.floor(t * 1.6) % 2 === 0) Text.draw(ctx, '화면을 누르거나 아무 키나 누르세요', 320, 300, { size: 18, align: 'center' });
       Text.draw(ctx, '© 2026 · 모든 그래픽과 음악은 코드로 생성되었습니다', 320, 456, { size: 11, align: 'center', color: '#6a6a90' });
@@ -10764,7 +12430,7 @@ const Main = (() => {
     }, 1000);
     Engine.setScene(Title.layer);
     // 테스트·디버그용 훅
-    window.__jr = { expForLevel, Dials, Game, Field, Engine, Battle, Save, Quests, Settings, Sound, Input, Menu, Story, MAPS, ITEMS, SKILLS, MONSTERS, Events, S, UI, Main, BattleCore, Util };
+    window.__jr = { expForLevel, Dials, Hourglass, Game, Field, Engine, Battle, Save, Quests, Settings, Sound, Input, Menu, Story, MAPS, ITEMS, SKILLS, MONSTERS, Events, S, UI, Main, BattleCore, Util };
   }
 
   return { boot, newGame, loadSlot, toTitle, applyTouchSetting };

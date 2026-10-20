@@ -60,6 +60,8 @@ class Actor {
     return this.elem[el] !== undefined ? this.elem[el] : 1;
   }
   get disabled() { return !!(this.status.sleep || this.status.paralyze); }
+  // 도감·상성 기억에 쓰는 ID (신기루는 본체와 같은 마물로 기억한다)
+  get knownId() { return this.def ? this.def.knownAs || this.defId : null; }
 }
 Actor.next = 1;
 
@@ -94,11 +96,12 @@ class BattleCore {
     return a;
   }
   renameEnemies() {
+    // 같은 이름끼리 A·B·C (신기루는 본체와 이름이 같아 함께 묶인다)
     const groups = {};
-    for (const e of this.enemies) (groups[e.defId] = groups[e.defId] || []).push(e);
-    for (const id in groups) {
-      const g = groups[id];
-      g.forEach((e, i) => { e.name = g.length > 1 ? `${MONSTERS[id].name} ${SUFFIX[i] || i + 1}` : MONSTERS[id].name; });
+    for (const e of this.enemies) (groups[e.def.name] = groups[e.def.name] || []).push(e);
+    for (const nm in groups) {
+      const g = groups[nm];
+      g.forEach((e, i) => { e.name = g.length > 1 ? `${nm} ${SUFFIX[i] || i + 1}` : nm; });
     }
   }
   get alivePartyList() { return this.party.filter((a) => a.alive); }
@@ -266,6 +269,14 @@ class BattleCore {
       case 'magic':
       case 'damage':
         for (const t of targets) { if (t.alive) ev.push(...this.magicHit(a, t, sk)); }
+        if (sk.debuffAll) {
+          for (const t of targets) {
+            if (!t.alive) continue;
+            for (const k in sk.debuffAll) t.buffs[k] = { mult: sk.debuffAll[k], turns: 3 };
+            ev.push({ type: 'buff', target: t, up: false });
+          }
+          ev.push({ type: 'msg', text: `모래가 눈에 들어가 ${BUFF_NAMES[Object.keys(sk.debuffAll)[0]]}${Util.josa(BUFF_NAMES[Object.keys(sk.debuffAll)[0]], '이')} 떨어졌다!` });
+        }
         break;
       case 'heal': {
         for (const t of targets) {
@@ -276,7 +287,9 @@ class BattleCore {
           t.hp = Math.min(t.mhp, t.hp + amt);
           ev.push({ type: 'heal', target: t, amount: t.hp - before, hpAfter: t.hp });
           ev.push({ type: 'msg', text: `${t.name}의 HP가 ${t.hp - before} 회복되었다!` });
+          if (sk.regenAfter) t.buffs.regen = { mult: 1.08, turns: sk.regenAfter };
         }
+        if (sk.regenAfter) ev.push({ type: 'msg', text: '부드러운 노랫소리가 일행을 감싸 안았다…' });
         break;
       }
       case 'mp':
@@ -318,7 +331,10 @@ class BattleCore {
           for (const k in sk.buff) t.buffs[k] = { mult: sk.buff[k], turns: sk.turns || 3 };
           if (sk.taunt) t.taunt = true;
           ev.push({ type: 'buff', target: t, up: true });
-          for (const k in sk.buff) ev.push({ type: 'msg', text: `${t.name}의 ${BUFF_NAMES[k]}${Util.josa(BUFF_NAMES[k], '이')} ${sk.buff[k] >= 1.6 ? '크게 ' : ''}올랐다!` });
+          for (const k in sk.buff) {
+            if (k === 'regen') ev.push({ type: 'msg', text: `${t.name}${Util.josa(t.name, '은')} 생명의 물결에 감싸였다!` });
+            else ev.push({ type: 'msg', text: `${t.name}의 ${BUFF_NAMES[k]}${Util.josa(BUFF_NAMES[k], '이')} ${sk.buff[k] >= 1.6 ? '크게 ' : ''}올랐다!` });
+          }
         }
         break;
       case 'debuff':
@@ -337,7 +353,7 @@ class BattleCore {
         for (const t of targets) { if (t.alive) ev.push(...this.inflict(t, sk.status, true)); }
         break;
       case 'analyze':
-        ev.push(...this.analyze(targets[0]));
+        for (const t of targets) if (t.alive) ev.push(...this.analyze(t));
         break;
       case 'steal':
         ev.push(...this.trySteal(a, targets[0]));
@@ -376,7 +392,9 @@ class BattleCore {
       }
       case 'summon': {
         const added = [];
-        for (const id of sk.summon) { const n = this.addEnemy(id); if (n) added.push(n); }
+        for (const id of sk.summon) { const n = this.addEnemy(id); if (n) { added.push(n); if (n.def.mirage) n.mirrorOf = a; } }
+        // 신기루: 본체와 섞여 어느 쪽이 진짜인지 모르게 자리를 뒤섞는다
+        if (sk.shuffle && added.length) { Util.shuffle(this.enemies); this.renameEnemies(); }
         if (added.length) { ev.push({ type: 'sfx', name: a.defId === 'ironfang' ? 'roar' : 'summon' }); ev.push({ type: 'summon', actors: added }); }
         else ev.push({ type: 'msg', text: '…그러나 아무것도 나타나지 않았다.' });
         break;
@@ -487,6 +505,8 @@ class BattleCore {
 
   damage(t, dmg, info = {}) {
     const ev = [];
+    // 신기루는 맞는 순간 흩어진다
+    if (!t.isParty && t.def.mirage) return this.dispelMirage(t, '공격이 그대로 통과했다…');
     t.hp = Math.max(0, t.hp - dmg);
     ev.push({ type: 'damage', target: t, amount: dmg, crit: info.crit, weak: info.em > 1, resist: info.em < 1, hpAfter: t.hp });
     let txt = t.isParty ? `${t.name}${Util.josa(t.name, '은')} [r]${dmg}[/]의 피해를 입었다!` : `${t.name}에게 [y]${dmg}[/]의 피해!`;
@@ -497,6 +517,11 @@ class BattleCore {
     if (t.hp <= 0) ev.push(...this.kill(t));
     else if (!t.isParty && t.def.phases) ev.push(...this.checkPhases(t));
     return ev;
+  }
+
+  dispelMirage(t, why) {
+    t._hp = 0; t.buffs = {}; t.charging = null;
+    return [{ type: 'die', target: t }, { type: 'msg', text: `${why} [y]${t.name}${Util.josa(t.name, '은')} 신기루였다![/] 모래가 되어 흩어졌다.` }];
   }
 
   kill(t) {
@@ -510,6 +535,7 @@ class BattleCore {
       ev.push({ type: 'msg', text: `[r]${t.name}${Util.josa(t.name, '은')} 쓰러졌다…[/]` });
     } else {
       this.killed.push(t);
+      for (const m of this.enemies) if (m.mirrorOf === t && m.alive) { m._hp = 0; ev.push({ type: 'die', target: m, silent: true }); }
       if (t.pilfered) { Game.addGold(t.pilfered); this.recoveredGold += t.pilfered; }
       ev.push({ type: 'die', target: t });
       ev.push({ type: 'msg', text: `${t.name}${Util.josa(t.name, '을')} 쓰러뜨렸다!` + (t.pilfered ? ` [y](${t.pilfered}G를 되찾았다)[/]` : '') });
@@ -548,7 +574,7 @@ class BattleCore {
   // 속성 상성이 드러나면 도감에 영구 기록 (다음에 만나도 표시된다)
   discover(t, el, em) {
     if (t.isParty || !el || !ELEMENTS[el]) return [];
-    if (!Game.learnElem(t.defId, el, em) || em === 1) return [];
+    if (!Game.learnElem(t.knownId, el, em) || em === 1) return [];
     const kind = em > 1 ? '약점' : em === 0 ? '무효' : '내성';
     return [{ type: 'msg', text: `[g]〈기억〉 ${t.def.name}의 ${kind}: ${ELEMENTS[el]}[/]`, quick: true }];
   }
@@ -556,8 +582,9 @@ class BattleCore {
   analyze(t) {
     const ev = [];
     const d = t.def;
-    Game.state.seen[t.defId] = true;
-    for (const k in ELEMENTS) Game.learnElem(t.defId, k, t.elemMult(k));
+    if (d.mirage) { ev.push({ type: 'analyze', target: t }); return ev.concat(this.dispelMirage(t, '이방인의 눈이 아지랑이를 꿰뚫었다!')); }
+    Game.state.seen[t.knownId] = true;
+    for (const k in ELEMENTS) Game.learnElem(t.knownId, k, t.elemMult(k));
     const weak = [], res = [], immune = [];
     for (const k in ELEMENTS) {
       const m = t.elemMult(k);
@@ -597,6 +624,12 @@ class BattleCore {
           ev.push({ type: 'status', target: a });
           ev.push({ type: 'msg', text: `${a.name}${Util.josa(a.name, '은')} ${{ sleep: '잠에서 깨어났다!', paralyze: '마비가 풀렸다!', silence: '다시 주문을 외울 수 있게 되었다!' }[s]}` });
         }
+      }
+      if (a.buffs.regen && a.buffs.regen.turns > 0 && a.hp < a.mhp) {
+        const before = a.hp;
+        a.hp = Math.min(a.mhp, a.hp + Math.max(1, Math.round(a.mhp * (a.buffs.regen.mult - 1))));
+        ev.push({ type: 'heal', target: a, amount: a.hp - before, hpAfter: a.hp });
+        ev.push({ type: 'msg', text: `${a.name}의 HP가 ${a.hp - before} 회복되었다. [g](생명의 물결)[/]` });
       }
       for (const k in a.buffs) {
         const b = a.buffs[k];
