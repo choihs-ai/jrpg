@@ -114,6 +114,38 @@ const QUESTS = {
     ],
     reward: { gold: 3000, items: [['sand_badge', 1]] },
   },
+  main5: {
+    name: '파도의 종', type: 'main', giver: '오필리아 학장',
+    desc: '북해로 가는 배가 한 달째 묶여 있다. 등대가 꺼진 뒤로 안개 속에서 회색 돛을 단 배가 나타나 배들을 삼킨다고 한다.',
+    stages: [
+      { goal: '은빛 가도 북쪽 숲길을 지나 항구 마을 마레아로 간다', hint: '숲 너머 북쪽, 눈 덮인 바닷가의 항구로', target: { map: 'highway', x: 42, y: 1 } },
+      { goal: '마레아의 항만 사무소에서 항만장을 만난다', hint: '배가 묶인 사정을 아는 사람을 찾아가자', target: { map: 'marea', x: 5, y: 11 } },
+      { goal: '마을 동쪽 집의 등대지기 손녀 에다를 찾아간다', hint: '꺼진 등대를 지키던 집안을 찾아가자', target: { map: 'marea', x: 34, y: 20 } },
+      { goal: '해안 동쪽의 얼어붙은 해식 동굴을 지나 등대로 간다', hint: '무너진 절벽길 대신, 얼음 동굴을 지나 등대 곶으로', target: { map: 'coast', x: 33, y: 13 } },
+      { goal: '등대 꼭대기 등명실로 올라간다', hint: '꺼진 등대 위에서 무언가가 차갑게 타고 있다', target: { map: 'lighthouse1', x: 5, y: 1 } },
+      { goal: '마레아의 항만장 그레고르에게 돌아간다', hint: '바다 위의 그림자를 쫓으려면 배가 필요하다', target: { map: 'marea', x: 5, y: 11 } },
+      { goal: '부두 동쪽 끝의 작은 배를 타고 유령선으로 간다', hint: '부두에서 기다리는 배에 오르자', target: { map: 'marea', x: 30, y: 2 } },
+      { goal: '선창을 지나 선미 갑판의 함장을 찾는다', hint: '배의 주인은 키를 잡고 있다. 길은 배 밑바닥을 지나 이어진다', target: { map: 'ship_hold', x: 22, y: 2 } },
+      { goal: '가라앉은 신전 깊은 곳, 파도 종의 방으로 간다', hint: '바닷속 깊은 곳에서 종의 노래가 들린다', target: { map: 'sunken1', x: 12, y: 1 } },
+      { goal: '마레아의 항만장 그레고르에게 돌아간다', hint: '항구로 돌아가 소식을 전하자', target: { map: 'marea', x: 5, y: 11 } },
+    ],
+    reward: { gold: 4500, items: [['anchor_badge', 1]] },
+  },
+  s_crab: {
+    name: '집게왕 현상수배', type: 'sub', giver: '항만 사무소 게시판',
+    desc: '해안 동쪽 모래톱에 거대한 게 「집게왕」이 나타나 어구를 부수고 있다. 토벌하면 현상금 1800G.',
+    stages: [
+      { goal: '해안 동쪽 모래톱의 집게왕을 토벌한다', hint: '바닷가 모래톱에서 어구를 부수는 거대한 게를 찾아보자', target: { map: 'coast', x: 41, y: 26 } },
+      { goal: '항만장 그레고르에게 보고한다', hint: '토벌 소식을 항만 사무소에 알리자', target: { map: 'marea', x: 5, y: 11 } },
+    ],
+    reward: { gold: 1800, items: [['sailor_knot', 1]] },
+  },
+  s_letter: {
+    name: '얼어붙은 편지', type: 'sub', giver: '해식 동굴의 얼음',
+    desc: '해식 동굴의 얼음 속에서 15년 전의 편지를 꺼냈다. 「마레아의 엘사에게 ─ 은빛 갈매기호 갑판원 한스」',
+    stages: [{ goal: '선술집 「갈매기」의 엘사에게 편지를 전한다', hint: '편지가 부르는 사람을 마을에서 찾아보자', target: { map: 'marea', x: 5, y: 20 } }],
+    reward: { items: [['pearl_ring', 1], ['elixir', 2]] },
+  },
   s_diary: {
     name: '무녀의 일기', type: 'sub', giver: '모래에 묻힌 일기장',
     desc: '사막에서 낡은 일기장의 찢어진 페이지를 발견했다. 단정한 글씨의 주인은 십 년 전 사미라에 왔던 사람인 듯하다.',
@@ -214,8 +246,9 @@ const Quests = (() => {
     },
     // 현재 화면에 띄울 대표 목표 (메인 우선)
     currentGoal() {
-      for (const id of ['main1', 'main2', 'main3', 'main4']) if (this.isActive(id)) return { id, text: this.goal(id), target: this.target(id) };
-      if (Game.flag('chapter3_done')) return { id: null, text: '자유 탐험 — 다음 이야기를 기다리며 남은 일을 정리해 보자', target: null };
+      for (const id of ['main1', 'main2', 'main3', 'main4', 'main5']) if (this.isActive(id)) return { id, text: this.goal(id), target: this.target(id) };
+      if (Game.flag('chapter4_done')) return { id: null, text: '자유 탐험 — 다음 이야기를 기다리며 남은 일을 정리해 보자', target: null };
+      if (Game.flag('chapter3_done')) return { id: null, text: detailed() ? '마도학원의 오필리아 학장을 찾아가 북해 배편에 대해 듣자' : '사막의 일을 왕도에 전하자. 학원에서 새 소식이 기다리고 있을지도 모른다', target: detailed() ? { map: 'capital', x: 7, y: 10 } : null };
       if (Game.flag('chapter2_done')) return { id: null, text: detailed() ? '마도학원의 오필리아 학장을 찾아가 다음 여정에 대해 듣자' : '왕도에서 쉬는 동안, 학원에서 새 소식이 기다리고 있을지도 모른다', target: detailed() ? { map: 'capital', x: 7, y: 10 } : null };
       if (Game.flag('chapter1_done')) return { id: null, text: detailed() ? '리벨의 하르도 장로에게 작별 인사를 하고 왕도로 떠나자' : '새로운 여정을 앞두고, 마을의 어른께 인사를 드리자', target: detailed() ? { map: 'rivel', x: 18, y: 5 } : null };
       return null;

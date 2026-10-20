@@ -39,6 +39,17 @@ const SHOPS = {
     stock: ['flame_saber', 'sand_axe', 'scorpion_dagger', 'sun_staff', 'desert_mail', 'mirage_robe', 'sand_garb', 'sun_shield', 'turban', 'desert_helm', 'mythril_sword', 'war_axe', 'rune_staff', 'mythril_mail', 'knight_shield', 'silver_helm'],
     bye: '칼날에 모래가 끼지 않게 잘 닦아 두게.',
   },
+  marea_arms: {
+    name: '「닻과 그물」 무기 진열대', keeper: '비욘',
+    stock: ['frost_brand', 'tide_axe', 'coral_dagger', 'pearl_staff', 'siren_harp', 'silver_harp', 'whale_mail', 'seafoam_robe', 'sealskin_coat', 'coral_shield', 'fur_hood', 'captain_hat'],
+    bye: '손 얼지 않게 조심해라.',
+  },
+  marea_items: {
+    name: '「닻과 그물」 잡화', keeper: '잉가',
+    stock: ['hi_potion', 'mega_potion', 'ether', 'hi_ether', 'warm_soup', 'antidote', 'smelling', 'panacea', 'feather', 'sand_bomb', 'return_wing', 'incense', 'warm_charm'],
+    extra: [{ when: () => Game.flag('cassandra_joined'), items: ['elixir', 'pearl_ring'] }],
+    bye: '따뜻하게 입고 다녀요!',
+  },
   bazaar_items: {
     name: '바자르 「모래 별 상회」', keeper: '알리',
     stock: ['potion', 'hi_potion', 'mega_potion', 'ether', 'hi_ether', 'antidote', 'smelling', 'panacea', 'feather', 'sand_bomb', 'return_wing', 'incense'],

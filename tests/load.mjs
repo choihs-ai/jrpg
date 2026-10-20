@@ -7,7 +7,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const LOGIC = [
   'src/core/util.js', 'src/data/items.js', 'src/data/skills.js', 'src/data/characters.js', 'src/data/monsters.js',
   'src/systems/settings.js', 'src/systems/game.js', 'src/systems/quests.js', 'src/systems/save.js', 'src/systems/battlecore.js',
-  'src/maps/legend.js', 'src/maps/maps.js', 'src/maps/rivel.js', 'src/maps/field.js', 'src/maps/dungeons.js', 'src/maps/story.js', 'src/maps/chapter2.js', 'src/maps/story2.js', 'src/maps/chapter3.js', 'src/maps/story3.js', 'src/data/talk.js',
+  'src/maps/legend.js', 'src/maps/maps.js', 'src/maps/rivel.js', 'src/maps/field.js', 'src/maps/dungeons.js', 'src/maps/story.js', 'src/maps/chapter2.js', 'src/maps/story2.js', 'src/maps/chapter3.js', 'src/maps/story3.js', 'src/maps/chapter4.js', 'src/maps/story4.js', 'src/data/talk.js',
 ];
 export function loadGame() {
   const store = {};

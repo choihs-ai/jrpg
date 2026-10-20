@@ -8,6 +8,8 @@ const MapView = (() => {
     highway: [[3, 16, '← 평원'], [14, 11, '역참'], [27, 15, '은빛 다리'], [46, 4, '늑대 굴'], [51, 16, '왕도'], [48, 29, '붉은 협곡 ↓']],
     canyon: [[15, 1, '↑ 은빛 가도'], [7, 41, '↓ 사막']],
     desert: [[30, 2, '↑ 협곡'], [18, 20, '사미라'], [48, 8, '옛 우물'], [30, 34, '모래시계 사원'], [50, 32, '바위 야영지']],
+    coast: [[24, 33, '↓ 은빛 가도'], [10, 6, '마레아'], [33, 12, '해식 동굴'], [44, 4, '등대 곶'], [41, 25, '모래톱']],
+    marea: [[5, 7, '항만 사무소'], [14, 7, '여관'], [25, 7, '잡화점'], [5, 16, '선술집'], [34, 16, '에다의 집'], [32, 0, '부두'], [19, 17, '분수']],
     samira: [[17, 3, '족장의 집'], [5, 4, '여관'], [29, 4, '물의 사당'], [5, 18, '바자르'], [30, 18, '나디아의 집'], [17, 10, '샘']],
     capital: [[7, 8, '마도학원'], [23, 3, '왕성'], [40, 8, '기사단'], [6, 19, '여관'], [40, 19, '강철 사자'], [40, 32, '약방'], [6, 32, '보육원'], [16, 31, '음유시인'], [23, 18, '분수 광장'], [9, 37, '맨홀']],
     rivel: [[18, 3, '장로의 집'], [29, 3, '신전'], [6, 8, '여관'], [6, 15, '대장간'], [32, 9, '도구점'], [31, 15, '빵집'], [5, 21, '오웬의 집'], [12, 21, '풍차'], [32, 22, '피포의 집'], [19, 14, '우물']],
@@ -23,7 +25,9 @@ const MapView = (() => {
   const ENTRY = {
     rivel: ['field', 31, 38], cellar: ['rivel', 19, 14], ruins1: ['field', 31, 5], ruins2: ['field', 31, 5], bell: ['field', 31, 5],
     capital: ['highway', 52, 16], sewer1: ['capital', 9, 37], sewer2: ['capital', 9, 37], tower1: ['capital', 7, 9], tower2: ['capital', 7, 9], tower3: ['capital', 7, 9],
-    canyon: ['highway', 48, 31], desert: ['canyon', 7, 43], samira: ['desert', 18, 21], sandcave: ['desert', 48, 9], temple1: ['desert', 30, 35], temple2: ['desert', 30, 35], temple3: ['desert', 30, 35],
+    canyon: ['highway', 48, 31], desert: ['canyon', 7, 43],
+    coast: ['highway', 42, 0], marea: ['coast', 10, 7], icecave: ['coast', 33, 13], lighthouse1: ['coast', 44, 2], lighthouse2: ['coast', 44, 2],
+    ship_deck: ['marea', 30, 2], ship_hold: ['marea', 30, 2], sunken1: ['marea', 30, 2], sunken2: ['marea', 30, 2], samira: ['desert', 18, 21], sandcave: ['desert', 48, 9], temple1: ['desert', 30, 35], temple2: ['desert', 30, 35], temple3: ['desert', 30, 35],
   };
   // [지도, x, y] 를 바깥쪽으로 따라간 사슬
   function chain(mapId, x, y) {
@@ -60,6 +64,7 @@ const MapView = (() => {
     if (!views.some((v) => v.map === 'field')) views.push({ map: 'field', at: [62, 30] });
     if (Game.flag('highway_first') && !views.some((v) => v.map === 'highway')) views.push({ map: 'highway', at: [1, 16] });
     if (Game.flag('desert_first') && !views.some((v) => v.map === 'desert')) views.push({ map: 'desert', at: [30, 1] });
+    if (Game.flag('coast_first') && !views.some((v) => v.map === 'coast')) views.push({ map: 'coast', at: [24, 34] });
 
     let vi = 0;
     Sound.sfx('menu');

@@ -613,6 +613,9 @@ const Field = (() => {
       else if (o.type === 'deco' && o.draw === 'bell') g.drawImage(ObjArt.bell(!!Game.flag('velgar_defeated')), sx - 24, sy - 30);
       else if (o.type === 'deco' && o.draw === 'sandbell') g.drawImage(ObjArt.sandbell(!!Game.flag('zahir_defeated'), T), sx - 24, sy - 30);
       else if (o.type === 'hourglass') g.drawImage(ObjArt.hourglass(!!Game.flag('hg_flip')), sx, sy);
+      else if (o.type === 'deco' && o.draw === 'wavebell') g.drawImage(ObjArt.wavebell(!!Game.flag('levia_defeated'), T), sx - 24, sy - 30);
+      else if (o.art === 'lens') g.drawImage(ObjArt.lens(!!Game.flag('cassandra_joined'), T), sx, sy - 16);
+      else if (o.art === 'rope') g.drawImage(ObjArt.rope(), sx, sy);
       else if (o.type === 'search' && o.hidden && hasNell() && !Game.flag('got:' + o.id)) g.drawImage(ObjArt.sparkle(T + o.x), sx, sy);
       else if (o.art === 'circle') {
         // 귀환의 마법진

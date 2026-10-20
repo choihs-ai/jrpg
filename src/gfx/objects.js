@@ -161,5 +161,34 @@ const ObjArt = (() => {
       if (!rung) { g.fillStyle = 'rgba(232,184,96,0.8)'; g.fillRect(23, 44, 2, 4); }
     });
   }
-  return { chest, lever, herb, note, rope, sparkle, windmill, bell, valve, dial, manhole, plaque, timebell, hourglass, sandbell };
+  // 등대 렌즈 (lit: 별빛으로 켜짐 / 꺼진 동안은 잿빛 불꽃) — 32x32, 두 칸을 덮는다
+  function lens(lit, t) {
+    const f = Math.floor(t * 4) % 2;
+    return once('lens' + lit + f, 32, 32, (p, g) => {
+      g.fillStyle = '#6a5a3a'; g.fillRect(4, 26, 24, 6); g.fillStyle = '#8a7a4a'; g.fillRect(4, 26, 24, 2);
+      g.fillStyle = lit ? 'rgba(255,240,160,0.35)' : 'rgba(150,150,170,0.3)'; g.beginPath(); g.arc(16, 15, 15, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#c8d8e8'; g.beginPath(); g.ellipse(16, 15, 10, 12, 0, 0, Math.PI * 2); g.fill();
+      g.strokeStyle = '#7a8a9a'; g.lineWidth = 1; for (let r = 3; r <= 11; r += 3) { g.beginPath(); g.ellipse(16, 15, r * 0.85, r, 0, 0, Math.PI * 2); g.stroke(); }
+      g.fillStyle = lit ? (f ? '#fff8c0' : '#ffe880') : (f ? '#b8b8c8' : '#9898a8');
+      g.beginPath(); g.ellipse(16, 15, 4, 5, 0, 0, Math.PI * 2); g.fill();
+      if (!lit) { g.fillStyle = 'rgba(200,200,220,0.6)'; g.fillRect(14, 6 - f, 4, 4); }
+    });
+  }
+  // 파도 종 (청록빛, 물결 문양)
+  function wavebell(rung, t) {
+    const f = rung ? Math.floor(t * 3) % 2 : 0;
+    return once('wbell' + rung + f, 48, 48, (p, g) => {
+      const body = rung ? '#7ad8d0' : '#4a8a8a', dark = '#1e4a4a', light = '#c8fff8';
+      g.fillStyle = dark; g.fillRect(22, 0, 4, 6);
+      g.fillStyle = body;
+      g.beginPath(); g.moveTo(14, 8); g.quadraticCurveTo(24, 0, 34, 8); g.lineTo(38, 34); g.lineTo(44, 40); g.lineTo(4, 40); g.lineTo(10, 34); g.closePath(); g.fill();
+      g.fillStyle = dark; g.fillRect(4, 38, 40, 4);
+      g.fillStyle = light; g.fillRect(15, 10, 3, 24);
+      g.strokeStyle = rung ? '#ffffff' : '#a8e8e0'; g.lineWidth = 1.5; g.beginPath();
+      for (let x = 12; x <= 36; x += 2) g.lineTo(x, 22 + Math.sin(x * 0.6 + f) * 2.5); g.stroke();
+      g.fillStyle = '#123a3a'; g.beginPath(); g.ellipse(24, 43, 4, 3, 0, 0, Math.PI * 2); g.fill();
+      if (!rung) { g.fillStyle = 'rgba(160,160,170,0.6)'; for (let i = 0; i < 4; i++) g.fillRect(14 + i * 6, 4 + (i % 2) * 3, 2, 4); }
+    });
+  }
+  return { chest, lever, herb, note, rope, sparkle, windmill, bell, valve, dial, manhole, plaque, timebell, hourglass, sandbell, lens, wavebell };
 })();

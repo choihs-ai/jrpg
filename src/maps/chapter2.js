@@ -9,12 +9,12 @@
 defMap('highway', {
   name: '은빛 가도', kind: 'field', bgm: 'field', base: '.',
   tiles: [
-    '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^', // 0
-    '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^', // 1
-    'TTY.T.TY".T.,.....,......s~~~..T.TYY..TT.T...YT..TYTYT.T', // 2
-    'TT....TT.Y...;........,...~~~.,YY.YYTY.TYTYT.....rYTY,TT', // 3
-    'T.Y.YTY.YY........."....".~~~s.TTTY..YT;TTT...r...Y.TTTT', // 4
-    'T.T,.....Y.,.............s~~~..TTTTTYTTYYT.........T.TTT', // 5
+    '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^:^^^^^^^^^^^^^', // 0
+    '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^:^^^^^^^^^^^^^', // 1
+    'TTY.T.TY".T.,.....,......s~~~..T.TYY..TT.T:..YT..TYTYT.T', // 2
+    'TT....TT.Y...;........,...~~~.,YY.YYTY.TYT:T.....rYTY,TT', // 3
+    'T.Y.YTY.YY........."....".~~~s.TTTY..YT;TT:...r...Y.TTTT', // 4
+    'T.T,.....Y.,.............s~~~..TTTTTYTTYYT:........T.TTT', // 5
     'T...YTYTTY......,.........~~~,..TT..TTYT.:::.......YTYTT', // 6
     'T.TY..T.TT;........,......~~~s.TYY.TTT,TT:T.......TT.T.T', // 7
     'T.YT.Y..Y..................~~~,.TT.YT.TYT:TYTTTY.TTYT.TT', // 8
@@ -58,6 +58,10 @@ defMap('highway', {
     {
       x: 48, y: 31, to: 'canyon', tx: 15, ty: 1, dir: 'down', cond: () => Game.flag('ch3_started'),
       blocked: async () => { await S.say(null, '(협곡 쪽에서 모래 섞인 바람이 사납게 몰아친다. 눈을 뜨기도 힘들다.)\n…지금은 이 너머로 갈 수 없을 것 같다.'); },
+    },
+    {
+      x: 42, y: 0, to: 'coast', tx: 24, ty: 34, dir: 'up', cond: () => Game.flag('ch4_started'),
+      blocked: async () => { await S.say(null, '(숲길 끝이 눈보라에 하얗게 막혀 있다. 북쪽에서 차가운 바닷바람이 불어온다.)\n…지금은 이 너머로 갈 이유가 없다.'); },
     },
   ],
   triggers: [
@@ -313,7 +317,7 @@ defMap('academy', {
   npcs: [
     {
       id: 'ophelia', x: 12, y: 3, look: 'dean', dir: 'down',
-      mark: () => P() === 11 || P() === 15 || P() === 16,
+      mark: () => P() === 11 || P() === 15 || P() === 16 || P() === 24,
       talk: () => Story.dean(),
     },
     {

@@ -29,7 +29,7 @@ d.battlePolicy = async (d, s) => {
     if (!core || !a) return null;
     const foes = core.aliveEnemyList;
     const charging = foes.find((e) => e.charging);
-    const marked = charging && ((charging.mem.mark === a && ['execution', 'queen_strike'].includes(charging.charging)) || (charging.charging === 'falling_sand' && (a.mhp < 420 || a.hp / a.mhp < 0.6)));
+    const marked = charging && ((charging.mem.mark === a && ['execution', 'queen_strike', 'tusk_crush', 'anchor_crash'].includes(charging.charging)) || (charging.charging === 'falling_sand' && (a.mhp < 420 || a.hp / a.mhp < 0.6)) || (charging.charging === 'tidal_wave' && a.hp / a.mhp < 0.5));
     const low = core.alivePartyList.filter((x) => x.hp / x.mhp < 0.45);
     const dead = core.party.filter((x) => !x.alive).length;
     const boss = foes.find((e) => e.def.boss);

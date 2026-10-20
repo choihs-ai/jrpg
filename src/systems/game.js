@@ -254,6 +254,14 @@ const Game = (() => {
   //  9 2장 출발 · 10 베인 격파 · 11 왕도 도착 · 12 학장 면담 · 13 브란 입단 · 14 늙은 이빨 격파 · 15 카산드라 격파 · 16 2장 완료
   function progress() {
     const f = state.flags;
+    if (f.chapter4_done) return 32;
+    if (f.levia_defeated) return 31;
+    if (f.orca_defeated) return 30;
+    if (f.cassandra_joined) return 29;
+    if (f.walrus_defeated) return 28;
+    if (f.cave4_open) return 27;
+    if (f.reached_marea) return 26;
+    if (f.ch4_started) return 25;
     if (f.chapter3_done) return 24;
     if (f.zahir_defeated) return 23;
     if (f.mio_rescued) return 22;
