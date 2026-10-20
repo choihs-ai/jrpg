@@ -16,6 +16,7 @@ const Input = (() => {
   };
   const DIRS = ['up', 'down', 'left', 'right'];
   const REPEAT_DELAY = 0.32, REPEAT_RATE = 0.075;
+  let padDead = 0.1; // 방향 패드 중앙 무반응 영역 (패드 지름 대비)
 
   const held = {};          // action → 눌린 소스 수
   const heldOrder = [];     // 방향키 누른 순서 (마지막이 우선)
@@ -121,8 +122,14 @@ const Input = (() => {
     const fromEvent = (e) => {
       const r = el.getBoundingClientRect();
       const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
-      if (Math.hypot(dx, dy) < r.width * 0.12) return null;
-      return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
+      if (Math.hypot(dx, dy) < r.width * padDead) return null;
+      const ax = Math.abs(dx), ay = Math.abs(dy);
+      const horiz = dx > 0 ? 'right' : 'left', vert = dy > 0 ? 'down' : 'up';
+      // 대각선 근처에서 방향이 떨리지 않도록, 지금 누르고 있는 축을 조금 더 유리하게 본다
+      const BIAS = 1.35;
+      if (cur === 'left' || cur === 'right') return ax * BIAS >= ay ? horiz : vert;
+      if (cur === 'up' || cur === 'down') return ay * BIAS >= ax ? vert : horiz;
+      return ax > ay ? horiz : vert;
     };
     el.addEventListener('pointerdown', (e) => { e.preventDefault(); el.setPointerCapture(e.pointerId); lastPointerType = 'touch'; setDir(fromEvent(e)); });
     el.addEventListener('pointermove', (e) => { if (cur !== null || e.buttons) setDir(fromEvent(e)); });
@@ -151,6 +158,7 @@ const Input = (() => {
     isHeld: (a) => !!held[a],
     dir() { for (let i = heldOrder.length - 1; i >= 0; i--) if (held[heldOrder[i]]) return heldOrder[i]; return null; },
     setPointerHandler(fn) { pointerHandler = fn; },
+    setPadDeadzone(v) { padDead = v; },
     onAny(fn) { listeners.add(fn); },
     get pointerType() { return lastPointerType; },
     setEnabled(v) { enabled = v; if (!v) queue.length = 0; },

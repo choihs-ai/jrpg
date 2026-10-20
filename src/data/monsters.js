@@ -166,7 +166,7 @@ const MONSTERS = {
           { type: 'shake', mag: 6 },
           { type: 'msg', text: '벨가르의 가슴을 덮고 있던 돌껍질이 갈라졌다!' },
           { type: 'msg', text: '[p]검은 수정[/]이 드러나 섬뜩하게 맥동한다…!' },
-          { type: 'msg', text: '[y]약점이 드러났다! 빛과 번개가 잘 통할 것 같다![/]' },
+          { type: 'msg', text: '[y]갈라진 껍질 속에서 무언가 반응한다… 약점이 드러난 것 같다![/]' },
         ];
       }
       return [];
@@ -271,7 +271,7 @@ const MONSTERS = {
     name: '시험관 기사 가웨인', art: 'knight', boss: true, pal: { metal: '#b8bccc', dark: '#7a7e90', trim: '#d8b040', cloth: '#3f63b8', shield: '#3f63b8', blade: '#c8a070', plume: '#c4473a', eye: '#7cc4ff' },
     hp: 380, mp: 0, atk: 64, def: 24, mag: 0, spd: 12, exp: 300, gold: 0,
     elem: {}, resist: { poison: 1, sleep: 1, paralyze: 0.6, silence: 1 }, drops: [],
-    desc: '수호기사단의 시험관. 목검이라지만 한 방 한 방이 무겁다. 높이 치켜든 다음 턴의 일격을 조심하자.',
+    desc: '수호기사단의 시험관. 목검이라지만 한 방 한 방이 무겁다. 목검 끝을 잘 보자.',
     ai(self, B) {
       const m = self.mem;
       m.turn = (m.turn || 0) + 1;
@@ -315,7 +315,7 @@ const MONSTERS = {
     name: '수로의 주인 「늙은 이빨」', art: 'croc', boss: true, pal: { body: '#4a6a3a', dark: '#2a3e22', belly: '#a8b888', ridge: '#2a3a1a', eye: '#ffd040' },
     hp: 3000, mp: 0, atk: 74, def: 30, mag: 0, spd: 10, exp: 1600, gold: 700,
     elem: { thunder: 1.5, ice: 1.25, fire: 0.75 }, resist: { poison: 0.5, sleep: 0.6, paralyze: 0.6, silence: 1 }, drops: [{ item: 'hi_potion', p: 1 }],
-    desc: '수십 년 동안 왕도 지하에 살아온 거대한 악어. 잠수하면 다음 턴에 무시무시한 회전 공격이 온다. 번개에 약하다.',
+    desc: '수십 년 동안 왕도 지하에 살아온 거대한 악어. 물속으로 사라질 때가 가장 위험하다. 번개에 약하다.',
     ai(self, B) {
       const m = self.mem;
       m.turn = (m.turn || 0) + 1;
@@ -366,7 +366,7 @@ const MONSTERS = {
     name: '제2성부 카산드라', art: 'sorceress', boss: true, pal: { dress: '#4a3a6a', dark: '#2a1e44', trim: '#ffd75e', hair: '#4a5a8a', skin: '#f0d8c0', eye: '#c040ff', clock: '#e8d080' },
     hp: 2600, mp: 999, atk: 50, def: 30, mag: 46, spd: 20, exp: 2600, gold: 1200,
     elem: { ice: 1.25, thunder: 1.25, light: 0.75, dark: 0 }, resist: { poison: 0.5, sleep: 1, paralyze: 1, silence: 0.3 }, drops: [],
-    desc: '잿빛 성가대의 「제2성부」. 시계태엽 수호자가 살아 있는 동안 결계로 몸을 지킨다. 시간을 되감는 주문은 침묵으로 막을 수 있다.',
+    desc: '잿빛 성가대의 「제2성부」. 곁을 지키는 태엽 거인이 서 있는 한 그녀의 몸에는 칼날이 잘 들어가지 않는다. 시간을 되감는 주문은… 입을 막을 수 있다면 좋을 텐데.',
     barrier: (self, B) => B.enemies.some((e) => e.alive && e.defId === 'clock_guardian'),
     phases: [{ key: 'p2', below: 0.5 }],
     onPhase(self, B, key) {

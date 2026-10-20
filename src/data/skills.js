@@ -113,21 +113,21 @@ const SKILLS = {
 
   // ── 미니 보스: 베인 · 회색갈기 · 늙은 이빨 · 가웨인 ──
   execution: { name: '처형', kind: 'enemy', target: 'enemy', type: 'physical', mult: 2.0, anim: 'bigslash', msg: '{A|이} 거대한 낫을 {T|에게} 내리찍었다!' },
-  mark_doom: { name: '처형 선고', kind: 'enemy', target: 'enemy', type: 'charge', next: 'execution', msg: '{A|이} 낫끝으로 {T|을} 가리켰다. "다음은 네 차례다."', hint: '[y]다음 턴에 처형이 온다! 노려진 동료는 「방어」하거나 감싸자![/]' },
+  mark_doom: { name: '처형 선고', kind: 'enemy', target: 'enemy', type: 'charge', next: 'execution', msg: '{A|이} 낫끝으로 {T|을} 가리켰다. "다음은 네 차례다."', hint: '[y]낫이 겨눈 자에게 곧 처형이 내려질 것이다…[/]' },
   acolyte_call: { name: '신도 소집', kind: 'enemy', target: 'none', type: 'summon', summon: ['choir_acolyte'], msg: '{A|이} 종을 흔들자 성가대 신도가 나타났다!' },
   pack_call: { name: '무리 부르기', kind: 'enemy', target: 'none', type: 'summon', summon: ['gray_wolf', 'gray_wolf'], msg: '{A|이} 길게 울부짖자 잿빛늑대들이 달려왔다!' },
   rend: { name: '갈기 찢기', kind: 'enemy', target: 'enemies', type: 'physical', mult: 0.8, anim: 'slash', msg: '{A|이} 회오리처럼 몸을 날려 일행을 할퀴었다!' },
-  submerge: { name: '잠수', kind: 'enemy', target: 'self', type: 'charge', next: 'death_roll', buffSelf: { def: 2.5 }, msg: '{A|이} 오수 속으로 잠수했다! 수면 아래에서 무언가가 노린다…', hint: '[y]다음 턴에 강력한 공격이 온다! (방어하면 피해 감소)[/]' },
+  submerge: { name: '잠수', kind: 'enemy', target: 'self', type: 'charge', next: 'death_roll', buffSelf: { def: 2.5 }, msg: '{A|이} 오수 속으로 잠수했다! 수면 아래에서 무언가가 노린다…', hint: '[y]수면 아래에서 무언가 노리고 있다…[/]' },
   death_roll: { name: '죽음의 회전', kind: 'enemy', target: 'enemy', type: 'physical', mult: 2.3, anim: 'impact', msg: '{A|이} 튀어 올라 {T|을} 물고 회전했다!' },
   tail_sweep: { name: '꼬리 휩쓸기', kind: 'enemy', target: 'enemies', type: 'physical', mult: 0.85, anim: 'quake', msg: '{A|이} 거대한 꼬리로 휩쓸었다!' },
   murk: { name: '오수 뿜기', kind: 'enemy', target: 'enemies', type: 'debuff', buff: { hit: 0.7 }, turns: 3, chance: 0.6, anim: 'mist', msg: '{A|이} 탁한 오수를 뿜어 시야를 가렸다!' },
   knight_stance: { name: '기사의 자세', kind: 'enemy', target: 'self', type: 'buff', buff: { def: 1.5 }, turns: 2, msg: '{A|이} 방패를 앞세워 자세를 가다듬었다.' },
   heavy_blow: { name: '중단 내려치기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 2.0, anim: 'bigslash', msg: '{A|이} 목검을 높이 들었다가 힘껏 내리쳤다!' },
-  ready_blow: { name: '자세 잡기', kind: 'enemy', target: 'enemy', type: 'charge', next: 'heavy_blow', msg: '{A|이} 목검을 머리 위로 높이 들어 올렸다…', hint: '[y]큰 일격이 온다! 「방어」나 「철벽」으로 받아내자![/]' },
+  ready_blow: { name: '자세 잡기', kind: 'enemy', target: 'enemy', type: 'charge', next: 'heavy_blow', msg: '{A|이} 목검을 머리 위로 높이 들어 올렸다…', hint: '[y]목검이 높이 올라갔다… 곧 큰 일격이 온다![/]' },
 
   // ── 보스: 카산드라 ──
   call_wisps: { name: '정령 소환', kind: 'enemy', target: 'none', type: 'summon', summon: ['time_wisp', 'time_wisp'], msg: '멈춘 시간의 틈새에서 째깍 정령들이 흘러나왔다!' },
-  rewind_charge: { name: '되감기 준비', kind: 'enemy', target: 'none', type: 'charge', next: 'rewind', msg: '{A|이} 시계를 거꾸로 돌리기 시작했다… 째깍, 째깍, 째깍──', hint: '[y]시간을 되감으려 한다! 「침묵」으로 주문을 막을 수 있을지도…![/]' },
+  rewind_charge: { name: '되감기 준비', kind: 'enemy', target: 'none', type: 'charge', next: 'rewind', msg: '{A|이} 시계를 거꾸로 돌리기 시작했다… 째깍, 째깍, 째깍──', hint: '[y]시간을 되감으려 한다… 주문이 완성되기 전에 막을 수 있다면…[/]' },
   rewind: { name: '시간 되감기', kind: 'enemy', target: 'self', type: 'heal', power: 420, scale: 0, anim: 'heal', msg: '{A|의} 상처가 거꾸로 흐르는 시간 속에서 아물었다!' },
   stop_toll: { name: '정지의 종소리', kind: 'enemy', target: 'enemies', type: 'debuff', buff: { spd: 0.55 }, turns: 3, chance: 0.85, anim: 'wave', msg: '데에엥──. 시간의 종이 울리자 세상이 느려졌다!' },
   shatter_hour: { name: '부서지는 시각', kind: 'enemy', target: 'enemies', type: 'magic', element: 'dark', power: 16, scale: 0.35, anim: 'dark', msg: '{A|이} 시곗바늘을 휘두르자 시간의 파편이 쏟아졌다!' },
@@ -135,14 +135,14 @@ const SKILLS = {
 
   // ── 보스: 철엄니 ──
   tusk: { name: '엄니 찌르기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.2, msg: '{A|이} 쇠 같은 엄니로 들이받았다!' },
-  paw: { name: '돌진 준비', kind: 'enemy', target: 'enemy', type: 'charge', next: 'rampage', msg: '{A|이} 앞발로 땅을 긁으며 {T|을} 노려본다!', hint: '[y]다음 턴에 강력한 돌진이 온다! (방어하면 피해 감소)[/]' },
+  paw: { name: '돌진 준비', kind: 'enemy', target: 'enemy', type: 'charge', next: 'rampage', msg: '{A|이} 앞발로 땅을 긁으며 {T|을} 노려본다!', hint: '[y]땅을 긁는 소리… 곧 돌진이 올 것이다![/]' },
   rampage: { name: '맹돌진', kind: 'enemy', target: 'enemy', type: 'physical', mult: 2.2, hit: 0.1, anim: 'impact', msg: '{A|이} 굉음과 함께 {T|에게} 돌진했다!' },
   roar: { name: '포효', kind: 'enemy', target: 'none', type: 'summon', summon: ['thorn_boar', 'thorn_boar'], msg: '{A|이} 숲이 울리도록 포효했다! 가시멧돼지들이 달려온다!' },
   rage: { name: '분노', kind: 'enemy', target: 'self', type: 'buff', buff: { atk: 1.3 }, turns: 99, msg: '{A|의} 눈이 시뻘겋게 타오른다! 공격력이 올랐다!' },
 
   // ── 보스: 벨가르 ──
   crush: { name: '종지기의 철퇴', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.25, anim: 'impact', msg: '{A|이} 거대한 철퇴를 내리쳤다!' },
-  toll_charge: { name: '종 울릴 준비', kind: 'enemy', target: 'none', type: 'charge', next: 'resonance', msg: '{A|이} 철퇴를 높이 들어 등 뒤의 거대한 종을 겨눈다…', hint: '[y]공기가 떨린다! 다음 턴에 강력한 전체 공격이 온다! (방어하면 피해 감소)[/]' },
+  toll_charge: { name: '종 울릴 준비', kind: 'enemy', target: 'none', type: 'charge', next: 'resonance', msg: '{A|이} 철퇴를 높이 들어 등 뒤의 거대한 종을 겨눈다…', hint: '[y]공기가 떨린다… 곧 종소리가 일행 전체를 덮칠 것이다![/]' },
   resonance: { name: '공명파', kind: 'enemy', target: 'enemies', type: 'magic', element: null, power: 26, scale: 0.4, status: { paralyze: 0.2 }, anim: 'wave', msg: '데에엥──! 거대한 종소리가 공명파가 되어 휩쓸었다!' },
   stone_guard: { name: '돌의 수호', kind: 'enemy', target: 'self', type: 'buff', buff: { def: 1.4 }, turns: 3, msg: '{A|의} 몸이 단단한 바위처럼 굳었다!' },
   dark_pulse: { name: '어둠의 맥동', kind: 'enemy', target: 'enemies', type: 'magic', element: 'dark', power: 13, scale: 0.3, status: { silence: 0.3 }, anim: 'dark', msg: '검은 수정이 맥동하며 어둠의 파동을 뿜었다!' },

@@ -48,7 +48,7 @@ const Menu = (() => {
       Text.draw(ctx, `[y]${Game.gold}G[/]`, 196, 416, { size: 20, bold: true });
       Text.draw(ctx, `⏱ ${Util.fmtTime(st.playTime)}`, 196, 442, { size: 14, color: Theme.dim });
       Text.draw(ctx, `📍 ${Field.map ? Field.map.name : ''}`, 608, 418, { size: 15, align: 'right' });
-      const g = Quests.currentGoal();
+      const g = Settings.get('showGoal') ? Quests.currentGoal() : null;
       if (g) Text.draw(ctx, '★ ' + g.text, 608, 442, { size: 13, align: 'right', color: '#ffe9a8', maxW: 300 });
     },
   };
@@ -470,7 +470,7 @@ const Menu = (() => {
         q.stages.forEach((stg, i) => {
           if (s.status !== 'done' && i > s.stage) return;
           const done = s.status === 'done' || i < s.stage;
-          let t = (done ? '[d]✔ ' : '▶ ') + stg.goal;
+          let t = (done ? '[d]✔ ' : '▶ ') + Quests.stageText(stg);
           if (!done && stg.count) t += ` (${stg.count()}/${stg.max})`;
           if (done) t += '[/]';
           const ls = Text.layout(ctx, t, 330, 14);

@@ -14,11 +14,15 @@ html, body {
 /* 터치 컨트롤 */
 #touch { display: none; }
 body.touch-on #touch { display: block; }
+#touch { --padscale: 1.25; --padlift: 0px; }
+:root { --padscale: 1.25; --padlift: 0px; }
 #dpad {
-  position: absolute; left: calc(14px + env(safe-area-inset-left)); bottom: calc(14px + env(safe-area-inset-bottom));
+  position: absolute; left: calc(14px + env(safe-area-inset-left)); bottom: calc(14px + env(safe-area-inset-bottom) + var(--padlift));
   width: 150px; height: 150px; border-radius: 50%; background: rgba(255, 255, 255, 0.08); border: 2px solid rgba(255, 255, 255, 0.18);
-  touch-action: none; z-index: 5;
+  touch-action: none; z-index: 5; transform: scale(var(--padscale)); transform-origin: left bottom;
 }
+/* 눈에 보이는 원 바깥도 손가락이 닿으면 인식 (엄지가 살짝 벗어나도 안 끊기도록) */
+#dpad::before { content: ''; position: absolute; inset: -22px; border-radius: 50%; }
 #dpad .arr { position: absolute; color: rgba(255, 255, 255, 0.6); font-size: 22px; line-height: 1; pointer-events: none; }
 #dpad .up { left: 50%; top: 10px; transform: translateX(-50%); }
 #dpad .down { left: 50%; bottom: 10px; transform: translateX(-50%); }
@@ -27,7 +31,8 @@ body.touch-on #touch { display: block; }
 #dpad[data-dir="up"] .up, #dpad[data-dir="down"] .down, #dpad[data-dir="left"] .left, #dpad[data-dir="right"] .right { color: #ffd75e; }
 #btns {
   position: absolute; right: calc(14px + env(safe-area-inset-right)); bottom: calc(14px + env(safe-area-inset-bottom));
-  width: 170px; height: 150px; z-index: 5;
+  width: 170px; height: 150px; z-index: 5; transform: scale(var(--padscale)); transform-origin: right bottom;
+  bottom: calc(14px + env(safe-area-inset-bottom) + var(--padlift));
 }
 #btns button {
   position: absolute; width: 66px; height: 66px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.35);
@@ -40,8 +45,8 @@ body.touch-on #touch { display: block; }
 
 /* 세로 화면 + 터치: 게임 화면은 위, 컨트롤은 아래 */
 @media (orientation: portrait) {
-  body.touch-on #game-wrap { flex: 0 1 auto; height: calc(100% - 190px); align-items: center; }
-  body.touch-on #touch { position: relative; height: 190px; }
+  body.touch-on #game-wrap { flex: 0 1 auto; height: calc(100% - var(--touch-h, 190px)); align-items: center; }
+  body.touch-on #touch { position: relative; height: var(--touch-h, 190px); }
 }
 
 /* 이름 입력 */
