@@ -108,6 +108,19 @@ const desertGear = () => J(() => {
   G.healAll();
 });
 
+// 보스전: 지면 여관에서 깨어나므로 보스 앞으로 돌아가 다시 도전한다 (실제 플레이어처럼, 최대 3번)
+const bossFight = async (flag, approach, back) => {
+  for (let i = 0; i < 3; i++) {
+    await approach();
+    await d.pump({ timeout: 2400000 });
+    if (await J((f) => __jr.Game.flag(f) === true, flag)) return;
+    log(`  (패배 → 재도전 ${i + 1})`);
+    await J(() => __jr.Game.healAll());
+    await J(back);
+    await sleep(600); await d.pump();
+  }
+};
+
 if (process.env.TRACE) setInterval(async () => {
   try { log('   [trace] ' + await J(() => { const c = __jr.Battle.core; if (!c) return '-'; return `R${c.round} ` + c.party.map((a) => a.name[0] + a.hp + '/' + a.mp).join(' ') + ' | ' + c.enemies.filter((e) => e.alive).map((e) => e.defId + e.hp + (e.charging ? '!' + e.charging : '')).join(' '); })); } catch (e) { log('   [trace-err] ' + e.message); }
 }, 8000);
@@ -221,9 +234,8 @@ try {
     await d.interactAt(2, 6);
     await check('일기 조각 2', () => __jr.Game.count('aria_page') === 2);
     await train(19);
-    await d.walkTo(20, 6);
-    await d.walkTo(20, 5);
-    await d.pump({ timeout: 2400000 });
+    await desertGear(); // 바자르에서 사막 장비를 사 입었다고 가정
+    await bossFight('queen_defeated', async () => { await d.walkTo(20, 6); await d.walkTo(20, 5); }, () => __jr.Field.warp('sandcave', 20, 7, 'up'));
     await check('전갈 여왕 격파 (진행도 21)', () => __jr.Game.flag('queen_defeated') === true && __jr.Game.progress() === 21);
     await d.interactAt(26, 1);
     await check('태양의 열쇠', () => __jr.Game.count('sun_key') === 1 && __jr.Quests.stage('main4') === 5);
@@ -266,9 +278,7 @@ try {
   step('11. 침묵의 제단 — 베인 재전 → 미오 구출');
   await train(20);
   await desertGear();
-  await d.walkTo(12, 10);
-  await d.walkTo(12, 9);
-  await d.pump({ timeout: 2400000 });
+  await bossFight('mio_rescued', async () => { await d.walkTo(12, 10); await d.walkTo(12, 9); }, () => __jr.Field.warp('temple2', 12, 11, 'up'));
   await check('베인 격파 · 미오 구출 (진행도 22)', () => __jr.Game.flag('mio_rescued') === true && __jr.Game.progress() === 22);
   await check('미오가 원래 자리로 (넬은 대기)', () => __jr.Game.state.party.includes('mio') && __jr.Game.state.reserve.includes('nell') || [__jr.Game.state.party, __jr.Game.state.reserve]);
   await check('미오 레벨 보정', () => __jr.Game.member('mio').level >= __jr.Game.member('hero').level - 1 || __jr.Game.member('mio').level);
@@ -280,9 +290,7 @@ try {
   step('12. 제3성부 자히르');
   await train(22);
   await J(() => __jr.Game.addItem('hi_ether', 5));
-  await d.walkTo(9, 10);
-  await d.walkTo(9, 9);
-  await d.pump({ timeout: 2400000 });
+  await bossFight('zahir_defeated', async () => { await d.walkTo(9, 10); await d.walkTo(9, 9); }, () => __jr.Field.warp('temple3', 9, 11, 'up'));
   await check('자히르 격파 (진행도 23)', () => __jr.Game.flag('zahir_defeated') === true && __jr.Game.progress() === 23);
   await check('모래의 심장', () => __jr.Game.count('sand_heart') === 1);
   await check('미오: 어머니의 자장가', () => __jr.Game.member('mio').skills.includes('mother_song'));
