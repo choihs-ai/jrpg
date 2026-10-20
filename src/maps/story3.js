@@ -174,7 +174,7 @@ Object.assign(Story, {
     await S.say('베인', ['그리고 너. 오스릭 님은 너를 건드리지 말라 하셨다. 「심장을 모으게 두어라」고.', '…나는 기다리는 게 싫다. 열쇠에 필요한 건 그 손뿐이니까.']);
     await Story.line('linette', '…심장을 모으게 둔다고요? 어째서…');
     await Story.line('nell', '말 많네. 미오 돌려줘.');
-    const r = await S.battle(['choir_knight', 'vane2', 'choir_acolyte'], { bg: 'temple', bgm: 'boss', boss: true, canEscape: false, intro: '잿빛 성가대 집행자 베인' });
+    const r = await S.battle(['choir_knight', 'vane2'], { bg: 'temple', bgm: 'boss', boss: true, canEscape: false, intro: '잿빛 성가대 집행자 베인' });
     if (r !== 'win') return;
     Game.setFlag('mio_rescued');
     Sound.bgm('sandtemple');

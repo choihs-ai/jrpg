@@ -236,13 +236,13 @@ for (const L of [19, 20]) run(`Lv${L} 미오없음 ch3 gear 전갈 여왕`, N, (
 console.log('── 모래시계 사원 ──');
 run('Lv20 미오없음 ch3 gear temple', N, () => setup(NOMIO, 20, E_CH3, POT3), encounter('temple'));
 run('Lv20 미오없음 ch3 gear 황금 탐욕상자', N, () => setup(NOMIO, 20, E_CH3, POT3), () => ['cursed_chest']);
-for (const L of [20, 21, 22]) run(`Lv${L} 미오없음 ch3 gear 베인(재전)`, N, () => setup(NOMIO, L, E_CH3, POT3), () => ['choir_knight', 'vane2', 'choir_acolyte'], { boss: true });
+for (const L of [20, 21, 22]) run(`Lv${L} 미오없음 ch3 gear 베인(재전)`, N, () => setup(NOMIO, L, E_CH3, POT3), () => ['choir_knight', 'vane2'], { boss: true });
 run('Lv21 4인 ch3 gear temple', N, () => setup(P4, 21, E_CH3, POT3), encounter('temple'));
 for (const L of [21, 22, 23]) run(`Lv${L} 4인 ch3 gear 자히르`, N, () => setup(P4, L, E_CH3, POT3), () => ['zahir'], { boss: true });
 for (const L of [21, 22]) run(`Lv${L} 넬 포함 ch3 gear 자히르`, N, () => setup(['hero', 'nell', 'linette', 'mio'], L, E_CH3, POT3), () => ['zahir'], { boss: true });
 NAIVE = true;
 run('NAIVE Lv20 전갈 여왕', N, () => setup(NOMIO, 20, E_CH3, POT3), () => ['scorpion_queen'], { boss: true });
-run('NAIVE Lv21 베인(재전)', N, () => setup(NOMIO, 21, E_CH3, POT3), () => ['choir_knight', 'vane2', 'choir_acolyte'], { boss: true });
+run('NAIVE Lv21 베인(재전)', N, () => setup(NOMIO, 21, E_CH3, POT3), () => ['choir_knight', 'vane2'], { boss: true });
 run('NAIVE Lv22 자히르', N, () => setup(P4, 22, E_CH3, POT3), () => ['zahir'], { boss: true });
 NAIVE = false;
 console.log('── 평균 보상 (3장) ──');

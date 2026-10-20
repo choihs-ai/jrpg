@@ -33,7 +33,9 @@ d.battlePolicy = async (d, s) => {
     const low = core.alivePartyList.filter((x) => x.hp / x.mhp < 0.45);
     const dead = core.party.filter((x) => !x.alive).length;
     const boss = foes.find((e) => e.def.boss);
-    const target = boss || foes[0];
+    // 졸개(정령·기사 등)가 있으면 먼저 정리한다 — 신기루는 보스와 같은 이름이라 졸개로 치지 않는다
+    const add = foes.filter((e) => !e.def.boss).sort((x, y) => x.hp - y.hp)[0];
+    const target = add || boss || foes[0];
     const weak = target ? Object.keys(target.elem).filter((k) => target.elem[k] > 1).sort((x, y) => target.elem[y] - target.elem[x]) : [];
     return {
       id: a.id, mp: a.mp, hp: a.hp / a.mhp, skills: a.ref.skills, silenced: !!a.status.silence,
