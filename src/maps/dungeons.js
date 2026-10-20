@@ -149,7 +149,7 @@ defMap('ruins2', {
       after: async () => { await Levers.check(); },
     },
     { type: 'event', x: 15, y: 7, solid: true, run: () => S.savePoint('수정이 따뜻한 빛을 내뿜는다… 일행의 HP와 MP가 모두 회복되었다!') },
-    { type: 'event', x: 14, y: 11, solid: true, show: () => !(Game.flag('lever_w') && Game.flag('lever_e')), run: async () => { await S.say(null, '두꺼운 철창이 길을 막고 있다. 손으로는 꿈쩍도 하지 않는다.\n(서쪽과 동쪽, 어딘가에 여는 장치가 있을 것 같다.)'); } },
+    { type: 'event', x: 14, y: 11, solid: true, show: () => !(Game.flag('lever_w') && Game.flag('lever_e')), run: async () => { await S.say(null, '두꺼운 철창이 길을 막고 있다. 손으로는 꿈쩍도 하지 않는다.\n(어딘가에 여는 장치가 있을 것 같다.)'); } },
     { type: 'event', x: 15, y: 11, solid: true, show: () => !(Game.flag('lever_w') && Game.flag('lever_e')), run: async () => { await S.say(null, '두꺼운 철창이 길을 막고 있다. 손으로는 꿈쩍도 하지 않는다.\n(서쪽과 동쪽, 어딘가에 여는 장치가 있을 것 같다.)'); } },
     { type: 'chest', id: 'r2_sw', x: 3, y: 20, item: 'blessed_staff' },
     { type: 'chest', id: 'r2_se', x: 26, y: 20, item: 'star' },

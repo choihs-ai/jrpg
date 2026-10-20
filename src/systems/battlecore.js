@@ -389,7 +389,7 @@ class BattleCore {
         const before = a.hp;
         a.hp = Math.min(a.mhp, a.hp + healed);
         ev.push({ type: 'heal', target: a, amount: a.hp - before, hpAfter: a.hp });
-        ev.push({ type: 'msg', text: `${a.name}의 HP가 ${a.hp - before} 회복되었다! [y](그림자 잔향을 먼저 쓰러뜨려 두면 막을 수 있다)[/]` });
+        ev.push({ type: 'msg', text: `${a.name}의 HP가 ${a.hp - before} 회복되었다! [y](…그림자 잔향이 곁에 있는 한, 같은 일이 되풀이될 것이다)[/]` });
         break;
       }
       case 'flee': {

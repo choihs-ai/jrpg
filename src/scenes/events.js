@@ -110,6 +110,8 @@ const S = {
     await S.say(null, `[${QUESTS[id].type === 'main' ? 'y' : 'g'}]${QUESTS[id].type === 'main' ? '메인' : '서브'} 퀘스트 「${QUESTS[id].name}」[/] 시작!\n[d]${Quests.goal(id)}[/]`);
   },
   stage(id, n) { Quests.setStage(id, n); },
+  // 현재 목표 안내 (설정에 따라 암시 또는 자세히)
+  async goalUpdate(id, extra = '') { await S.say(null, `[y]목표 갱신: ${Quests.goal(id)}[/]${extra}`); },
   async completeQuest(id, outcome) {
     const r = Quests.complete(id, outcome);
     if (!r) return;

@@ -112,8 +112,8 @@ const MapView = (() => {
           if (Math.floor(Engine.time * 3) % 2 === 0) { ctx.fillStyle = '#ff4040'; ctx.beginPath(); ctx.arc(px, py, Math.max(4, s * 0.6), 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke(); }
           // 범례
           UI.drawWindow(ctx, 24, 406, 592, 52, { alpha: 0.9 });
-          Text.draw(ctx, '[r]●[/] 현재 위치   [y]★[/] 메인 목적지   [g]◆[/] 서브 퀘스트', 40, 412, { size: 14 });
-          Text.draw(ctx, goal ? '목표: ' + goal.text : '', 40, 434, { size: 13, color: '#ffe9a8', maxW: 560 });
+          Text.draw(ctx, Settings.get('showGoal') >= 2 ? '[r]●[/] 현재 위치   [y]★[/] 메인 목적지   [g]◆[/] 서브 퀘스트' : '[r]●[/] 현재 위치   [d](목적지 표시는 설정의 「목표 표시: 자세히」에서 켤 수 있다)[/]', 40, 412, { size: 14 });
+          Text.draw(ctx, goal && Settings.get('showGoal') ? '목표: ' + goal.text : '', 40, 434, { size: 13, color: '#ffe9a8', maxW: 560 });
         },
       };
       Engine.push(L);

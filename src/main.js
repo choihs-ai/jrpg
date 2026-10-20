@@ -11,6 +11,12 @@ const Main = (() => {
     const mode = Settings.get('touch');
     const show = mode === 1 || (mode === 0 && touchSeen);
     document.body.classList.toggle('touch-on', show);
+    const root = document.documentElement.style;
+    const scale = [1, 1.25, 1.5][Settings.get('padSize')] || 1.25, lift = [0, 36, 72][Settings.get('padPos')] || 0;
+    root.setProperty('--padscale', scale);
+    root.setProperty('--padlift', lift + 'px');
+    root.setProperty('--touch-h', Math.round(40 + 150 * scale + lift) + 'px'); // 세로 화면에서 게임 화면 아래 확보할 높이
+    Input.setPadDeadzone([0.05, 0.1, 0.18][Settings.get('padSens')] || 0.1);
     Engine.resize();
   }
 
