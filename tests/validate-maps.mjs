@@ -32,8 +32,12 @@ function bfs(map, starts, allFlags) {
     // 워프 칸에서는 더 나아가지 않는다(밟으면 이동)
     if (map.warps.some((w) => w.x === x && w.y === y) && !starts.some(([sx, sy]) => sx === x && sy === y)) continue;
     for (const [dx, dy] of D4) {
-      const nx = x + dx, ny = y + dy, k = nx + ',' + ny;
-      if (seen.has(k) || !walkable(map, rt, nx, ny, allFlags)) continue;
+      let nx = x + dx, ny = y + dy;
+      if (!walkable(map, rt, nx, ny, allFlags)) continue;
+      // 얼음: 막힐 때까지 미끄러진다 (지나친 칸에는 멈출 수 없다)
+      while (TILES[rt[ny][nx]].slide && !map.warps.some((w) => w.x === nx && w.y === ny) && walkable(map, rt, nx + dx, ny + dy, allFlags)) { nx += dx; ny += dy; }
+      const k = nx + ',' + ny;
+      if (seen.has(k)) continue;
       seen.add(k); q.push([nx, ny]);
     }
   }

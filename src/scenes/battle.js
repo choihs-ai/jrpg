@@ -111,6 +111,46 @@ const BattleBG = (() => {
       for (const x of [26, 280]) { p.rect(x, 10, 14, 102, '#8a6a40'); p.rect(x, 10, 3, 102, '#b89868'); }
       p.rect(0, 112, 320, 128, '#a88048'); p.rect(110, 112, 100, 128, '#7a3a2a'); p.rect(110, 112, 3, 128, '#e8c070'); p.rect(207, 112, 3, 128, '#e8c070');
     },
+    // ── 제4장 ──
+    snowfield(p, g) {
+      sky(p, '#6a7a98', '#d8e0ec', 110);
+      g.fillStyle = '#8a9ab4'; g.beginPath(); g.moveTo(0, 96); for (let x = 0; x <= 320; x += 16) g.lineTo(x, 70 + Math.sin(x * 0.03) * 14); g.lineTo(320, 110); g.lineTo(0, 110); g.fill();
+      g.fillStyle = '#3c6a9a'; g.fillRect(0, 98, 320, 14); g.fillStyle = '#d8ecff'; for (let x = 0; x < 320; x += 24) g.fillRect(x + ((x / 24) % 2) * 8, 102, 10, 1);
+      p.rect(0, 112, 320, 128, '#e6edf6'); p.noise(['#d2dbe8', '#f6f9fd'], 0.06, 301, [0, 112, 320, 128]);
+      for (let i = 0; i < 6; i++) p.ellipse(30 + i * 55, 150 + (i % 2) * 14, 24, 4, 'rgba(150,170,200,0.35)');
+      g.fillStyle = 'rgba(255,255,255,0.8)'; for (let i = 0; i < 40; i++) g.fillRect((i * 53) % 320, (i * 29) % 112, 1, 1);
+    },
+    icecave(p, g) {
+      p.rect(0, 0, 320, 240, '#14283a');
+      for (let i = 0; i < 14; i++) { const x = i * 24; g.fillStyle = i % 2 ? '#4a88a8' : '#7ab8d8'; g.beginPath(); g.moveTo(x, 0); g.lineTo(x + 12, 20 + (i * 17) % 28); g.lineTo(x + 24, 0); g.fill(); }
+      g.fillStyle = 'rgba(160,220,255,0.15)'; g.beginPath(); g.moveTo(120, 0); g.lineTo(200, 0); g.lineTo(250, 112); g.lineTo(70, 112); g.fill();
+      for (const x of [40, 270]) { g.fillStyle = '#a8dcf0'; g.beginPath(); g.moveTo(x - 10, 112); g.lineTo(x, 50); g.lineTo(x + 10, 112); g.fill(); }
+      p.rect(0, 112, 320, 128, '#a8d8f0'); p.noise(['#98cce8', '#bce4f6'], 0.06, 311, [0, 112, 320, 128]);
+      for (let i = 0; i < 8; i++) p.rect(20 + i * 40, 130 + (i % 3) * 30, 18, 1, '#d8f2ff');
+    },
+    lighthouse(p, g) {
+      sky(p, '#0a0c1e', '#283a5a', 112);
+      g.fillStyle = 'rgba(255,240,160,0.18)'; g.beginPath(); g.moveTo(160, 40); g.lineTo(0, 10); g.lineTo(0, 70); g.fill(); g.beginPath(); g.moveTo(160, 40); g.lineTo(320, 20); g.lineTo(320, 80); g.fill();
+      for (let i = 0; i < 40; i++) { g.fillStyle = `rgba(255,255,255,${0.3 + (i % 3) * 0.2})`; g.fillRect((i * 71) % 320, (i * 37) % 100, 1, 1); }
+      p.rect(0, 100, 320, 12, '#3a3a48'); for (let x = 0; x < 320; x += 20) p.rect(x, 96, 3, 16, '#5a5a68');
+      p.rect(0, 112, 320, 128, '#4b4759'); for (let x = 0; x < 320; x += 32) p.rect(x, 112, 1, 128, '#3c384a'); for (let y = 112; y < 240; y += 16) p.rect(0, y, 320, 1, '#3c384a');
+    },
+    ship(p, g) {
+      sky(p, '#101828', '#3a4a5a', 112);
+      g.fillStyle = 'rgba(200,220,220,0.12)'; for (let i = 0; i < 5; i++) g.fillRect(0, 30 + i * 16, 320, 6);
+      for (const x of [70, 250]) { p.rect(x, 0, 8, 112, '#3a2414'); p.rect(x - 40, 20, 88, 3, '#3a2414'); g.fillStyle = 'rgba(200,190,170,0.35)'; g.beginPath(); g.moveTo(x - 36, 24); g.lineTo(x + 44, 24); g.lineTo(x + 30, 88); g.lineTo(x - 22, 88); g.fill(); }
+      p.rect(0, 104, 320, 8, '#4a3020'); for (let x = 4; x < 320; x += 16) p.rect(x, 96, 3, 10, '#5a3c28');
+      p.rect(0, 112, 320, 128, '#6a4a30'); for (let x = 0; x < 320; x += 16) p.rect(x, 112, 1, 128, '#4a3020');
+      g.fillStyle = 'rgba(120,200,160,0.25)'; g.fillRect(0, 112, 320, 4);
+    },
+    sunken(p, g) {
+      sky(p, '#06141c', '#1a4a5a', 240);
+      g.fillStyle = 'rgba(160,230,255,0.08)'; for (let i = 0; i < 6; i++) { g.beginPath(); g.moveTo(40 + i * 50, 0); g.lineTo(60 + i * 50, 0); g.lineTo(90 + i * 50, 112); g.lineTo(70 + i * 50, 112); g.fill(); }
+      for (const x of [30, 280]) { p.rect(x, 10, 16, 102, '#3a6878'); p.rect(x, 10, 4, 102, '#5a8a98'); p.rect(x - 4, 6, 24, 6, '#5a8a98'); }
+      g.fillStyle = 'rgba(200,240,255,0.5)'; for (let i = 0; i < 24; i++) { g.beginPath(); g.arc((i * 41) % 320, (i * 67) % 200, 1 + (i % 3), 0, Math.PI * 2); g.fill(); }
+      p.rect(0, 112, 320, 128, '#2e5a68'); p.noise(['#28505e', '#3a6a78'], 0.08, 321, [0, 112, 320, 128]);
+      for (let i = 0; i < 5; i++) p.ellipse(40 + i * 64, 170, 26, 4, 'rgba(10,30,40,0.4)');
+    },
   };
   function get(name) {
     if (!cache[name]) cache[name] = Pix.make(320, 240, (p, g) => (DEFS[name] || DEFS.plains)(p, g));
@@ -303,6 +343,7 @@ const Battle = (() => {
       } else g.drawImage(flash ? Pix.silhouette(d.img) : d.img, dx, d.y + bob);
       g.globalAlpha = 1;
       if (e.status.sleep) { g.fillStyle = '#ffffff'; g.font = '8px sans-serif'; g.fillText('z', d.x + d.w - 6, d.y + 6 + Math.sin(Engine.time * 3) * 2); }
+      if (e.status.freeze) { g.fillStyle = 'rgba(170,230,255,0.4)'; g.fillRect(dx + 2, d.y + bob + 2, d.w - 4, d.h - 4); }
     }
     Engine.blitLow(ctx);
     if (darken > 0) { ctx.fillStyle = `rgba(0,0,0,${darken})`; ctx.fillRect(0, 0, Engine.W, Engine.H); }
@@ -313,7 +354,8 @@ const Battle = (() => {
       const cx = (d.x + d.w / 2) * 2, top = d.y * 2;
       const tags = [];
       if (e.charging) tags.push(['!!', '#ff5050']);
-      for (const s of ['poison', 'sleep', 'paralyze', 'silence']) if (e.status[s]) tags.push([STATUS_NAMES[s], { poison: '#c070ff', sleep: '#70a8ff', paralyze: '#ffd050', silence: '#a0a0b0' }[s]]);
+      for (const s of ['poison'].concat(TEMP_STATUS)) if (e.status[s]) tags.push([STATUS_NAMES[s], STATUS_COLORS[s]]);
+      if (e.mem.guard && e.mem.guard.tag) tags.push([e.mem.guard.tag, e.mem.guard.color || '#7cc4ff']);
       if (e.buffs.atk && e.buffs.atk.mult > 1) tags.push(['공↑', '#ff8a5a']);
       if (e.buffs.def && e.buffs.def.mult > 1) tags.push(['방↑', '#ffd050']);
       if (e.buffs.spd && e.buffs.spd.mult < 1) tags.push(['속↓', '#70a8ff']);
@@ -387,7 +429,7 @@ const Battle = (() => {
     // 상태 태그
     const tags = [];
     if (dead) tags.push(['전투불능', Theme.red]);
-    for (const s of ['poison', 'sleep', 'paralyze', 'silence']) if (a.status[s]) tags.push([STATUS_NAMES[s], { poison: '#c070ff', sleep: '#70a8ff', paralyze: '#ffd050', silence: '#a0a0b0' }[s]]);
+    for (const s of ['poison'].concat(TEMP_STATUS)) if (a.status[s]) tags.push([STATUS_NAMES[s], STATUS_COLORS[s]]);
     if (a.defending) tags.push(['방어', '#7cc4ff']);
     if (a.buffs.atk) tags.push(a.buffs.atk.mult >= 1 ? ['공↑', '#ff8a5a'] : ['공↓', '#a0a0b0']);
     if (a.buffs.def && a.buffs.def.mult > 1) tags.push(['방↑', '#ffd050']);
@@ -794,7 +836,7 @@ const Battle = (() => {
     await Engine.fadeOut(260);
     Engine.remove(layer);
     // 전투 후 상태 정리 (일시 상태 제거)
-    for (const id of Game.state.party) { const m = Game.state.members[id]; for (const k of ['sleep', 'paralyze', 'silence']) delete m.status[k]; }
+    for (const id of Game.state.party) { const m = Game.state.members[id]; for (const k of TEMP_STATUS) delete m.status[k]; }
     if (result !== 'lose' && Field.map) Sound.bgm(typeof Field.map.bgm === 'function' ? Field.map.bgm() : Field.map.bgm);
     if (result !== 'lose') await Engine.fadeIn(260);
     core = null;

@@ -6,7 +6,10 @@
 //  msg: 기술 사용 문장 ({A}=사용자, {T}=대상). 없으면 기본 문장.
 // ─────────────────────────────────────────────────────────────
 const ELEMENTS = { fire: '불', ice: '얼음', thunder: '번개', light: '빛', dark: '어둠' };
-const STATUS_NAMES = { poison: '독', sleep: '수면', paralyze: '마비', silence: '침묵' };
+const STATUS_NAMES = { poison: '독', sleep: '수면', paralyze: '마비', silence: '침묵', freeze: '빙결', bind: '속박' };
+// 전투가 끝나면 사라지는 상태 (독만 전투 밖에서도 남는다)
+const TEMP_STATUS = ['sleep', 'paralyze', 'silence', 'freeze', 'bind'];
+const STATUS_COLORS = { poison: '#c070ff', sleep: '#70a8ff', paralyze: '#ffd050', silence: '#a0a0b0', freeze: '#9fe8ff', bind: '#5ab88a' };
 const BUFF_NAMES = { atk: '공격력', def: '방어력', spd: '민첩', hit: '명중률', mag: '마력', eva: '회피율', regen: '재생' };
 
 const SKILLS = {
@@ -60,13 +63,13 @@ const SKILLS = {
   meteor: { name: '유성우', kind: 'spell', mp: 20, target: 'enemies', type: 'magic', element: null, power: 52, scale: 0.85, anim: 'fire', desc: '하늘에서 유성을 떨어뜨린다. 속성 없는 강력한 전체 공격.' },
 
   // ── 미오 ──
-  cure: { name: '정화', kind: 'spell', mp: 2, target: 'ally', type: 'cure', cures: ['poison', 'sleep', 'paralyze', 'silence'], anim: 'heal', field: true, desc: '아군 한 명의 독·수면·마비·침묵을 치료한다.' },
+  cure: { name: '정화', kind: 'spell', mp: 2, target: 'ally', type: 'cure', cures: ['poison', 'sleep', 'paralyze', 'silence', 'freeze', 'bind'], anim: 'heal', field: true, desc: '아군 한 명의 독·수면·마비·침묵·빙결·속박을 치료한다.' },
   protect: { name: '수호의 기도', kind: 'spell', mp: 4, target: 'allies', type: 'buff', buff: { def: 1.35 }, turns: 4, anim: 'buff', desc: '아군 전체의 방어력을 높인다. (4턴)' },
   holy_lance: { name: '빛의 창', kind: 'spell', mp: 4, target: 'enemy', type: 'magic', element: 'light', power: 22, scale: 0.7, anim: 'light', desc: '빛의 창을 내리꽂는다. 빛 속성. 언데드와 어둠의 존재에게 강하다.' },
   revive: { name: '소생', kind: 'spell', mp: 10, target: 'deadAlly', type: 'revive', pct: 0.5, anim: 'heal', field: true, desc: '쓰러진 동료를 HP 절반으로 되살린다.' },
   heal_all: { name: '치유의 비', kind: 'spell', mp: 9, target: 'allies', type: 'heal', power: 26, scale: 0.6, anim: 'heal', field: true, desc: '치유의 빛을 비처럼 내려 아군 전체를 회복한다.' },
 
-  chime_cleanse: { name: '정화의 방울', kind: 'spell', mp: 6, target: 'allies', type: 'cure', cures: ['poison', 'sleep', 'paralyze', 'silence'], anim: 'heal', field: true, desc: '별빛 방울을 울려 아군 전체의 독·수면·마비·침묵을 치료한다.' },
+  chime_cleanse: { name: '정화의 방울', kind: 'spell', mp: 6, target: 'allies', type: 'cure', cures: ['poison', 'sleep', 'paralyze', 'silence', 'freeze', 'bind'], anim: 'heal', field: true, desc: '별빛 방울을 울려 아군 전체의 독·수면·마비·침묵·빙결·속박을 치료한다.' },
   holy_burst: { name: '성광', kind: 'spell', mp: 10, target: 'enemies', type: 'magic', element: 'light', power: 30, scale: 0.7, anim: 'light', desc: '눈부신 빛을 터뜨려 적 전체에 빛 속성 피해.' },
   sanctuary: { name: '성역', kind: 'spell', mp: 10, target: 'allies', type: 'buff', buff: { def: 1.4, mag: 1.2 }, turns: 4, anim: 'buff', desc: '빛의 결계를 펼친다. 아군 전체의 방어력과 마력이 오른다. (4턴)' },
 
@@ -88,6 +91,22 @@ const SKILLS = {
 
   shadow_twin: { name: '그림자 분신', kind: 'skill', mp: 7, target: 'enemy', type: 'physical', mult: 1.0, hits: 2, randomTargets: true, crit: 0.2, anim: 'slash', desc: '분신과 함께 두 번 벤다. (무작위 대상, 회심이 나오기 쉽다)' },
   death_mark: { name: '사신의 표식', kind: 'skill', mp: 10, target: 'enemy', type: 'physical', mult: 2.0, status: { poison: 0.6, paralyze: 0.3 }, anim: 'slash', desc: '급소에 표식을 새긴다. 강력한 일격에 독과 마비를 노린다.' },
+  // 제4장 새 기술
+  polaris: { name: '북극성 베기', kind: 'skill', mp: 16, target: 'enemies', type: 'physical', mult: 1.3, element: 'light', anim: 'starslash', desc: '북극성처럼 흔들림 없는 빛으로 적 전체를 벤다. 빛 속성.' },
+  avalanche: { name: '눈사태', kind: 'skill', mp: 14, target: 'enemy', type: 'physical', mult: 2.6, anim: 'impact', desc: '온 체중을 실어 도끼를 내리찍는다. 매우 강력한 일격.' },
+  absolute_zero: { name: '절대영도', kind: 'spell', mp: 24, target: 'enemies', type: 'magic', element: 'ice', power: 58, scale: 0.95, status: { freeze: 0.2 }, anim: 'ice', desc: '모든 것을 얼리는 냉기. 강력한 얼음 속성 전체 공격. (확률로 빙결)' },
+  holy_wave: { name: '성스러운 물결', kind: 'spell', mp: 16, target: 'enemies', type: 'magic', element: 'light', power: 40, scale: 0.8, anim: 'light', desc: '빛의 물결로 적 전체를 씻어 낸다. 빛 속성.' },
+  shadow_bind: { name: '그림자 묶기', kind: 'skill', mp: 8, target: 'enemy', type: 'physical', mult: 1.1, status: { bind: 0.5 }, anim: 'slash', desc: '적의 그림자를 단검으로 꿰뚫어 묶는다. 확률로 속박.' },
+  // 카산드라 (노래 — 주문처럼 침묵에 막힌다)
+  song_valor: { name: '용기의 노래', kind: 'spell', mp: 6, target: 'allies', type: 'buff', buff: { atk: 1.25 }, turns: 4, anim: 'buff', desc: '힘찬 행진곡. 아군 전체의 공격력을 높인다. (4턴)' },
+  lullaby: { name: '잠의 노래', kind: 'spell', mp: 6, target: 'enemies', type: 'status', status: { sleep: 0.45 }, anim: 'mist', desc: '나지막한 노래로 적 전체를 재운다. (확률)' },
+  song_ward: { name: '수호의 노래', kind: 'spell', mp: 6, target: 'allies', type: 'buff', buff: { def: 1.3 }, turns: 4, anim: 'buff', desc: '굳건한 화음. 아군 전체의 방어력을 높인다. (4턴)' },
+  hush_song: { name: '정적의 노래', kind: 'spell', mp: 7, target: 'enemies', type: 'status', status: { silence: 0.5 }, anim: 'debuff', desc: '모든 소리를 삼키는 노래. 적 전체의 주문을 봉인한다. (확률)' },
+  song_wind: { name: '바람의 노래', kind: 'spell', mp: 8, target: 'allies', type: 'buff', buff: { spd: 1.3 }, turns: 4, anim: 'buff', desc: '경쾌한 바람의 노래. 아군 전체의 민첩을 높인다. (4턴)' },
+  dirge: { name: '진혼가', kind: 'spell', mp: 12, target: 'enemies', type: 'magic', element: 'dark', power: 34, scale: 0.75, anim: 'dark', desc: '잠들지 못한 것들을 위한 노래. 적 전체에 어둠 속성 피해.' },
+  song_solace: { name: '위로의 노래', kind: 'spell', mp: 12, target: 'allies', type: 'heal', power: 60, scale: 0.6, anim: 'heal', field: true, desc: '다정한 노래로 아군 전체를 회복한다.' },
+  stopped_time: { name: '멈춘 시간의 노래', kind: 'spell', mp: 10, target: 'enemies', type: 'debuff', buff: { spd: 0.6 }, turns: 4, chance: 0.8, anim: 'debuff', desc: '시계탑에서 부르던 노래. 적 전체의 민첩을 크게 떨어뜨린다. (확률)' },
+  grand_aria: { name: '대영창', kind: 'spell', mp: 20, target: 'allies', type: 'buff', buff: { atk: 1.3, mag: 1.3 }, turns: 4, anim: 'buff', desc: '온 힘을 다한 노래. 아군 전체의 공격력과 마력을 높인다. (4턴)' },
 
   // ── 적 기술 ──
   tackle: { name: '몸통박치기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.25, hit: -0.05, msg: '{A|이} 몸을 날려 부딪쳐 왔다!' },
@@ -178,6 +197,40 @@ const SKILLS = {
   spirit_call: { name: '모래 정령 부르기', kind: 'enemy', target: 'none', type: 'summon', summon: ['sand_spirit'], msg: '{A|이} 기도하자 모래가 일어나 정령의 모습이 되었다!' },
   mirage_spear: { name: '사구의 창', kind: 'enemy', target: 'enemy', type: 'magic', element: 'light', power: 14, scale: 0, anim: 'light', msg: '{A|이} 모래를 굳혀 만든 창을 {T|에게} 날렸다!' },
   idle_shimmer: { name: '일렁임', kind: 'enemy', target: 'none', type: 'none', msg: '{A|의} 모습이 아지랑이처럼 일렁인다…' },
+
+  // ── 제4장: 북쪽 바다 ──
+  frost_breath: { name: '얼어붙는 숨결', kind: 'enemy', target: 'enemies', type: 'magic', element: 'ice', power: 26, scale: 0.42, status: { freeze: 0.2 }, anim: 'ice', msg: '{A|이} 얼어붙는 숨결을 내뿜었다!' },
+  snow_bite: { name: '서리 이빨', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.1, status: { freeze: 0.15 }, msg: '{A|이} 서리 낀 이빨로 {T|을} 물었다!' },
+  pinch: { name: '집게 찝기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.15, msg: '{A|이} 커다란 집게로 {T|을} 찝었다!' },
+  shell_up: { name: '껍데기 굳히기', kind: 'enemy', target: 'self', type: 'buff', buff: { def: 1.6 }, turns: 3, msg: '{A|이} 단단한 껍데기 속으로 몸을 웅크렸다!' },
+  gull_dive: { name: '급강하', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.2, msg: '{A|이} 하늘에서 {T|에게} 내리꽂혔다!' },
+  ice_shard: { name: '얼음 파편', kind: 'enemy', target: 'enemy', type: 'magic', element: 'ice', power: 34, scale: 0.6, anim: 'ice', msg: '{A|이} 날카로운 얼음 파편을 날렸다!' },
+  drowned_grab: { name: '물귀신 손', kind: 'enemy', target: 'enemy', type: 'physical', mult: 0.9, status: { bind: 0.3 }, msg: '{A|이} 축축한 손으로 {T|의} 발목을 움켜쥐었다!' },
+  lantern_wail: { name: '등불의 곡소리', kind: 'enemy', target: 'enemies', type: 'magic', element: 'dark', power: 18, scale: 0.4, status: { silence: 0.2 }, anim: 'dark', msg: '{A|이} 가느다란 곡소리를 냈다…' },
+  grey_flame: { name: '잿빛 불길', kind: 'enemy', target: 'enemies', type: 'magic', element: 'fire', power: 30, scale: 0.5, anim: 'fire', msg: '잿빛 불꽃이 차갑게 타오르며 일행을 휘감았다!' },
+  ink_spray: { name: '먹물 뿌리기', kind: 'enemy', target: 'enemies', type: 'magic', element: 'dark', power: 12, scale: 0.2, debuffAll: { hit: 0.75 }, anim: 'dark', msg: '{A|이} 시커먼 먹물을 뿜었다!' },
+  lure_light: { name: '유혹의 불빛', kind: 'enemy', target: 'enemies', type: 'status', status: { sleep: 0.3 }, anim: 'light', msg: '{A|의} 머리 위 불빛이 가물가물 흔들린다…' },
+  // 보스: 서리엄니
+  tusk_aim: { name: '엄니 겨누기', kind: 'enemy', target: 'enemy', type: 'charge', next: 'tusk_crush', msg: '{A|이} 얼음 위에서 몸을 낮추고 {T|을} 노려본다…', hint: '[y]미끄러지듯 덮쳐 올 것이다![/]' },
+  tusk_crush: { name: '빙판 돌진', kind: 'enemy', target: 'enemy', type: 'physical', mult: 2.3, anim: 'impact', msg: '{A|이} 빙판 위를 미끄러져 {T|에게} 엄니를 박았다!' },
+  ice_armor: { name: '얼음 갑옷', kind: 'enemy', target: 'self', type: 'buff', buff: { def: 1.8 }, turns: 3, msg: '{A|의} 몸이 두꺼운 얼음으로 뒤덮였다!' },
+  // 보스: 제4성부 오르카
+  anchor_aim: { name: '닻 겨누기', kind: 'enemy', target: 'enemy', type: 'charge', next: 'anchor_crash', msg: '{A|이} 녹슨 닻을 휘두르며 {T|을} 가리켰다. "다음은 너다."', hint: '[y]거대한 닻이 날아들 것이다…[/]' },
+  anchor_crash: { name: '닻 내리치기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 2.2, anim: 'impact', msg: '{A|이} 거대한 닻을 {T|에게} 내리꽂았다!' },
+  saber_slash: { name: '해군도', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.1, anim: 'slash', msg: '{A|이} 녹슨 해군도로 {T|을} 베었다!' },
+  cold_command: { name: '얼음 바다의 호령', kind: 'enemy', target: 'enemies', type: 'magic', element: 'ice', power: 30, scale: 0.5, status: { freeze: 0.15 }, anim: 'ice', msg: '{A|이} 호령하자 갑판 위로 차가운 파도가 덮쳤다!' },
+  high_tide: { name: '밀물', kind: 'enemy', target: 'none', type: 'none', msg: '{A|이} 나침반을 돌렸다. 밀물이 차오르며 그의 몸을 감싼다… 칼날도 물결에 미끄러질 것 같다.' },
+  low_tide: { name: '썰물', kind: 'enemy', target: 'none', type: 'none', msg: '{A|이} 나침반을 돌렸다. 썰물이 빠져나가며 소용돌이가 인다… 주문의 빛이 휘어진다.' },
+  crab_call: { name: '게 떼 부르기', kind: 'enemy', target: 'none', type: 'summon', summon: ['ice_crab', 'ice_crab'], msg: '{A|이} 집게를 딱딱 부딪치자 바위틈에서 게들이 몰려나왔다!' },
+  crew_call: { name: '선원 소집', kind: 'enemy', target: 'none', type: 'summon', summon: ['drowned_sailor', 'drowned_sailor'], msg: '"전원 갑판으로!" 물속에서 선원들이 기어 올라왔다!' },
+  // 보스: 심해의 수호자 레비아
+  tentacle_grab: { name: '휘감기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 0.8, status: { bind: 0.6 }, msg: '{A|이} {T|을} 휘감아 들어 올렸다!' },
+  tentacle_lash: { name: '촉수 후려치기', kind: 'enemy', target: 'enemies', type: 'physical', mult: 0.6, anim: 'quake', msg: '{A|이} 일행을 후려쳤다!' },
+  wave_rise: { name: '파도 일으키기', kind: 'enemy', target: 'none', type: 'charge', next: 'tidal_wave', msg: '{A|이} 깊이 숨을 들이쉬자 바닷물이 솟구치기 시작한다…', hint: '[y]거대한 파도가 밀려온다! 파도를 끌어올리는 것들이 많을수록 높아질 것이다…[/]' },
+  tidal_wave: { name: '해일', kind: 'enemy', target: 'enemies', type: 'magic', element: null, power: 44, scale: 0.55, anim: 'wave', msg: '쿠르르르──! 해일이 일행을 덮쳤다!' },
+  great_wave: { name: '대해일', kind: 'enemy', target: 'enemies', type: 'magic', element: null, power: 70, scale: 0.7, anim: 'wave', msg: '촉수들이 끌어올린 거대한 해일이 일행을 덮쳤다!' },
+  regrow: { name: '촉수 재생', kind: 'enemy', target: 'none', type: 'summon', summon: ['levia_tentacle'], msg: '{A|의} 몸에서 새 촉수가 꿈틀거리며 자라났다!' },
+  abyss_song: { name: '심해의 노래', kind: 'enemy', target: 'enemies', type: 'magic', element: 'dark', power: 24, scale: 0.4, status: { sleep: 0.3 }, anim: 'dark', msg: '{A|이} 깊은 바다 밑바닥의 노래를 불렀다…' },
 
   // ── 보스: 철엄니 ──
   tusk: { name: '엄니 찌르기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.2, msg: '{A|이} 쇠 같은 엄니로 들이받았다!' },

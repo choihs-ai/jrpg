@@ -65,6 +65,20 @@ const TILES = {
   '8': { name: 'floorTemple' },
   '9': { name: 'quicksand', solid: true },
   '/': { name: 'cliffRed', solid: true },
+  // 북쪽 바다
+  'σ': { name: 'snow' },
+  'τ': { name: 'snowPine', solid: true },
+  'ι': { name: 'ice', slide: true },            // 밟으면 막힐 때까지 미끄러진다
+  'Ψ': { name: 'wallIce', solid: true },
+  'π': { name: 'dock', road: true },
+  'δ': { name: 'deck' },
+  'ρ': { name: 'hull', solid: true },
+  'μ': { name: 'mast', solid: true },
+  'κ': { name: 'floorCoral' },
+  'Κ': { name: 'wallCoral', solid: true },
+  'ς': { name: 'seaweed', solid: true },
+  'λ': { name: 'iconLighthouse' },
+  'θ': { name: 'iconIceCave' },
   // 실내
   'I': { name: 'wallIn', solid: true },
   'w': { name: 'floorWood' },

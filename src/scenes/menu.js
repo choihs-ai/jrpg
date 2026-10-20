@@ -42,7 +42,7 @@ const Menu = (() => {
       UI.drawWindow(ctx, 176, 12, 452, 388);
       const st = Game.state;
       const ids = st.party.concat(st.reserve);
-      const rowH = ids.length > 4 ? 72 : 90;
+      const rowH = ids.length > 5 ? 60 : ids.length > 4 ? 72 : 90;
       ids.forEach((id, i) => memberRow(ctx, id, 196, 30 + i * rowH, 412, { reserve: i >= st.party.length }));
       UI.drawWindow(ctx, 176, 406, 452, 62);
       Text.draw(ctx, `[y]${Game.gold}G[/]`, 196, 416, { size: 20, bold: true });
@@ -400,7 +400,8 @@ const Menu = (() => {
           Text.draw(ctx, '주문·특기', 440, 150, { size: 15, color: Theme.gold });
           // 기술이 많으면 두 줄로 나눠 적는다
           const two = m.skills.length > 6;
-          m.skills.slice(0, 14).forEach((sk, i) => Text.draw(ctx, `${SKILLS[sk].kind === 'spell' ? '◆' : '◇'} ${SKILLS[sk].name}`, 440 + (two ? Math.floor(i / 7) * 92 : 0), 174 + (two ? i % 7 : i) * 21, { size: two ? 13 : 14, maxW: two ? 88 : 180 }));
+          const rows = m.skills.length > 14 ? 8 : 7, lh = rows === 8 ? 18 : 21;
+          m.skills.slice(0, rows * 2).forEach((sk, i) => Text.draw(ctx, `${SKILLS[sk].kind === 'spell' ? '◆' : '◇'} ${SKILLS[sk].name}`, 440 + (two ? Math.floor(i / rows) * 92 : 0), 174 + (two ? i % rows : i) * (two ? lh : 21), { size: two ? (rows === 8 ? 12 : 13) : 14, maxW: two ? 88 : 180 }));
           const nextLearn = Object.keys(def.learn).map(Number).filter((l) => l > m.level).sort((a, b) => a - b)[0];
           if (nextLearn) Text.draw(ctx, `Lv ${nextLearn}: ???`, 440, two ? 322 : 174 + m.skills.length * 21, { size: 13, color: Theme.dim });
           const lines = Text.layout(ctx, def.bio.replace('주인공', Game.heroName()), 570, 15);

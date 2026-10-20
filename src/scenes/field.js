@@ -5,7 +5,7 @@
 const Field = (() => {
   const TS = 16, VW = 20, VH = 15;
   const DIRV = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
-  const SPEED_WALK = 4.6, SPEED_RUN = 7.6, NPC_SPEED = 2.6;
+  const SPEED_WALK = 4.6, SPEED_RUN = 7.6, SPEED_SLIDE = 9, NPC_SPEED = 2.6;
 
   let map = null, rt = null;
   const pl = { x: 0, y: 0, dir: 'down', fromX: 0, fromY: 0, t: 1, moving: false, phase: 0, speed: SPEED_WALK };
@@ -179,7 +179,7 @@ const Field = (() => {
   }
 
   // ── 이동 ──
-  function startMove(dir) {
+  function startMove(dir, sliding) {
     pl.dir = dir;
     const [dx, dy] = DIRV[dir];
     const nx = pl.x + dx, ny = pl.y + dy;
@@ -207,9 +207,11 @@ const Field = (() => {
     pl.fromX = pl.x; pl.fromY = pl.y;
     pl.x = nx; pl.y = ny;
     pl.t = 0; pl.moving = true;
-    pl.speed = (Input.isHeld('run') ? !Settings.get('autoRun') : Settings.get('autoRun')) ? SPEED_RUN : SPEED_WALK;
+    pl.speed = sliding ? SPEED_SLIDE : (Input.isHeld('run') ? !Settings.get('autoRun') : Settings.get('autoRun')) ? SPEED_RUN : SPEED_WALK;
     return true;
   }
+  // 얼음 칸: 밟으면 같은 방향으로 막힐 때까지 미끄러진다
+  const slideAt = (x, y) => { const t = TILES[tileAt(x, y)]; return !!(t && t.slide); };
   function bump() {
     if (bumpT <= 0) { Sound.sfx('bump'); bumpT = 0.3; }
   }
@@ -260,9 +262,9 @@ const Field = (() => {
         return true;
       }
     }
-    // 인카운터
+    // 인카운터 (미끄러지는 동안은 없음)
     const z = encZone(pl.x, pl.y);
-    if (z && grace <= 0 && st.ward <= 0 && !Game.flag('debug_noenc')) {
+    if (z && grace <= 0 && st.ward <= 0 && !Game.flag('debug_noenc') && !slideAt(pl.x, pl.y)) {
       encLeft -= TILES[tileAt(pl.x, pl.y)].road ? 0.6 : 1;
       if (encLeft <= 0) {
         resetEnc();
@@ -407,14 +409,18 @@ const Field = (() => {
       for (const dname of ['up', 'down', 'left', 'right']) {
         const [dx, dy] = DIRV[dname];
         const nx = cx + dx, ny = cy + dy;
-        const k = key(nx, ny);
-        if (prev.has(k) || !inBounds(nx, ny)) continue;
+        if (!inBounds(nx, ny)) continue;
         if (blocked(nx, ny, 'player')) continue;
         // 워프 칸은 목적지일 때만 통과
         if (warpAt(nx, ny) && !(nx === tx && ny === ty)) continue;
+        // 얼음 위에서는 멈출 때까지 미끄러진 곳이 다음 칸
+        let sx = nx, sy = ny;
+        while (slideAt(sx, sy) && !warpAt(sx, sy) && inBounds(sx + dx, sy + dy) && !blocked(sx + dx, sy + dy, 'player')) { sx += dx; sy += dy; }
+        const k = key(sx, sy);
+        if (prev.has(k)) continue;
         prev.set(k, [cx, cy, dname]);
-        if (goal(nx, ny)) { found = [nx, ny]; q.length = 0; break; }
-        q.push([nx, ny]);
+        if (goal(sx, sy)) { found = [sx, sy]; q.length = 0; break; }
+        q.push([sx, sy]);
       }
     }
     if (!found) return null;
@@ -481,7 +487,8 @@ const Field = (() => {
         if (pl.onArrive) { const cb = pl.onArrive; pl.onArrive = null; cb(); }
         else {
           const stop = onStepEnd();
-          if (!stop && canControl && !busy) continueMove();
+          if (!stop && !busy && slideAt(pl.x, pl.y) && startMove(pl.dir, true)) { /* 미끄러지는 중 */ }
+          else if (!stop && canControl && !busy) continueMove();
         }
       }
     } else if (canControl) {
@@ -656,6 +663,16 @@ const Field = (() => {
     }
     // 날씨: 모래바람
     const weather = typeof map.weather === 'function' ? map.weather() : map.weather;
+    if (weather === 'snow') {
+      g.fillStyle = 'rgba(200,220,255,0.12)'; g.fillRect(0, 0, Engine.LW, Engine.LH);
+      g.fillStyle = 'rgba(255,255,255,0.85)';
+      for (let i = 0; i < 46; i++) {
+        const sp = 18 + (i % 4) * 7;
+        const y = (i * 41 + T * sp) % (Engine.LH + 8) - 4;
+        const x = (i * 67 + Math.sin(T * 1.3 + i) * 10 + T * 6) % Engine.LW;
+        g.fillRect(x, y, i % 3 ? 1 : 2, i % 3 ? 1 : 2);
+      }
+    }
     if (weather === 'sand') {
       g.fillStyle = 'rgba(220,170,90,0.16)'; g.fillRect(0, 0, Engine.LW, Engine.LH);
       g.fillStyle = 'rgba(250,220,160,0.55)';
