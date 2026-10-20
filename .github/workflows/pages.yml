@@ -11,15 +11,13 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  # 모든 푸시에서 단일 파일 빌드를 확인한다
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -30,9 +28,22 @@ jobs:
           node tools/build.mjs
           mkdir -p _site
           cp dist/starbell-jrpg.html _site/index.html
-      - uses: actions/configure-pages@v5
+      - name: Logic tests
+        run: |
+          node tests/unit.mjs
+          node tests/validate-maps.mjs
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
+  # github-pages 환경은 main 에서만 배포할 수 있다
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v5
       - id: deployment
         uses: actions/deploy-pages@v4
