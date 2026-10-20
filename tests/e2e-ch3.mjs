@@ -36,7 +36,7 @@ d.battlePolicy = async (d, s) => {
     const target = boss || foes[0];
     const weak = target ? Object.keys(target.elem).filter((k) => target.elem[k] > 1).sort((x, y) => target.elem[y] - target.elem[x]) : [];
     return {
-      id: a.id, mp: a.mp, hp: a.hp / a.mhp, skills: a.ref.skills,
+      id: a.id, mp: a.mp, hp: a.hp / a.mhp, skills: a.ref.skills, silenced: !!a.status.silence,
       defend: !!marked, low: low.length, dead, mirage: foes.some((e) => e.def.mirage),
       targetId: target ? target.uid : null, weak, boss: !!boss, many: foes.length >= 3,
       buffDef: core.party.some((p) => p.buffs.def && p !== a), buffAtk: core.party.some((p) => p.buffs.atk), regen: core.party.some((p) => p.buffs.regen),
@@ -53,6 +53,7 @@ d.battlePolicy = async (d, s) => {
     await d.key('Enter'); await sleep(80);
   };
   const menu = async (col, name, aim = true) => {
+    if (col === 1 && info.silenced) return false;
     await d.pickInList(col); await sleep(120);
     const st = await d.state();
     if (!st.items || st.items[0] === '공격') return false;
