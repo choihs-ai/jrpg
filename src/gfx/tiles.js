@@ -7,7 +7,7 @@ const Tiles = (() => {
   const cache = new Map();
   // 바닥 위에 올려 그리는 물체 타일
   const OBJ = new Set(['T', 'Y', 'Z', 'r', 'F', 'e', 'l', 'S', 'o', 'x', 'X', 'j', 'P', 'g', 'b', 't', 'h', 'p', 'a', 'z', '*', 'A', 'V', 'U', 'K', 'C', '|', 'O', '@', 'J', 'd']);
-  const ANIM = new Set(['~', '&', 'f', '*', 'V', 'C', '@', 'v', '1']);
+  const ANIM = new Set(['~', '&', 'f', '*', 'V', 'C', '@', 'v', '1', 'Z']);
 
   const C = {
     g0: '#5fae4c', g1: '#4f9b3f', g2: '#76c45e', g3: '#3f8a35',
@@ -90,7 +90,12 @@ const Tiles = (() => {
       p.circle(8, 6, 6, C.treeD); p.circle(8, 6, 5, C.tree);
       p.circle(6, 4, 3, C.treeL); p.px(5, 3, '#7ccc6c'); p.px(10, 8, C.treeD); p.px(11, 6, C.treeD);
     },
-    'Z': (p) => D['T'](p), // 비밀 나무 — 똑같이 보인다
+    // 비밀 나무 — 겉모습은 나무 그대로지만, 바람이 지나가는 길이라 잎이 살랑이며 날린다
+    'Z': (p, v, f) => {
+      D['T'](p);
+      p.px(1 + f * 2, 9, '#9be07c'); p.px(3 + f, 11, '#7ccc6c'); p.px(0 + f * 3, 6, '#b8f09a');
+      p.px(12 - f * 2, 12, '#9be07c'); p.px(14 - f, 8, '#7ccc6c');
+    },
     'Y': (p) => {
       p.ellipse(8, 14, 5, 2, 'rgba(0,0,0,0.25)');
       p.rect(7, 12, 2, 3, C.trunk);

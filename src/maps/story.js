@@ -82,7 +82,7 @@ const Story = {
       Game.setFlag('visited_hunter');
       S.stage('main2', 1);
       await S.say(null, '[y]목표 갱신: 북쪽 고개를 넘어 유적으로 향한다[/]');
-      await S.say('사냥꾼 고르도', ['…그리고 하나 더. 혹시 숲에서 내 사냥개 바우를 보면 알려 주게. 사흘째 돌아오지 않아.', '녀석은 서쪽 숲의 「늙은 나무 사이로 바람이 지나가는 길」을 좋아했지.']);
+      await S.say('사냥꾼 고르도', ['…그리고 하나 더. 혹시 숲에서 내 사냥개 바우를 보면 알려 주게. 사흘째 돌아오지 않아.', '녀석은 서쪽 숲의 「늙은 나무 사이로 바람이 지나가는 길」을 좋아했지.', '큰길에서 서쪽으로 한참 가면 나무가 한 줄로 서 있는 곳이 있어. 거기 잎이 유난히 살랑이는 나무들은 걸어서 지나갈 수 있다네. 어릴 때 나도 거기로 다녔지.']);
       await S.startQuest('s_dog');
     }
     if (Quests.isActive('s_letter') && Quests.stage('s_letter') === 0 && Game.count('letter')) {
