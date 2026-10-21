@@ -86,6 +86,9 @@ function policy(core, a) {
     if (a.id !== 'mio' || core.boss || bestDmg > physAtk * 1.5) return best;
   }
   if (a.id === 'mio' && !core.boss) return { kind: 'attack', target: foes[0] };
+  // 4장: 동료를 휘감은 촉수를 먼저 끊는다
+  const holder = (() => { const v = allies.find((x) => x.status.bind && x.bindBy); return v && foes.find((f) => f.uid === v.bindBy); })();
+  if (holder && a.atk > a.mag) return has('bash') ? { kind: 'skill', skill: 'bash', target: holder } : { kind: 'attack', target: holder };
   const bossT = foes.find((f) => f.defId === 'clock_guardian') || foes.find((f) => f.def.boss) || foes[0];
   if (core.party.length === 1 && a.hp / a.mhp < 0.4 && (Game.count('hi_potion') || Game.count('potion'))) return { kind: 'item', item: Game.count('hi_potion') ? 'hi_potion' : 'potion', target: a };
   if (has('stellar_blade') && core.boss) return { kind: 'skill', skill: 'stellar_blade', target: bossT };
@@ -117,7 +120,9 @@ function fight(enemies, opts = {}) {
   return { win: core.result === 'win', rounds, hpLeft, deaths, exp: core.killed.reduce((n, e) => n + e.def.exp, 0) };
 }
 
+const ONLY = process.env.ONLY ? new RegExp(process.env.ONLY) : null; // 예: ONLY=오르카 node tests/sim-balance.mjs
 function run(label, n, setupFn, enemiesFn, opts) {
+  if (ONLY && !ONLY.test(label)) return 0;
   let wins = 0, rounds = 0, hp = 0, deaths = 0;
   for (let i = 0; i < n; i++) {
     setupFn();
@@ -276,6 +281,7 @@ const E_CH4 = {
 };
 const POT4 = { hi_potion: 5, mega_potion: 4, hi_ether: 3, feather: 2, warm_soup: 4 };
 const P4C = ['hero', 'bran', 'linette', 'cassandra'];
+const P4M = ['hero', 'bran', 'mio', 'cassandra'];
 console.log('\n── 제4장: 해안 · 해식 동굴 ──');
 run('Lv23 4인 ch3 gear coast', N, () => setup(P4, 23, E_CH3, POT4), encounter('coast'));
 run('Lv24 4인 ch4 gear icecave', N, () => setup(P4, 24, E_CH4, POT4), encounter('icecave'));
@@ -287,11 +293,13 @@ for (const L of [24, 25, 26]) run(`Lv${L} 4인 ch4 gear 잿빛 불꽃`, N, () =>
 run('Lv26 4인 ch4 gear ship', N, () => setup(P4, 26, E_CH4, POT4), encounter('ship'));
 run('Lv26 4인 ch4 gear 따개비 탐욕상자', N, () => setup(P4, 26, E_CH4, POT4), () => ['barnacle_chest']);
 for (const L of [25, 26, 27]) run(`Lv${L} 4인 ch4 gear 오르카`, N, () => setup(P4, L, E_CH4, POT4), () => ['orca'], { boss: true });
-for (const L of [25, 26]) run(`Lv${L} 카산드라 포함 ch4 gear 오르카`, N, () => setup(P4C, L, E_CH4, POT4), () => ['orca'], { boss: true });
+for (const L of [25, 26, 27]) run(`Lv${L} 카산드라 포함 ch4 gear 오르카`, N, () => setup(P4C, L, E_CH4, POT4), () => ['orca'], { boss: true });
+for (const L of [25, 26, 27]) run(`Lv${L} 미오+카산드라 ch4 gear 오르카`, N, () => setup(P4M, L, E_CH4, POT4), () => ['orca'], { boss: true });
 console.log('── 가라앉은 신전 ──');
 run('Lv27 4인 ch4 gear sunken', N, () => setup(P4, 27, E_CH4, POT4), encounter('sunken'));
 for (const L of [26, 27, 28, 29]) run(`Lv${L} 4인 ch4 gear 레비아`, N, () => setup(P4, L, E_CH4, POT4), () => ['levia_tentacle', 'levia', 'levia_tentacle'], { boss: true });
 for (const L of [27, 28]) run(`Lv${L} 카산드라 포함 ch4 gear 레비아`, N, () => setup(P4C, L, E_CH4, POT4), () => ['levia_tentacle', 'levia', 'levia_tentacle'], { boss: true });
+for (const L of [28, 29, 30]) run(`Lv${L} 미오+카산드라 ch4 gear 레비아`, N, () => setup(P4M, L, E_CH4, POT4), () => ['levia_tentacle', 'levia', 'levia_tentacle'], { boss: true });
 NAIVE = true;
 run('NAIVE Lv24 서리엄니', N, () => setup(P4, 24, E_CH4, POT4), () => ['frost_walrus'], { boss: true });
 run('NAIVE Lv27 오르카', N, () => setup(P4, 27, E_CH4, POT4), () => ['orca'], { boss: true });

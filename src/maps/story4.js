@@ -337,15 +337,15 @@ Object.assign(Story, {
   async frozenLetter() {
     await S.say(null, ['(겉봉에 번진 글씨: 「마레아의 엘사에게」)', '(뒷면에는 「은빛 갈매기호 갑판원 한스」라고 적혀 있다.)']);
     await Story.line('linette', '은빛 갈매기호… 15년 전에 가라앉은 배예요. 이 편지, 15년 동안 얼음 속에 있었던 거예요.');
-    if (!Quests.get('s_letter')) await S.startQuest('s_letter');
+    if (!Quests.get('s_frozen')) await S.startQuest('s_frozen');
   },
   async elsa() {
-    if (Quests.isActive('s_letter') && Game.count('frozen_letter')) {
+    if (Quests.isActive('s_frozen') && Game.count('frozen_letter')) {
       await S.say('엘사', ['…이 글씨. 한스의 글씨야.', '(엘사는 떨리는 손으로 편지를 펼쳤다.)']);
       await S.say(null, '「엘사. 이번 항해가 끝나면 그 반지를 정식으로 끼워 줄게. 갈매기호가 돌아오는 날, 등대 불빛 아래에서 기다려 줘. ─ 한스」');
       await S.say('엘사', ['…바보. 15년이나 늦었잖아.', '(엘사는 한참 동안 울다가, 앞치마에 얼굴을 닦고 웃었다.)', '고마워요. 이제야 기다림을 끝낼 수 있겠어요. 이건… 그 사람이 주려던 반지예요. 바다로 나가는 당신들이 가져가요.']);
       Game.removeItem('frozen_letter', 1);
-      await S.completeQuest('s_letter');
+      await S.completeQuest('s_frozen');
       return;
     }
     await S.say('엘사', byP({

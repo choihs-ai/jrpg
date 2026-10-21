@@ -1,4 +1,5 @@
 // 핵심 시스템 단위 테스트 (전투 규칙 · 인벤토리 · 장비 · 성장 · 퀘스트 · 저장)
+import { readFileSync } from 'node:fs';
 import { loadGame } from './load.mjs';
 const G = loadGame();
 const { Game, BattleCore, SKILLS, ITEMS, Quests, Save, Util } = G;
@@ -481,6 +482,23 @@ t('4장 진행도: 플래그 순서대로 25 → 32', () => {
   Game.setFlag('chapter3_done'); eq(Game.progress(), 24);
   const steps = ['ch4_started', 'reached_marea', 'cave4_open', 'walrus_defeated', 'cassandra_joined', 'orca_defeated', 'levia_defeated', 'chapter4_done'];
   steps.forEach((f, i) => { Game.setFlag(f); eq(Game.progress(), 25 + i, f); });
+});
+
+t('데이터 표에 같은 키가 두 번 정의되지 않는다', () => {
+  // 객체 리터럴의 중복 키는 조용히 앞의 정의를 덮어쓰므로 소스에서 직접 찾는다
+  const files = ['src/data/items.js', 'src/data/skills.js', 'src/data/monsters.js', 'src/data/characters.js', 'src/systems/quests.js'];
+  for (const f of files) {
+    let seen = null;
+    readFileSync(new URL('../' + f, import.meta.url), 'utf8').split('\n').forEach((ln, i) => {
+      if (/^const \w+ = \{/.test(ln)) seen = new Map();
+      else if (/^\};?/.test(ln)) seen = null;
+      const m = seen && ln.match(/^  ([A-Za-z_$][\w$]*)\s*:/);
+      if (!m) return;
+      if (seen.has(m[1])) throw new Error(`${f}:${i + 1} '${m[1]}' 중복 (처음 ${seen.get(m[1])}행)`);
+      seen.set(m[1], i + 1);
+    });
+  }
+  eq(G.QUESTS.s_letter.giver, '여관 주인 마르타');
 });
 
 console.log(`\n${pass} passed, ${fail} failed`);

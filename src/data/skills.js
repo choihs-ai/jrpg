@@ -98,15 +98,15 @@ const SKILLS = {
   holy_wave: { name: '성스러운 물결', kind: 'spell', mp: 16, target: 'enemies', type: 'magic', element: 'light', power: 40, scale: 0.8, anim: 'light', desc: '빛의 물결로 적 전체를 씻어 낸다. 빛 속성.' },
   shadow_bind: { name: '그림자 묶기', kind: 'skill', mp: 8, target: 'enemy', type: 'physical', mult: 1.1, status: { bind: 0.5 }, anim: 'slash', desc: '적의 그림자를 단검으로 꿰뚫어 묶는다. 확률로 속박.' },
   // 카산드라 (노래 — 주문처럼 침묵에 막힌다)
-  song_valor: { name: '용기의 노래', kind: 'spell', mp: 8, target: 'allies', type: 'buff', buff: { atk: 1.3, mag: 1.3 }, turns: 4, anim: 'buff', desc: '힘찬 행진곡. 아군 전체의 공격력과 마력을 높인다. (4턴)' },
+  song_valor: { name: '용기의 노래', kind: 'spell', mp: 8, target: 'allies', type: 'buff', buff: { atk: 1.3, mag: 1.3 }, turns: 5, anim: 'buff', desc: '힘찬 행진곡. 아군 전체의 공격력과 마력을 높인다. (5턴)' },
   lullaby: { name: '잠의 노래', kind: 'spell', mp: 6, target: 'enemies', type: 'status', status: { sleep: 0.45 }, anim: 'mist', desc: '나지막한 노래로 적 전체를 재운다. (확률)' },
-  song_ward: { name: '수호의 노래', kind: 'spell', mp: 9, target: 'allies', type: 'buff', buff: { def: 1.35, regen: 1.06 }, turns: 4, anim: 'buff', desc: '굳건한 화음. 아군 전체의 방어력을 높이고, 턴이 끝날 때마다 HP를 조금씩 회복시킨다. (4턴)' },
+  song_ward: { name: '수호의 노래', kind: 'spell', mp: 9, target: 'allies', type: 'buff', buff: { def: 1.35, regen: 1.06 }, turns: 5, anim: 'buff', desc: '굳건한 화음. 아군 전체의 방어력을 높이고, 턴이 끝날 때마다 HP를 조금씩 회복시킨다. (5턴)' },
   hush_song: { name: '정적의 노래', kind: 'spell', mp: 7, target: 'enemies', type: 'status', status: { silence: 0.5 }, anim: 'debuff', desc: '모든 소리를 삼키는 노래. 적 전체의 주문을 봉인한다. (확률)' },
-  song_wind: { name: '바람의 노래', kind: 'spell', mp: 8, target: 'allies', type: 'buff', buff: { spd: 1.3 }, turns: 4, anim: 'buff', desc: '경쾌한 바람의 노래. 아군 전체의 민첩을 높인다. (4턴)' },
-  dirge: { name: '진혼가', kind: 'spell', mp: 12, target: 'enemies', type: 'magic', element: null, power: 46, scale: 0.9, anim: 'dark', desc: '잠들지 못한 것들을 위한 노래. 속성 없는 노래가 적 전체를 울린다.' },
+  song_wind: { name: '바람의 노래', kind: 'spell', mp: 8, target: 'allies', type: 'buff', buff: { spd: 1.3 }, turns: 5, anim: 'buff', desc: '경쾌한 바람의 노래. 아군 전체의 민첩을 높인다. (5턴)' },
+  dirge: { name: '진혼가', kind: 'spell', mp: 12, target: 'enemies', type: 'magic', element: null, power: 56, scale: 1.0, anim: 'dark', desc: '잠들지 못한 것들을 위한 노래. 속성 없는 노래가 적 전체를 울린다.' },
   song_solace: { name: '위로의 노래', kind: 'spell', mp: 12, target: 'allies', type: 'heal', power: 60, scale: 0.6, anim: 'heal', field: true, desc: '다정한 노래로 아군 전체를 회복한다.' },
-  stopped_time: { name: '멈춘 시간의 노래', kind: 'spell', mp: 10, target: 'enemies', type: 'debuff', buff: { spd: 0.6 }, turns: 4, chance: 1.0, anim: 'debuff', desc: '시계탑에서 부르던 노래. 적 전체의 민첩을 크게 떨어뜨린다. (확률)' },
-  grand_aria: { name: '대영창', kind: 'spell', mp: 20, target: 'allies', type: 'buff', buff: { atk: 1.45, mag: 1.45, spd: 1.2 }, turns: 4, anim: 'buff', desc: '온 힘을 다한 노래. 아군 전체의 공격력·마력·민첩을 크게 높인다. (4턴)' },
+  stopped_time: { name: '멈춘 시간의 노래', kind: 'spell', mp: 10, target: 'enemies', type: 'debuff', buff: { spd: 0.6, hit: 0.8 }, turns: 4, chance: 1.0, anim: 'debuff', desc: '시계탑에서 부르던 노래. 적 전체의 민첩과 명중률을 크게 떨어뜨린다. (확률)' },
+  grand_aria: { name: '대영창', kind: 'spell', mp: 20, target: 'allies', type: 'buff', buff: { atk: 1.45, mag: 1.45, spd: 1.2 }, turns: 5, anim: 'buff', desc: '온 힘을 다한 노래. 아군 전체의 공격력·마력·민첩을 크게 높인다. (5턴)' },
 
   // ── 적 기술 ──
   tackle: { name: '몸통박치기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.25, hit: -0.05, msg: '{A|이} 몸을 날려 부딪쳐 왔다!' },

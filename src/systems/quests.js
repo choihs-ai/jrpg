@@ -140,7 +140,7 @@ const QUESTS = {
     ],
     reward: { gold: 1800, items: [['sailor_knot', 1]] },
   },
-  s_letter: {
+  s_frozen: {
     name: '얼어붙은 편지', type: 'sub', giver: '해식 동굴의 얼음',
     desc: '해식 동굴의 얼음 속에서 15년 전의 편지를 꺼냈다. 「마레아의 엘사에게 ─ 은빛 갈매기호 갑판원 한스」',
     stages: [{ goal: '선술집 「갈매기」의 엘사에게 편지를 전한다', hint: '편지가 부르는 사람을 마을에서 찾아보자', target: { map: 'marea', x: 5, y: 20 } }],

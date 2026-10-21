@@ -306,7 +306,7 @@ defMap('tavern', {
   npcs: [
     {
       id: 'elsa', x: 10, y: 3, look: 'innkeeper', dir: 'down',
-      mark: () => Quests.isActive('s_letter'),
+      mark: () => Quests.isActive('s_frozen'),
       talk: () => Story.elsa(),
     },
     { id: 'tavern_sailor1', x: 2, y: 6, look: 'sailor', dir: 'right', talk: async () => { await S.say('취한 뱃사람', byP({ 25: ['해식 동굴의 서리엄니 녀석? 얼음 갑옷을 두르면 작살도 튕겨 나가지.', '그 녀석을 녹이는 건… 뻔하지 않나? 여기 엘사 수프처럼 뜨거운 거. 딸꾹.'], 30: '유령선 선장이 오르카였다니… 그 함장은 우리 아버지 세대의 영웅이었어.' })); } },
@@ -582,7 +582,7 @@ defMap('sunken1', {
     }
   },
   objects: [
-    { type: 'event', x: 8, y: 15, solid: true, art: 'plaque', run: async () => { await S.say(null, ['벽에 새겨진 오래된 벽화. 거대한 문어 같은 수호자가 종을 감싸 안고 있다.', '「수호자의 팔이 많을수록 바다는 높이 일어난다. 팔을 거두어라, 그러면 파도도 눕는다.」']); } },
+    { type: 'event', x: 8, y: 15, solid: true, art: 'plaque', run: async () => { await S.say(null, ['벽에 새겨진 오래된 벽화. 거대한 문어 같은 수호자가 종을 감싸 안고 있다.', '「수호자의 팔이 많을수록 바다는 높이 일어난다. 팔을 거두어라, 그러면 파도도 눕는다.」', '그 아래에 반쯤 지워진 글귀가 이어진다. 「…하늘이 으르렁대는 밤이면, 수호자는 깊은 곳으로 몸을 숨겼다…」']); } },
     { type: 'chest', id: 'sk_ne', x: 22, y: 1, item: 'seafoam_robe' },
     { type: 'chest', id: 'sk_nw', x: 1, y: 1, item: 'elixir' },
     { type: 'chest', id: 'sk_w', x: 1, y: 11, item: 'mega_potion', n: 3 },

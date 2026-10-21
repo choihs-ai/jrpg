@@ -123,12 +123,13 @@ export class Driver {
           if (st.moving || st.x !== before.x || st.y !== before.y || st.busy || st.map !== before.map) { moved = true; break; }
         }
         await this.page.keyboard.up(keyOf[d]);
-        for (let i = 0; i < 60; i++) { const st = await this.state(); if (!st.moving) break; await sleep(15); }
+        // 얼음 위에서는 긴 미끄러짐이 끝날 때까지 기다린다 (중간에 다음 키를 누르면 경로가 어긋남)
+        for (let i = 0; i < 240; i++) { const st = await this.state(); if (!st.moving) break; await sleep(15); }
         const after = await this.state();
         if (!moved) { this.log(`  ! blocked going ${d} at (${before.x},${before.y})`); interrupted = true; break; }
         if (after.busy || after.map !== before.map || after.inBattle) { interrupted = true; break; }
       }
-      if (!interrupted) { const s2 = await this.pump(); if (opts.adjacent || (s2.x === x && s2.y === y)) return true; }
+      if (!interrupted) { const s2 = await this.pump(); if (opts.adjacent ? Math.abs(s2.x - x) + Math.abs(s2.y - y) <= 1 : (s2.x === x && s2.y === y)) return true; }
     }
     throw new Error(`walkTo(${x},${y}) failed`);
   }
