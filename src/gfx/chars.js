@@ -333,6 +333,13 @@ const LOOKS = {
   messenger: { hair: '#2a2a2a', style: 'bandana', hat: '#d8b040', cloth: '#7a5a3a', accent: '#e8dcc0', pants: '#5a4030', skin: '#b8804a' },
   raider: { hair: '#2a2a2a', style: 'bandana', hat: '#3a3a3a', cloth: '#7a4a2a', accent: '#c4473a', pants: '#3a2a1a', skin: '#b07850' },
   nadia: { hair: '#b8b0a8', style: 'bun', cloth: '#c8a878', accent: '#3a6ab0', pants: '#a88858', skin: '#b07850', extras: ['robe'] },
+  gregor: { hair: '#5a5a68', style: 'cap', hat: '#1a2440', cloth: '#2a3a5a', accent: '#d8b040', pants: '#2a2a38', boots: '#1a1424', extras: ['beard', 'cape'] },
+  eda: { hair: '#c8784a', style: 'pony', cloth: '#c4473a', accent: '#f4f4f4', pants: '#4a3a5a', extras: ['blush'] },
+  bartol: { hair: '#e8e8f0', style: 'bald', cloth: '#5a6a7a', accent: '#d8b040', pants: '#3a3a48', extras: ['beard'] },
+  sailor: { hair: '#4a3a2a', style: 'bandana', hat: '#3f63b8', cloth: '#f4f4f4', accent: '#3f63b8', pants: '#2a3a5a' },
+  fisherF: { hair: '#5a3a24', style: 'bun', cloth: '#5a7a8a', accent: '#e8dcc0', pants: '#4a5a6a', extras: ['apron'] },
+  northKid: { hair: '#e8c070', style: 'short', cloth: '#6a8ab0', accent: '#f4f4f4', pants: '#4a5a6a', extras: ['blush'] },
+  orca: { hair: '#6a7a78', style: 'hat', hat: '#1a2440', cloth: '#2a3a5a', accent: '#d8b040', pants: '#2a2a38', boots: '#1a1424', skin: '#a8b8b0', extras: ['beard', 'cape'] },
   teller: { hair: '#4a2a5a', style: 'hood', cloth: '#6a3fa0', accent: '#ffd75e', pants: '#4a2a6a', skin: '#c88a5a', extras: ['robe'] },
   mushking: 'critter:mushroom',
 };

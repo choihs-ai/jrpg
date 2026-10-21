@@ -32,6 +32,19 @@ function policy(core, a) {
   const low = allies.filter((x) => x.hp / x.mhp < 0.45).sort((x, y) => x.hp / x.mhp - y.hp / y.mhp);
   const dead = core.party.filter((x) => !x.alive);
   if (dead.length && has('revive')) return { kind: 'skill', skill: 'revive', target: dead[0] };
+  // 4장: 얼거나 붙잡힌 동료 풀어 주기
+  const stuck = allies.find((x) => x.status.freeze || (x.status.bind && x.status.bind > 1));
+  if (stuck && a.id === 'mio' && has('chime_cleanse') && allies.filter((x) => x.status.freeze || x.status.bind).length >= 2) return { kind: 'skill', skill: 'chime_cleanse' };
+  if (stuck && a.id === 'mio' && has('cure')) return { kind: 'skill', skill: 'cure', target: stuck };
+  if (stuck && stuck.status.freeze && Game.count('warm_soup') && a.id !== 'linette') return { kind: 'item', item: 'warm_soup', target: stuck };
+  // 카산드라: 보스전에서는 노래로 받쳐 준다
+  if (a.id === 'cassandra') {
+    if (low.length >= 2 && has('song_solace')) return { kind: 'skill', skill: 'song_solace' };
+    if (core.boss && has('song_valor') && !allies.some((x) => x.buffs.mag && x.buffs.mag.mult > 1)) return { kind: 'skill', skill: 'song_valor' };
+    if (core.boss && has('song_ward') && !allies.some((x) => x.buffs.regen)) return { kind: 'skill', skill: 'song_ward' };
+    if (core.boss && has('stopped_time') && !foes.some((x) => x.buffs.spd)) return { kind: 'skill', skill: 'stopped_time' };
+    if (has('dirge') && (foes.length >= 2 || core.boss)) return { kind: 'skill', skill: 'dirge' };
+  }
   // 3장: 신기루는 통찰로 걷어낸다
   if (a.id === 'hero' && has('insight') && foes.some((e) => e.def.mirage)) return { kind: 'skill', skill: 'insight' };
   if (low.length >= 2 && has('mother_song')) return { kind: 'skill', skill: 'mother_song' };
@@ -50,27 +63,32 @@ function policy(core, a) {
     if (charging.charging === 'rampage' && charging.mem.markTarget === a) return { kind: 'defend' };
   }
   if (a.id === 'bran' && charging && charging.charging === 'rampage' && has('cover') && charging.mem.markTarget !== a) return { kind: 'skill', skill: 'cover', target: charging.mem.markTarget };
-  if (charging && charging.charging === 'queen_strike' && charging.mem.mark === a) return { kind: 'defend' };
+  if (charging && ['queen_strike', 'tusk_crush', 'anchor_crash'].includes(charging.charging) && charging.mem.mark === a) return { kind: 'defend' };
   if (charging && charging.charging === 'falling_sand' && (a.mhp < 420 || a.hp / a.mhp < 0.6)) return { kind: 'defend' };
+  if (charging && charging.charging === 'tidal_wave' && a.hp / a.mhp < 0.5) return { kind: 'defend' };
   if (a.id === 'mio' && has('regen') && core.boss && !allies.some((x) => x.buffs.regen) && core.round % 4 === 2) return { kind: 'skill', skill: 'regen' };
   if (a.id === 'mio' && has('protect') && core.boss && !allies.some((x) => x.buffs.def) && core.round % 4 === 1) return { kind: 'skill', skill: 'protect' };
   if (a.id === 'bran' && has('warcry') && core.boss && !allies.some((x) => x.buffs.atk) ) return { kind: 'skill', skill: 'warcry' };
-  // 약점 공격
+  // 약점 공격 (물때 자세로 막히는 쪽은 피한다)
+  const guardOf = (f) => (f.mem && f.mem.guard) || {};
   const spells = st.skills.filter((s) => has(s) && SKILLS[s].type === 'magic');
   let best = null, bestDmg = 0;
   for (const s of spells) {
     const sk = SKILLS[s];
     for (const t of sk.target === 'enemies' ? [foes[0]] : foes) {
       const n = sk.target === 'enemies' ? foes.reduce((acc, f) => acc + f.elemMult(sk.element) * core.barrierMult(f), 0) : t.elemMult(sk.element) * core.barrierMult(t);
-      const dmg = (sk.power + a.mag * sk.scale) * n;
+      const dmg = (sk.power + a.mag * sk.scale) * n * (guardOf(t || foes[0]).mag || 1);
       if (dmg > bestDmg) { bestDmg = dmg; best = { kind: 'skill', skill: s, target: sk.target === 'enemies' ? null : t }; }
     }
   }
-  const physAtk = (a.atk * a.atk) / (a.atk + foes[0].defense);
+  const physAtk = (a.atk * a.atk) / (a.atk + foes[0].defense) * (guardOf(foes[0]).phys || 1);
   if (best && (bestDmg > physAtk * 1.1 || a.id === 'linette' || a.id === 'mio')) {
     if (a.id !== 'mio' || core.boss || bestDmg > physAtk * 1.5) return best;
   }
   if (a.id === 'mio' && !core.boss) return { kind: 'attack', target: foes[0] };
+  // 4장: 동료를 휘감은 촉수를 먼저 끊는다
+  const holder = (() => { const v = allies.find((x) => x.status.bind && x.bindBy); return v && foes.find((f) => f.uid === v.bindBy); })();
+  if (holder && a.atk > a.mag) return has('bash') ? { kind: 'skill', skill: 'bash', target: holder } : { kind: 'attack', target: holder };
   const bossT = foes.find((f) => f.defId === 'clock_guardian') || foes.find((f) => f.def.boss) || foes[0];
   if (core.party.length === 1 && a.hp / a.mhp < 0.4 && (Game.count('hi_potion') || Game.count('potion'))) return { kind: 'item', item: Game.count('hi_potion') ? 'hi_potion' : 'potion', target: a };
   if (has('stellar_blade') && core.boss) return { kind: 'skill', skill: 'stellar_blade', target: bossT };
@@ -102,7 +120,9 @@ function fight(enemies, opts = {}) {
   return { win: core.result === 'win', rounds, hpLeft, deaths, exp: core.killed.reduce((n, e) => n + e.def.exp, 0) };
 }
 
+const ONLY = process.env.ONLY ? new RegExp(process.env.ONLY) : null; // 예: ONLY=오르카 node tests/sim-balance.mjs
 function run(label, n, setupFn, enemiesFn, opts) {
+  if (ONLY && !ONLY.test(label)) return 0;
   let wins = 0, rounds = 0, hp = 0, deaths = 0;
   for (let i = 0; i < n; i++) {
     setupFn();
@@ -248,4 +268,44 @@ NAIVE = false;
 console.log('── 평균 보상 (3장) ──');
 for (const z of ['canyon', 'desert', 'sandcave', 'temple']) console.log(`${z.padEnd(12)} ${avgExp(z)} EXP  ${avgGold(z)} G`);
 for (const L of [17, 18, 19, 20, 21, 22, 23, 24]) process.stdout.write(`Lv${L}:${G.expForLevel(L)}  `);
+console.log();
+
+// ════════ 제4장 ════════
+const E_CH4 = {
+  hero: { weapon: 'flame_saber', armor: 'whale_mail', shield: 'coral_shield', helm: 'fur_hood', accessory: 'courage_token' },
+  bran: { weapon: 'tide_axe', armor: 'whale_mail', shield: 'squire_shield', helm: 'captain_hat' },
+  linette: { weapon: 'pearl_staff', armor: 'seafoam_robe', helm: 'fur_hood', accessory: 'sage_earring' },
+  mio: { weapon: 'pearl_staff', armor: 'seafoam_robe', helm: 'fur_hood', accessory: 'aria_chime' },
+  nell: { weapon: 'coral_dagger', armor: 'sealskin_coat', helm: 'fur_hood' },
+  cassandra: { weapon: 'siren_harp', armor: 'seafoam_robe', helm: 'fur_hood' },
+};
+const POT4 = { hi_potion: 5, mega_potion: 4, hi_ether: 3, feather: 2, warm_soup: 4 };
+const P4C = ['hero', 'bran', 'linette', 'cassandra'];
+const P4M = ['hero', 'bran', 'mio', 'cassandra'];
+console.log('\n── 제4장: 해안 · 해식 동굴 ──');
+run('Lv23 4인 ch3 gear coast', N, () => setup(P4, 23, E_CH3, POT4), encounter('coast'));
+run('Lv24 4인 ch4 gear icecave', N, () => setup(P4, 24, E_CH4, POT4), encounter('icecave'));
+for (const L of [23, 24, 25]) run(`Lv${L} 4인 ch3 gear 서리엄니`, N, () => setup(P4, L, E_CH3, POT4), () => ['frost_walrus'], { boss: true });
+for (const L of [23, 24]) run(`Lv${L} 4인 ch4 gear 서리엄니`, N, () => setup(P4, L, E_CH4, POT4), () => ['frost_walrus'], { boss: true });
+run('Lv25 4인 ch4 gear 집게왕', N, () => setup(P4, 25, E_CH4, POT4), () => ['king_crab'], { boss: true });
+console.log('── 등대 · 유령선 ──');
+for (const L of [24, 25, 26]) run(`Lv${L} 4인 ch4 gear 잿빛 불꽃`, N, () => setup(P4, L, E_CH4, POT4), () => ['choir_elite', 'grey_wisp', 'choir_elite'], { boss: true });
+run('Lv26 4인 ch4 gear ship', N, () => setup(P4, 26, E_CH4, POT4), encounter('ship'));
+run('Lv26 4인 ch4 gear 따개비 탐욕상자', N, () => setup(P4, 26, E_CH4, POT4), () => ['barnacle_chest']);
+for (const L of [25, 26, 27]) run(`Lv${L} 4인 ch4 gear 오르카`, N, () => setup(P4, L, E_CH4, POT4), () => ['orca'], { boss: true });
+for (const L of [25, 26, 27]) run(`Lv${L} 카산드라 포함 ch4 gear 오르카`, N, () => setup(P4C, L, E_CH4, POT4), () => ['orca'], { boss: true });
+for (const L of [25, 26, 27]) run(`Lv${L} 미오+카산드라 ch4 gear 오르카`, N, () => setup(P4M, L, E_CH4, POT4), () => ['orca'], { boss: true });
+console.log('── 가라앉은 신전 ──');
+run('Lv27 4인 ch4 gear sunken', N, () => setup(P4, 27, E_CH4, POT4), encounter('sunken'));
+for (const L of [26, 27, 28, 29]) run(`Lv${L} 4인 ch4 gear 레비아`, N, () => setup(P4, L, E_CH4, POT4), () => ['levia_tentacle', 'levia', 'levia_tentacle'], { boss: true });
+for (const L of [27, 28]) run(`Lv${L} 카산드라 포함 ch4 gear 레비아`, N, () => setup(P4C, L, E_CH4, POT4), () => ['levia_tentacle', 'levia', 'levia_tentacle'], { boss: true });
+for (const L of [28, 29, 30]) run(`Lv${L} 미오+카산드라 ch4 gear 레비아`, N, () => setup(P4M, L, E_CH4, POT4), () => ['levia_tentacle', 'levia', 'levia_tentacle'], { boss: true });
+NAIVE = true;
+run('NAIVE Lv24 서리엄니', N, () => setup(P4, 24, E_CH4, POT4), () => ['frost_walrus'], { boss: true });
+run('NAIVE Lv27 오르카', N, () => setup(P4, 27, E_CH4, POT4), () => ['orca'], { boss: true });
+run('NAIVE Lv28 레비아', N, () => setup(P4, 28, E_CH4, POT4), () => ['levia_tentacle', 'levia', 'levia_tentacle'], { boss: true });
+NAIVE = false;
+console.log('── 평균 보상 (4장) ──');
+for (const z of ['coast', 'icecave', 'ship', 'sunken']) console.log(`${z.padEnd(12)} ${avgExp(z)} EXP  ${avgGold(z)} G`);
+for (const L of [24, 25, 26, 27, 28, 29, 30]) process.stdout.write(`Lv${L}:${G.expForLevel(L)}  `);
 console.log();

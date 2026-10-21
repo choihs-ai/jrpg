@@ -706,6 +706,24 @@ const Sound = (() => {
       mel: `E5.4 G5.4 B5.6 A5.2 G5.4 E5.4 C5.8 A4.4 C5.4 E5.4 D5.4 D#5.8 B4.8
             E5.4 B5.4 G5.6 F#5.2 G5.4 B5.4 D6.8 C6.4 B5.4 A5.4 E5.4 F#5.4 D#5.4 B4.8`,
     },
+    harbor: {
+      bpm: 96, bar: 16, loop: true, bass: 'hits', arp: 'up8', drums: 'pulse', lead: 'p25', leadVol: 0.085,
+      chords: 'G Em C D G Em C G',
+      mel: `D5.4 G5.4 B5.4 A5.4 G5.4 E5.4 B4.8 C5.4 E5.4 G5.4 E5.4 D5.4 F#5.4 A5.8
+            B5.4 A5.2 G5.2 D5.4 G5.4 E5.4 G5.4 B5.4 G5.4 C6.4 B5.4 A5.4 F#5.4 G5.12 r.4`,
+    },
+    northsea: {
+      bpm: 100, bar: 16, loop: true, bass: 'long', arp: 'slow', drums: 'pulse', lead: 'p25', leadVol: 0.08,
+      chords: 'Em Em C D Em Em Am B',
+      mel: `E5.4 G5.4 B5.6 A5.2 G5.4 F#5.4 E5.8 C5.4 E5.4 G5.4 C6.4 B5.4 A5.4 F#5.8
+            E5.4 B5.4 E6.6 D6.2 B5.4 G5.4 E5.8 A5.4 C6.4 E6.4 C6.4 B5.4 A5.2 G5.2 F#5.4 D#5.4`,
+    },
+    ghostship: {
+      bpm: 84, bar: 16, loop: true, bass: 'long', arp: 'slow', drums: 'pulse', lead: 'p12', leadVol: 0.08,
+      chords: 'Dm A Dm Gm Dm Bb A A',
+      mel: `D5.6 F5.2 A5.4 F5.4 E5.6 C#5.2 A4.8 D5.4 F5.4 A5.4 D6.4 Bb5.6 A5.2 G5.8
+            F5.4 A5.4 D6.6 C6.2 Bb5.4 F5.4 D5.8 C#5.4 E5.4 A5.4 G5.4 F5.4 E5.4 C#5.4 A4.4`,
+    },
     levelup: { bpm: 170, bar: 16, loop: false, bass: 'none', arp: 'none', drums: 'none', lead: 'p25', leadVol: 0.1, chords: 'C', mel: `C5.2 E5.2 G5.2 C6.4 r.2 G5.2 C6.8` },
     item: { bpm: 150, bar: 16, loop: false, bass: 'none', arp: 'none', drums: 'none', lead: 'p25', leadVol: 0.1, chords: 'G', mel: `G5.2 A5.2 B5.2 D6.6 r.4` },
     inn: {
@@ -1710,9 +1728,11 @@ const Pix = (() => {
 const Tiles = (() => {
   const S = 16;
   const cache = new Map();
+  // 벽면(앞면) 판정에 쓰는 벽 문자들
+  const WALLS = '#&%017ΨΚρ';
   // 바닥 위에 올려 그리는 물체 타일
-  const OBJ = new Set(['T', 'Y', 'Z', 'r', 'F', 'e', 'l', 'S', 'o', 'x', 'X', 'j', 'P', 'g', 'b', 't', 'h', 'p', 'a', 'z', '*', 'A', 'V', 'U', 'K', 'C', '|', 'O', '@', 'J', 'd', '3', '4', '6', '?', '(', ')']);
-  const ANIM = new Set(['~', '&', 'f', '*', 'V', 'C', '@', 'v', '1', 'Z', '9', '?']);
+  const OBJ = new Set(['T', 'Y', 'Z', 'r', 'F', 'e', 'l', 'S', 'o', 'x', 'X', 'j', 'P', 'g', 'b', 't', 'h', 'p', 'a', 'z', '*', 'A', 'V', 'U', 'K', 'C', '|', 'O', '@', 'J', 'd', '3', '4', '6', '?', '(', ')', 'τ', 'μ', 'ς', 'λ', 'θ']);
+  const ANIM = new Set(['~', '&', 'f', '*', 'V', 'C', '@', 'v', '1', 'Z', '9', '?', 'ς', 'λ', 'ι']);
 
   const C = {
     g0: '#5fae4c', g1: '#4f9b3f', g2: '#76c45e', g3: '#3f8a35',
@@ -2068,11 +2088,11 @@ const Tiles = (() => {
       p.px(4, 5, '#e8d0a0'); p.px(11, 6, '#e8d0a0');
     },
     '7': (p, v, f, nb) => {
-      const face = nb && nb.d !== undefined && !'#&%017'.includes(nb.d);
+      const face = nb && nb.d !== undefined && !WALLS.includes(nb.d);
       if (face) { bricks(p, '#b89868', '#8a6a40', '#d8b884', 4); p.rect(0, 0, 16, 2, '#4a3a24'); p.rect(0, 15, 16, 1, '#3a2a18'); p.px(4 + v, 7, '#e8c070'); }
       else {
         p.fill('#4a3a24'); p.noise(['#5a4830', '#3a2a18'], 0.18, 161 + v);
-        if (nb) { const open = (c) => c !== undefined && !'#&%017 '.includes(c); if (open(nb.l)) p.rect(0, 0, 1, 16, '#6a5838'); if (open(nb.r)) p.rect(15, 0, 1, 16, '#6a5838'); if (open(nb.u)) p.rect(0, 0, 16, 1, '#6a5838'); }
+        if (nb) { const open = (c) => c !== undefined && !(WALLS + ' ').includes(c); if (open(nb.l)) p.rect(0, 0, 1, 16, '#6a5838'); if (open(nb.r)) p.rect(15, 0, 1, 16, '#6a5838'); if (open(nb.u)) p.rect(0, 0, 16, 1, '#6a5838'); }
       }
     },
     '8': (p, v) => {
@@ -2178,14 +2198,14 @@ const Tiles = (() => {
     },
     // 던전
     '#': (p, v, f, nb) => {
-      const face = nb && nb.d !== undefined && !'#&%017'.includes(nb.d);
+      const face = nb && nb.d !== undefined && !WALLS.includes(nb.d);
       if (face) {
         bricks(p, C.dWall, C.dWallD, C.dWallL, 4);
         p.rect(0, 0, 16, 2, C.dTop); p.rect(0, 15, 16, 1, '#1e1b28');
       } else {
         p.fill(C.dTop); p.noise(['#2f2c3a', '#1d1a26'], 0.18, 91 + v);
         if (nb) {
-          const open = (c) => c !== undefined && !'#&%017 '.includes(c);
+          const open = (c) => c !== undefined && !(WALLS + ' ').includes(c);
           if (open(nb.l)) p.rect(0, 0, 1, 16, '#3a3648');
           if (open(nb.r)) p.rect(15, 0, 1, 16, '#3a3648');
           if (open(nb.u)) p.rect(0, 0, 16, 1, '#3a3648');
@@ -2229,6 +2249,89 @@ const Tiles = (() => {
     '$': (p, v) => { p.fill('#07050c'); p.noise(['#2a1a40', '#1a1028'], 0.05, 97 + v); },
     'y': (p, v) => { p.fill('#5a4a3a'); p.noise(['#4a3c2e', '#6a5a48'], 0.15, 99 + v); },
     'O': (p) => { p.rect(0, 2, 16, 14, '#6a6680'); p.rect(0, 2, 16, 2, '#9a96b0'); p.rect(0, 14, 16, 2, '#3a3648'); p.rect(3, 6, 10, 1, '#c4a050'); },
+    // 북쪽 바다
+    'σ': (p, v) => {
+      p.fill('#e6edf6'); p.noise(['#d2dbe8', '#f6f9fd'], 0.12, 201 + v);
+      if (v % 2) { p.px(4, 5, '#c4cfe0'); p.px(5, 5, '#c4cfe0'); p.px(11, 11, '#c4cfe0'); }
+      p.px(3 + v * 3, 9, '#ffffff');
+    },
+    'τ': (p) => {
+      p.ellipse(8, 14, 5, 2, 'rgba(60,80,110,0.25)');
+      p.rect(7, 12, 2, 3, '#5a3a24');
+      for (let y = 1; y < 13; y++) { const w = Math.floor(1 + (y % 5) * 0.9 + y * 0.35); p.rect(8 - w, y, w * 2, 1, y % 5 === 0 ? '#e8f0fa' : y % 5 === 1 ? '#f6f9fd' : '#2a5a46'); }
+      p.px(8, 0, '#f6f9fd'); p.px(5, 6, '#f6f9fd'); p.px(11, 11, '#f6f9fd');
+    },
+    'ι': (p, v, f) => {
+      p.fill('#a8d8f0'); p.noise(['#98cce8', '#bce4f6'], 0.08, 211 + v);
+      p.line(2 + v, 13, 9 + v, 6, '#d8f2ff'); p.line(5, 15, 13, 7, '#c8ecfc');
+      p.px(11 - v, 3, '#78b0d0'); p.px(12 - v, 4, '#78b0d0');
+      if (f && v === 1) p.px(4, 4, '#ffffff');
+    },
+    'Ψ': (p, v, f, nb) => {
+      const face = nb && nb.d !== undefined && !WALLS.includes(nb.d);
+      if (face) {
+        bricks(p, '#7ab8d8', '#4a88a8', '#a8dcf0', 4); p.rect(0, 0, 16, 2, '#1e3a52'); p.rect(0, 15, 16, 1, '#163048');
+        p.line(3 + v, 3, 5 + v, 12, '#d8f2ff');
+      } else {
+        p.fill('#1e3a52'); p.noise(['#28485e', '#163048'], 0.18, 221 + v);
+        if (nb) { const open = (c) => c !== undefined && !(WALLS + ' ').includes(c); if (open(nb.l)) p.rect(0, 0, 1, 16, '#4a7898'); if (open(nb.r)) p.rect(15, 0, 1, 16, '#4a7898'); if (open(nb.u)) p.rect(0, 0, 16, 1, '#4a7898'); }
+      }
+    },
+    'π': (p, v) => {
+      p.fill('#8a6a4a');
+      for (let y = 0; y < 16; y += 4) { p.rect(0, y + 3, 16, 1, '#5a4430'); p.rect(0, y, 16, 1, '#a8885e'); p.px(((y / 4 + v) % 2) * 8 + 2, y + 1, '#4a3420'); }
+    },
+    'δ': (p, v) => {
+      p.fill('#6a4a30');
+      for (let x = 0; x < 16; x += 4) { p.rect(x + 3, 0, 1, 16, '#4a3020'); p.rect(x, 0, 1, 16, '#80603e'); }
+      p.px(5 + v * 2, (v * 5) % 16, '#3a2414'); p.noise(['#5a3e28'], 0.04, 231 + v);
+    },
+    'ρ': (p, v, f, nb) => {
+      const face = nb && nb.d !== undefined && !WALLS.includes(nb.d);
+      if (face) {
+        p.fill('#4a3020');
+        for (let y = 2; y < 16; y += 3) { p.rect(0, y, 16, 1, '#2e1c10'); p.rect(0, y + 1, 16, 1, '#5a3c28'); }
+        p.rect(0, 0, 16, 2, '#7a5a3a'); p.rect(0, 0, 16, 1, '#a08060'); p.px(3 + v * 3, 8, '#8a8a98');
+      } else {
+        p.fill('#24160c'); p.noise(['#2e1c10', '#1a0e06'], 0.15, 241 + v);
+        if (nb) { const open = (c) => c !== undefined && !(WALLS + ' ').includes(c); if (open(nb.l)) p.rect(0, 0, 2, 16, '#7a5a3a'); if (open(nb.r)) p.rect(14, 0, 2, 16, '#7a5a3a'); if (open(nb.u)) p.rect(0, 0, 16, 2, '#7a5a3a'); }
+      }
+    },
+    'μ': (p) => {
+      p.ellipse(8, 14, 5, 2, 'rgba(0,0,0,0.3)');
+      p.rect(6, 0, 4, 15, '#5a3a20'); p.rect(6, 0, 1, 15, '#8a6040'); p.rect(4, 12, 8, 3, '#3a2414');
+      p.line(1, 0, 6, 6, '#c8b890'); p.line(15, 0, 10, 6, '#c8b890');
+    },
+    'κ': (p, v) => {
+      p.fill('#2e5a68'); p.noise(['#28505e', '#3a6a78'], 0.12, 251 + v);
+      p.ellipse(4 + v * 2, 11, 2, 1, '#4a8090'); p.px(12 - v, 4, '#88c8d8');
+    },
+    'Κ': (p, v, f, nb) => {
+      const face = nb && nb.d !== undefined && !WALLS.includes(nb.d);
+      if (face) {
+        bricks(p, '#3a6878', '#20485a', '#5a8a98', 4); p.rect(0, 0, 16, 2, '#0e2a34'); p.rect(0, 15, 16, 1, '#0a2028');
+        p.px(4 + v * 2, 6, '#e87a8a'); p.px(5 + v * 2, 5, '#e87a8a'); p.px(11, 10, '#f0a0a8');
+      } else {
+        p.fill('#0e2a34'); p.noise(['#143440', '#0a2028'], 0.18, 261 + v);
+        if (nb) { const open = (c) => c !== undefined && !(WALLS + ' ').includes(c); if (open(nb.l)) p.rect(0, 0, 1, 16, '#2a5a6a'); if (open(nb.r)) p.rect(15, 0, 1, 16, '#2a5a6a'); if (open(nb.u)) p.rect(0, 0, 16, 1, '#2a5a6a'); }
+      }
+    },
+    'ς': (p, v, f) => {
+      p.ellipse(8, 14, 5, 1, 'rgba(0,0,0,0.3)');
+      const sw = f ? 1 : -1;
+      for (const [x0, h, c] of [[4, 11, '#2a8a5a'], [8, 13, '#3aa86a'], [12, 9, '#2a8a5a']]) {
+        for (let y = 0; y < h; y++) p.px(x0 + Math.round(Math.sin((y + x0) * 0.6) * 1.2 * sw), 14 - y, c);
+      }
+    },
+    'λ': (p, v, f) => {
+      p.ellipse(8, 15, 5, 1, 'rgba(60,80,110,0.3)');
+      for (let y = 4; y < 15; y++) { const w = 2 + Math.floor((y - 4) * 0.3); p.rect(8 - w, y, w * 2, 1, Math.floor(y / 3) % 2 ? '#c4473a' : '#f4f4f4'); }
+      p.rect(5, 2, 6, 2, '#3a3a48'); p.rect(6, 0, 4, 2, f ? '#fff4a0' : '#ffd75e');
+    },
+    'θ': (p) => {
+      p.ellipse(8, 9, 7, 6, '#7ab8d8'); p.ellipse(8, 8, 6, 5, '#a8dcf0'); p.ellipse(8, 11, 3, 3, '#10202e'); p.rect(5, 11, 6, 3, '#10202e');
+      p.px(3, 6, '#ffffff'); p.px(12, 5, '#ffffff'); p.line(6, 3, 7, 6, '#d8f2ff');
+    },
     ' ': (p) => p.fill('#000'),
   };
 
@@ -2246,7 +2349,7 @@ const Tiles = (() => {
     }
   }
 
-  const NB_TILES = new Set(['~', 'I', '#', '&', '%', 'R', 'Q', 'G', 'c', 'v', '1', '7', '[']);
+  const NB_TILES = new Set(['~', 'I', '#', '&', '%', 'R', 'Q', 'G', 'c', 'v', '1', '7', '[', 'Ψ', 'Κ', 'ρ']);
 
   function get(ch, v, f, nbKey, nb) {
     const key = ch + v + '|' + f + '|' + (nbKey || '');
@@ -2280,7 +2383,7 @@ const Tiles = (() => {
       else if (ch === 'c') nbKey = ['u', 'd', 'l', 'r'].map((k) => (nb[k] === undefined || nb[k] === 'c' ? 0 : 1)).join('');
       else if (ch === '[') nbKey = (nb.d === '[' ? 'T' : 'F') + (nb.u === '[' ? 'T' : 'F');
       else if (ch === 'I') nbKey = nb.d !== undefined && nb.d !== 'I' ? 'F' : 'T';
-      else nbKey = (nb.d !== undefined && !'#&%017'.includes(nb.d) ? 'F' : 'T') + ['u', 'l', 'r'].map((k) => (nb[k] !== undefined && !'#&%017 '.includes(nb[k]) ? 1 : 0)).join('');
+      else nbKey = (nb.d !== undefined && !WALLS.includes(nb.d) ? 'F' : 'T') + ['u', 'l', 'r'].map((k) => (nb[k] !== undefined && !(WALLS + ' ').includes(nb[k]) ? 1 : 0)).join('');
     }
     g.drawImage(get(ch, OBJ.has(ch) ? 0 : v, f, nbKey, nb), sx, sy);
   }
@@ -2296,6 +2399,8 @@ const Tiles = (() => {
     '2': '#e2cd90', '3': '#3f9a4a', '4': '#4a9a4a', '5': '#d8b884', '6': '#c4473a', '[': '#e8d0a0', '?': '#3c7fd6', '(': '#ffd75e', ')': '#8a6a40', '7': '#4a3a24', '8': '#c8a878', '9': '#8a6a3a', '/': '#a8583a',
     'C': '#ffd75e', 'M': '#d8d4cc', '@': '#3c7fd6', 'J': '#bcbcca', 'd': '#c4473a', 'v': '#4a5a2a', '+': '#5a5a66', '1': '#c4a050',
     'O': '#6a6680', 'P': '#9d9cab', '|': '#55556a', '0': '#6a6680', '&': '#25222f', '%': '#25222f', 'k': '#c8925a', 'L': '#5e3818',
+    'σ': '#e6edf6', 'τ': '#2a5a46', 'ι': '#a8d8f0', 'Ψ': '#1e3a52', 'π': '#8a6a4a', 'δ': '#6a4a30', 'ρ': '#24160c', 'μ': '#5a3a20',
+    'κ': '#2e5a68', 'Κ': '#0e2a34', 'ς': '#3aa86a', 'λ': '#ffd75e', 'θ': '#7ab8d8',
   };
 
   return { get, drawAt, OBJ, MINI, S };
@@ -2638,6 +2743,13 @@ const LOOKS = {
   messenger: { hair: '#2a2a2a', style: 'bandana', hat: '#d8b040', cloth: '#7a5a3a', accent: '#e8dcc0', pants: '#5a4030', skin: '#b8804a' },
   raider: { hair: '#2a2a2a', style: 'bandana', hat: '#3a3a3a', cloth: '#7a4a2a', accent: '#c4473a', pants: '#3a2a1a', skin: '#b07850' },
   nadia: { hair: '#b8b0a8', style: 'bun', cloth: '#c8a878', accent: '#3a6ab0', pants: '#a88858', skin: '#b07850', extras: ['robe'] },
+  gregor: { hair: '#5a5a68', style: 'cap', hat: '#1a2440', cloth: '#2a3a5a', accent: '#d8b040', pants: '#2a2a38', boots: '#1a1424', extras: ['beard', 'cape'] },
+  eda: { hair: '#c8784a', style: 'pony', cloth: '#c4473a', accent: '#f4f4f4', pants: '#4a3a5a', extras: ['blush'] },
+  bartol: { hair: '#e8e8f0', style: 'bald', cloth: '#5a6a7a', accent: '#d8b040', pants: '#3a3a48', extras: ['beard'] },
+  sailor: { hair: '#4a3a2a', style: 'bandana', hat: '#3f63b8', cloth: '#f4f4f4', accent: '#3f63b8', pants: '#2a3a5a' },
+  fisherF: { hair: '#5a3a24', style: 'bun', cloth: '#5a7a8a', accent: '#e8dcc0', pants: '#4a5a6a', extras: ['apron'] },
+  northKid: { hair: '#e8c070', style: 'short', cloth: '#6a8ab0', accent: '#f4f4f4', pants: '#4a5a6a', extras: ['blush'] },
+  orca: { hair: '#6a7a78', style: 'hat', hat: '#1a2440', cloth: '#2a3a5a', accent: '#d8b040', pants: '#2a2a38', boots: '#1a1424', skin: '#a8b8b0', extras: ['beard', 'cape'] },
   teller: { hair: '#4a2a5a', style: 'hood', cloth: '#6a3fa0', accent: '#ffd75e', pants: '#4a2a6a', skin: '#c88a5a', extras: ['robe'] },
   mushking: 'critter:mushroom',
 };
@@ -2959,6 +3071,58 @@ const MonsterArt = (() => {
       L(g, 31, 26, 38, 32, p.skin, 3); Poly(g, [36, 32, 44, 14, 42, 12, 34, 30], p.blade); Poly(g, [43, 13, 44, 8, 40, 12], p.blade);
       L(g, 13, 26, 8, 34, p.skin, 3);
     } },
+
+    // ── 제4장 ──
+    crab: { w: 64, h: 44, draw(g, p) {
+      for (let i = 0; i < 3; i++) { L(g, 22 + i * 6, 32, 14 + i * 5, 42, p.dark, 2.5); L(g, 42 - i * 6, 32, 50 - i * 5, 42, p.dark, 2.5); }
+      E(g, 32, 28, 17, 10, p.dark); E(g, 32, 27, 16, 9, p.body); E(g, 28, 23, 8, 3, p.light);
+      L(g, 27, 20, 25, 12, p.dark, 2); L(g, 37, 20, 39, 12, p.dark, 2); eye(g, 25, 11, 2.2, '#140c1c', p.eye); eye(g, 39, 11, 2.2, '#140c1c', p.eye);
+      L(g, 18, 26, 8, 18, p.body, 4); E(g, 6, 13, 7, 6, p.claw); Poly(g, [0, 8, 6, 6, 4, 13], p.dark); E(g, 9, 10, 2, 1.5, p.light);
+      L(g, 46, 26, 56, 18, p.body, 4); E(g, 58, 13, 7, 6, p.claw); Poly(g, [64, 8, 58, 6, 60, 13], p.dark); E(g, 55, 10, 2, 1.5, p.light);
+      if (p.frost) { for (let i = 0; i < 6; i++) R(g, 20 + i * 4, 20 + (i % 2) * 2, 2, 1, '#ffffff'); }
+      if (p.crown) Poly(g, [24, 19, 25, 12, 28, 16, 32, 10, 36, 16, 39, 12, 40, 19], p.crown);
+    } },
+    walrus: { w: 96, h: 76, draw(g, p) {
+      E(g, 48, 72, 40, 4, 'rgba(160,200,230,0.4)');
+      E(g, 52, 50, 38, 22, p.dark); E(g, 50, 48, 37, 21, p.body); E(g, 40, 40, 20, 10, p.light);
+      E(g, 20, 66, 12, 5, p.dark); E(g, 80, 68, 12, 5, p.dark);
+      E(g, 26, 34, 20, 18, p.body); E(g, 24, 40, 12, 8, p.muzzle); for (let i = 0; i < 6; i++) R(g, 16 + i * 3, 40 + (i % 2), 1, 1, p.dark);
+      eye(g, 18, 26, 2.4, '#140c1c', p.eye); eye(g, 32, 25, 2.4, '#140c1c', p.eye);
+      Poly(g, [18, 44, 22, 44, 19, 66], p.tusk); Poly(g, [28, 44, 32, 44, 31, 66], p.tusk);
+      if (p.ice) { for (let i = 0; i < 5; i++) Poly(g, [50 + i * 8, 30, 54 + i * 8, 18 - (i % 2) * 6, 58 + i * 8, 30], p.ice); }
+    } },
+    captain: { w: 56, h: 76, draw(g, p) {
+      E(g, 28, 74, 16, 3, 'rgba(120,200,180,0.3)');
+      R(g, 18, 50, 8, 22, p.pants); R(g, 30, 50, 8, 22, p.pants); R(g, 16, 70, 11, 4, p.boots); R(g, 29, 70, 11, 4, p.boots);
+      Poly(g, [10, 70, 14, 26, 42, 26, 46, 70], p.coat); Poly(g, [28, 26, 42, 26, 46, 70, 30, 70], p.dark);
+      R(g, 24, 26, 8, 30, p.shirt); for (let i = 0; i < 4; i++) E(g, 22, 30 + i * 7, 1.2, 1.2, p.trim); R(g, 12, 46, 32, 3, p.trim);
+      R(g, 10, 26, 8, 4, p.trim); R(g, 38, 26, 8, 4, p.trim);
+      E(g, 28, 17, 8, 9, p.skin); R(g, 21, 20, 14, 6, p.beard); E(g, 25, 16, 1.4, 1.2, p.eye); E(g, 31, 16, 1.4, 1.2, p.eye); R(g, 30, 13, 4, 1, p.dark);
+      Poly(g, [12, 10, 28, 2, 44, 10, 40, 13, 16, 13], p.hat); R(g, 16, 11, 24, 2, p.trim); E(g, 28, 7, 2, 2, p.trim);
+      L(g, 44, 34, 52, 44, p.coat, 4); L(g, 52, 44, 50, 70, p.anchor, 3); Poly(g, [42, 66, 58, 66, 56, 72, 50, 68, 44, 72], p.anchor); R(g, 46, 46, 8, 2, p.anchor);
+      L(g, 12, 34, 4, 46, p.coat, 4); L(g, 4, 46, 2, 30, p.blade, 2);
+      if (p.ghost) { g.fillStyle = 'rgba(120,220,190,0.25)'; g.fillRect(8, 0, 40, 74); }
+    } },
+    kraken: { w: 120, h: 100, draw(g, p) {
+      for (let k = 0; k < 4; k++) { const x0 = 30 + k * 20; for (let i = 0; i < 10; i++) E(g, x0 + Math.sin(i * 0.8 + k) * 8, 70 + i * 3, 6 - i * 0.4, 4, i % 2 ? p.body : p.dark); }
+      E(g, 60, 44, 44, 34, p.dark); E(g, 60, 42, 42, 32, p.body); E(g, 48, 26, 22, 12, p.light);
+      for (let i = 0; i < 7; i++) E(g, 32 + i * 9, 58 + (i % 2) * 3, 3, 2, p.spot);
+      eye(g, 42, 46, 7, '#140c1c', p.eye); eye(g, 78, 46, 7, '#140c1c', p.eye);
+      E(g, 60, 66, 14, 6, '#140c1c'); for (let i = 0; i < 6; i++) Poly(g, [48 + i * 5, 62, 51 + i * 5, 62, 49.5 + i * 5, 68], '#f0e8d0');
+      if (p.flame) { g.fillStyle = 'rgba(160,160,170,0.45)'; for (let i = 0; i < 5; i++) { g.beginPath(); g.moveTo(36 + i * 12, 14); g.lineTo(42 + i * 12, 0); g.lineTo(48 + i * 12, 14); g.fill(); } }
+    } },
+    tentacle: { w: 40, h: 80, draw(g, p) {
+      for (let i = 0; i < 16; i++) { const t = i / 15; E(g, 20 + Math.sin(t * 5) * 8, 76 - t * 70, 9 - t * 6, 6 - t * 3, i % 2 ? p.body : p.dark); }
+      for (let i = 1; i < 14; i += 2) { const t = i / 15; E(g, 14 + Math.sin(t * 5) * 8, 76 - t * 70, 2 - t, 2 - t, p.sucker); }
+    } },
+    angler: { w: 60, h: 48, draw(g, p) {
+      Poly(g, [52, 24, 60, 12, 60, 36], p.dark);
+      E(g, 30, 26, 24, 18, p.dark); E(g, 30, 25, 23, 17, p.body); E(g, 26, 18, 12, 6, p.light);
+      E(g, 12, 32, 12, 8, '#140c1c'); for (let i = 0; i < 6; i++) { Poly(g, [3 + i * 4, 26, 6 + i * 4, 26, 4.5 + i * 4, 31], '#f0e8d0'); Poly(g, [3 + i * 4, 38, 6 + i * 4, 38, 4.5 + i * 4, 34], '#f0e8d0'); }
+      eye(g, 22, 18, 3, '#140c1c', p.eye);
+      L(g, 24, 9, 16, 0, p.dark, 1.5); L(g, 16, 0, 6, 4, p.dark, 1.5); E(g, 5, 6, 4, 4, p.lure); E(g, 5, 6, 2, 2, '#ffffff');
+      Poly(g, [32, 40, 40, 48, 44, 40], p.dark); Poly(g, [32, 10, 40, 2, 44, 10], p.dark);
+    } },
   };
 
   const cache = new Map();
@@ -3152,7 +3316,36 @@ const ObjArt = (() => {
       if (!rung) { g.fillStyle = 'rgba(232,184,96,0.8)'; g.fillRect(23, 44, 2, 4); }
     });
   }
-  return { chest, lever, herb, note, rope, sparkle, windmill, bell, valve, dial, manhole, plaque, timebell, hourglass, sandbell };
+  // 등대 렌즈 (lit: 별빛으로 켜짐 / 꺼진 동안은 잿빛 불꽃) — 32x32, 두 칸을 덮는다
+  function lens(lit, t) {
+    const f = Math.floor(t * 4) % 2;
+    return once('lens' + lit + f, 32, 32, (p, g) => {
+      g.fillStyle = '#6a5a3a'; g.fillRect(4, 26, 24, 6); g.fillStyle = '#8a7a4a'; g.fillRect(4, 26, 24, 2);
+      g.fillStyle = lit ? 'rgba(255,240,160,0.35)' : 'rgba(150,150,170,0.3)'; g.beginPath(); g.arc(16, 15, 15, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#c8d8e8'; g.beginPath(); g.ellipse(16, 15, 10, 12, 0, 0, Math.PI * 2); g.fill();
+      g.strokeStyle = '#7a8a9a'; g.lineWidth = 1; for (let r = 3; r <= 11; r += 3) { g.beginPath(); g.ellipse(16, 15, r * 0.85, r, 0, 0, Math.PI * 2); g.stroke(); }
+      g.fillStyle = lit ? (f ? '#fff8c0' : '#ffe880') : (f ? '#b8b8c8' : '#9898a8');
+      g.beginPath(); g.ellipse(16, 15, 4, 5, 0, 0, Math.PI * 2); g.fill();
+      if (!lit) { g.fillStyle = 'rgba(200,200,220,0.6)'; g.fillRect(14, 6 - f, 4, 4); }
+    });
+  }
+  // 파도 종 (청록빛, 물결 문양)
+  function wavebell(rung, t) {
+    const f = rung ? Math.floor(t * 3) % 2 : 0;
+    return once('wbell' + rung + f, 48, 48, (p, g) => {
+      const body = rung ? '#7ad8d0' : '#4a8a8a', dark = '#1e4a4a', light = '#c8fff8';
+      g.fillStyle = dark; g.fillRect(22, 0, 4, 6);
+      g.fillStyle = body;
+      g.beginPath(); g.moveTo(14, 8); g.quadraticCurveTo(24, 0, 34, 8); g.lineTo(38, 34); g.lineTo(44, 40); g.lineTo(4, 40); g.lineTo(10, 34); g.closePath(); g.fill();
+      g.fillStyle = dark; g.fillRect(4, 38, 40, 4);
+      g.fillStyle = light; g.fillRect(15, 10, 3, 24);
+      g.strokeStyle = rung ? '#ffffff' : '#a8e8e0'; g.lineWidth = 1.5; g.beginPath();
+      for (let x = 12; x <= 36; x += 2) g.lineTo(x, 22 + Math.sin(x * 0.6 + f) * 2.5); g.stroke();
+      g.fillStyle = '#123a3a'; g.beginPath(); g.ellipse(24, 43, 4, 3, 0, 0, Math.PI * 2); g.fill();
+      if (!rung) { g.fillStyle = 'rgba(160,160,170,0.6)'; for (let i = 0; i < 4; i++) g.fillRect(14 + i * 6, 4 + (i % 2) * 3, 2, 4); }
+    });
+  }
+  return { chest, lever, herb, note, rope, sparkle, windmill, bell, valve, dial, manhole, plaque, timebell, hourglass, sandbell, lens, wavebell };
 })();
 
 
@@ -3163,7 +3356,7 @@ const ObjArt = (() => {
 //  kind: consumable | weapon | armor | shield | helm | accessory | key
 //  가격(price) = 구매가. 판매가는 절반. key 종류는 팔 수 없다.
 // ─────────────────────────────────────────────────────────────
-const ALL = ['hero', 'bran', 'linette', 'mio', 'nell'];
+const ALL = ['hero', 'bran', 'linette', 'mio', 'nell', 'cassandra'];
 const ITEMS = {
   // ── 소모품 ──
   herb: { name: '약초', kind: 'consumable', price: 8, desc: '아군 한 명의 HP를 약 35 회복한다.', use: { type: 'heal', amount: 35, target: 'ally' }, battle: true, field: true },
@@ -3171,16 +3364,18 @@ const ITEMS = {
   ether: { name: '마력의 이슬', kind: 'consumable', price: 120, desc: '새벽 이슬에 마력이 깃든 것. MP를 25 회복한다.', use: { type: 'mp', amount: 25, target: 'ally' }, battle: true, field: true },
   antidote: { name: '해독초', kind: 'consumable', price: 6, desc: '쓴맛이 강한 풀. 독을 치료한다.', use: { type: 'cure', cures: ['poison'], target: 'ally' }, battle: true, field: true },
   smelling: { name: '정신 드는 향', kind: 'consumable', price: 15, desc: '코를 찌르는 향. 수면과 마비를 치료한다.', use: { type: 'cure', cures: ['sleep', 'paralyze'], target: 'ally' }, battle: true, field: true },
-  panacea: { name: '만능약', kind: 'consumable', price: 60, desc: '독·수면·마비·침묵을 모두 치료한다.', use: { type: 'cure', cures: ['poison', 'sleep', 'paralyze', 'silence'], target: 'ally' }, battle: true, field: true },
+  panacea: { name: '만능약', kind: 'consumable', price: 60, desc: '독·수면·마비·침묵·빙결·속박을 모두 치료한다.', use: { type: 'cure', cures: ['poison', 'sleep', 'paralyze', 'silence', 'freeze', 'bind'], target: 'ally' }, battle: true, field: true },
   feather: { name: '되살림 깃털', kind: 'consumable', price: 150, desc: '불사조의 깃털이라 불리는 물건. 쓰러진 동료를 HP 절반으로 되살린다.', use: { type: 'revive', pct: 0.5, target: 'deadAlly' }, battle: true, field: true },
   starwater: { name: '별의 물', kind: 'consumable', price: 400, desc: '별빛을 머금은 물. 아군 한 명의 HP와 MP를 모두 회복한다.', use: { type: 'full', target: 'ally' }, battle: true, field: true },
   firebomb: { name: '화염병', kind: 'consumable', price: 45, desc: '던지면 터지는 기름병. 적 전체에 불 속성 피해(약 30).', use: { type: 'damage', power: 30, element: 'fire', target: 'enemies', anim: 'fire' }, battle: true, field: false },
-  return_wing: { name: '귀환의 날개', kind: 'consumable', price: 20, desc: '던지면 가 본 적 있는 마을(리벨·왕도·사미라)로 돌아간다. (필드·던전에서 사용)', use: { type: 'return', target: 'none' }, battle: false, field: true },
+  return_wing: { name: '귀환의 날개', kind: 'consumable', price: 20, desc: '던지면 가 본 적 있는 마을(리벨·왕도·사미라·마레아)로 돌아간다. (필드·던전에서 사용)', use: { type: 'return', target: 'none' }, battle: false, field: true },
   hi_potion: { name: '고급 상처약', kind: 'consumable', price: 90, desc: '왕도 약방의 고급 상처약. HP를 약 200 회복한다.', use: { type: 'heal', amount: 200, target: 'ally' }, battle: true, field: true },
   thunder_flask: { name: '번개병', kind: 'consumable', price: 80, desc: '마도학원 실험실에서 나온 번개를 가둔 병. 적 전체에 번개 속성 피해(약 60).', use: { type: 'damage', power: 60, element: 'thunder', target: 'enemies', anim: 'thunder' }, battle: true, field: false },
   mega_potion: { name: '오아시스의 물', kind: 'consumable', price: 220, desc: '사미라 오아시스의 맑은 샘물. HP를 약 400 회복한다.', use: { type: 'heal', amount: 400, target: 'ally' }, battle: true, field: true },
   hi_ether: { name: '사막의 이슬', kind: 'consumable', price: 320, desc: '선인장 꽃에 맺힌 진한 이슬. MP를 60 회복한다.', use: { type: 'mp', amount: 60, target: 'ally' }, battle: true, field: true },
   sand_bomb: { name: '모래 폭탄', kind: 'consumable', price: 140, desc: '모래와 화약을 섞은 폭탄. 적 전체에 피해(약 110)를 주고 명중률을 떨어뜨린다.', use: { type: 'damage', power: 110, target: 'enemies', anim: 'impact', debuffAll: { hit: 0.75 } }, battle: true, field: false },
+  elixir: { name: '엘릭서', kind: 'consumable', price: 1500, desc: '전설의 영약. 아군 한 명의 HP와 MP를 모두 회복한다.', use: { type: 'full', target: 'ally' }, battle: true, field: true },
+  warm_soup: { name: '따끈한 생선 수프', kind: 'consumable', price: 90, desc: '마레아 선술집의 명물. HP를 약 200 회복하고 빙결을 녹인다.', use: { type: 'heal', amount: 200, cures: ['freeze'], target: 'ally' }, battle: true, field: true },
   incense: { name: '정령의 향', kind: 'consumable', price: 25, desc: '마물이 싫어하는 향. 한동안(약 120걸음) 마물과 마주치지 않는다.', use: { type: 'ward', steps: 120, target: 'none' }, battle: false, field: true },
 
   // ── 무기 ──
@@ -3204,6 +3399,12 @@ const ITEMS = {
   sand_axe: { name: '사구의 도끼', kind: 'weapon', price: 2900, stats: { atk: 48, spd: -2 }, who: ['bran'], desc: '모래 바람에도 녹슬지 않는 검은 쇠 도끼. 민첩 -2.' },
   scorpion_dagger: { name: '전갈 꼬리 단검', kind: 'weapon', price: 2400, stats: { atk: 36, spd: 7 }, who: ['nell', 'hero'], onHit: { poison: 0.3 }, desc: '전갈 여왕의 꼬리를 깎아 만든 단검. 공격 시 가끔 독. 민첩 +7.' },
   sun_staff: { name: '태양의 지팡이', kind: 'weapon', price: 2500, stats: { atk: 12, mag: 22 }, who: ['linette', 'mio'], desc: '꼭대기에 태양석이 박힌 지팡이. 마력 +22.' },
+  frost_brand: { name: '서리의 검', kind: 'weapon', price: 4200, stats: { atk: 52 }, who: ['hero', 'bran', 'nell'], element: 'ice', desc: '북해의 대장장이가 얼음 바다에서 담금질한 검. 공격에 얼음 속성이 깃든다.' },
+  tide_axe: { name: '파도 도끼', kind: 'weapon', price: 4500, stats: { atk: 60, spd: -2 }, who: ['bran'], desc: '포경선의 작살 날을 녹여 만든 도끼. 무겁지만 강하다.' },
+  coral_dagger: { name: '산호 단검', kind: 'weapon', price: 3800, stats: { atk: 45, spd: 8 }, who: ['nell', 'hero'], desc: '붉은 산호를 깎아 만든 단검. 민첩 +8.' },
+  pearl_staff: { name: '진주 지팡이', kind: 'weapon', price: 4000, stats: { atk: 14, mag: 28 }, who: ['linette', 'mio'], desc: '꼭대기에 커다란 흑진주가 박힌 지팡이. 마력 +28.' },
+  silver_harp: { name: '은빛 하프', kind: 'weapon', price: 1800, stats: { atk: 9, mag: 16 }, who: ['cassandra'], desc: '보육원 시절부터 아껴 온 작은 하프. 마력 +16.' },
+  siren_harp: { name: '세이렌의 하프', kind: 'weapon', price: 4300, stats: { atk: 12, mag: 26, spd: 4 }, who: ['cassandra'], desc: '바다 요정의 머리카락으로 줄을 맨 하프. 마력 +26, 민첩 +4.' },
   dorn_axe: { name: '드른의 도끼', kind: 'weapon', price: 0, stats: { atk: 28, def: 3 }, who: ['bran'], desc: '아버지 드른이 아들을 위해 밤새 벼린 도끼. 방어 +3.' },
 
   // ── 갑옷 ──
@@ -3211,17 +3412,21 @@ const ITEMS = {
   clothes: { name: '여행자의 옷', kind: 'armor', price: 20, stats: { def: 4 }, who: ALL, desc: '질긴 천으로 만든 평범한 여행복.' },
   thief_garb: { name: '도둑의 옷', kind: 'armor', price: 90, stats: { def: 6, spd: 2 }, who: ['nell', 'hero'], desc: '움직이기 편한 검은 옷. 민첩 +2.' },
   leather_armor: { name: '가죽 갑옷', kind: 'armor', price: 110, stats: { def: 8 }, who: ['hero', 'bran', 'nell'], desc: '무두질한 가죽으로 만든 갑옷.' },
-  mage_robe: { name: '마도 로브', kind: 'armor', price: 140, stats: { def: 6, mag: 3 }, who: ['linette', 'mio'], desc: '마력을 머금은 실로 짠 로브. 마력 +3.' },
+  mage_robe: { name: '마도 로브', kind: 'armor', price: 140, stats: { def: 6, mag: 3 }, who: ['linette', 'mio', 'cassandra'], desc: '마력을 머금은 실로 짠 로브. 마력 +3.' },
   vestment: { name: '무녀복', kind: 'armor', price: 160, stats: { def: 7, mag: 2 }, who: ['mio'], desc: '리벨 신전의 무녀복. 마력 +2.' },
   chain_mail: { name: '사슬 갑옷', kind: 'armor', price: 380, stats: { def: 14 }, who: ['hero', 'bran'], desc: '쇠사슬을 촘촘히 엮은 갑옷.' },
   shadow_cloak: { name: '그림자 망토', kind: 'armor', price: 420, stats: { def: 11, spd: 5 }, who: ['nell', 'hero'], desc: '어둠에 녹아드는 망토. 민첩 +5.' },
   mythril_mail: { name: '미스릴 갑옷', kind: 'armor', price: 1200, stats: { def: 22 }, who: ['hero', 'bran'], desc: '미스릴 비늘을 엮은 갑옷. 가볍고 튼튼하다.' },
-  mystic_robe: { name: '신비의 로브', kind: 'armor', price: 1050, stats: { def: 15, mag: 7 }, who: ['linette', 'mio'], desc: '별빛 실로 짠 로브. 마력 +7.' },
+  mystic_robe: { name: '신비의 로브', kind: 'armor', price: 1050, stats: { def: 15, mag: 7 }, who: ['linette', 'mio', 'cassandra'], desc: '별빛 실로 짠 로브. 마력 +7.' },
   night_garb: { name: '밤그림자 옷', kind: 'armor', price: 980, stats: { def: 16, spd: 7 }, who: ['nell', 'hero'], desc: '왕도 뒷골목의 장인이 지은 검은 옷. 민첩 +7.' },
   desert_mail: { name: '사막 비늘 갑옷', kind: 'armor', price: 2700, stats: { def: 29 }, who: ['hero', 'bran'], desc: '모래도마뱀 비늘을 엮은 갑옷. 가볍고 시원하다.' },
-  mirage_robe: { name: '신기루 로브', kind: 'armor', price: 2500, stats: { def: 20, mag: 9 }, who: ['linette', 'mio'], desc: '보는 각도에 따라 색이 일렁이는 로브. 마력 +9.' },
+  mirage_robe: { name: '신기루 로브', kind: 'armor', price: 2500, stats: { def: 20, mag: 9 }, who: ['linette', 'mio', 'cassandra'], desc: '보는 각도에 따라 색이 일렁이는 로브. 마력 +9.' },
   sand_garb: { name: '모래바람 옷', kind: 'armor', price: 2300, stats: { def: 21, spd: 9 }, who: ['nell', 'hero'], desc: '사막 유목민의 가벼운 옷. 민첩 +9.' },
-  sage_robe: { name: '현자의 로브', kind: 'armor', price: 450, stats: { def: 10, mag: 5 }, who: ['linette', 'mio'], desc: '별무늬가 수놓인 고대 로브. 마력 +5.' },
+  whale_mail: { name: '고래뼈 갑옷', kind: 'armor', price: 4200, stats: { def: 35 }, who: ['hero', 'bran'], desc: '고래뼈를 엮어 만든 북해의 갑옷. 가볍고 단단하다.' },
+  seafoam_robe: { name: '물거품 로브', kind: 'armor', price: 3900, stats: { def: 25, mag: 12 }, who: ['linette', 'mio', 'cassandra'], desc: '파도 거품처럼 하얀 로브. 마력 +12.' },
+  sealskin_coat: { name: '물개 가죽 외투', kind: 'armor', price: 3700, stats: { def: 27, spd: 9 }, who: ['nell', 'hero'], resist: { freeze: 0.5 }, desc: '따뜻하고 날렵한 외투. 민첩 +9, 빙결에 조금 강해진다.' },
+  choir_robe: { name: '성가대 예복', kind: 'armor', price: 0, stats: { def: 18, mag: 8 }, who: ['cassandra'], desc: '잿빛 성가대의 예복. 이제는 회색 실을 뜯어내고 별을 수놓았다. 마력 +8.' },
+  sage_robe: { name: '현자의 로브', kind: 'armor', price: 450, stats: { def: 10, mag: 5 }, who: ['linette', 'mio', 'cassandra'], desc: '별무늬가 수놓인 고대 로브. 마력 +5.' },
 
   // ── 방패 ──
   pot_lid: { name: '냄비 뚜껑', kind: 'shield', price: 10, stats: { def: 2 }, who: ['hero', 'bran', 'nell'], desc: '여관 주방에서 굴러다니던 냄비 뚜껑. 없는 것보단 낫다.' },
@@ -3233,19 +3438,22 @@ const ITEMS = {
   squire_shield: { name: '견습 기사의 방패', kind: 'shield', price: 0, stats: { def: 13, hp: 20 }, who: ['bran'], desc: '입단 시험을 통과한 견습 기사에게 주어지는 방패. 최대 HP +20.' },
   buckler: { name: '은 버클러', kind: 'shield', price: 620, stats: { def: 9, spd: 2 }, who: ['hero', 'bran', 'nell', 'linette'], desc: '가벼운 은 방패. 민첩 +2.' },
 
+  coral_shield: { name: '산호 방패', kind: 'shield', price: 3600, stats: { def: 25 }, who: ['hero', 'bran'], desc: '거대한 산호를 깎아 만든 방패.' },
   sun_shield: { name: '태양의 방패', kind: 'shield', price: 2200, stats: { def: 20 }, who: ['hero', 'bran'], resist: { sleep: 0.5 }, desc: '태양 문양이 새겨진 둥근 방패. 수면에 조금 강해진다.' },
 
   // ── 투구 ──
   leather_hat: { name: '가죽 모자', kind: 'helm', price: 30, stats: { def: 2 }, who: ALL, desc: '햇볕도 막아주는 가죽 모자.' },
-  wizard_hat: { name: '별무늬 모자', kind: 'helm', price: 110, stats: { def: 2, mag: 3 }, who: ['linette', 'mio'], desc: '마도학원 학생들이 쓰는 모자. 마력 +3.' },
+  wizard_hat: { name: '별무늬 모자', kind: 'helm', price: 110, stats: { def: 2, mag: 3 }, who: ['linette', 'mio', 'cassandra'], desc: '마도학원 학생들이 쓰는 모자. 마력 +3.' },
   iron_helm: { name: '철 투구', kind: 'helm', price: 240, stats: { def: 6 }, who: ['hero', 'bran'], desc: '머리를 단단히 지켜주는 투구.' },
-  hairpin: { name: '은방울 머리꽂이', kind: 'helm', price: 260, stats: { def: 4, mag: 2 }, who: ['mio', 'linette', 'nell'], resist: { silence: 1 }, desc: '맑은 소리가 나는 머리꽂이. 침묵에 걸리지 않는다.' },
+  hairpin: { name: '은방울 머리꽂이', kind: 'helm', price: 260, stats: { def: 4, mag: 2 }, who: ['mio', 'linette', 'nell', 'cassandra'], resist: { silence: 1 }, desc: '맑은 소리가 나는 머리꽂이. 침묵에 걸리지 않는다.' },
 
   silver_helm: { name: '은 투구', kind: 'helm', price: 760, stats: { def: 10 }, who: ['hero', 'bran'], desc: '은으로 덧댄 투구.' },
   feather_hat: { name: '깃털 모자', kind: 'helm', price: 680, stats: { def: 6, mag: 3, spd: 3 }, who: ['linette', 'mio', 'nell', 'hero'], desc: '축제 기간에 유행하는 깃털 모자. 마력 +3, 민첩 +3.' },
   festival_mask: { name: '축제 가면', kind: 'helm', price: 0, stats: { def: 5, spd: 6 }, who: ALL, resist: { sleep: 1 }, desc: '별내림 축제의 가면. 쓰면 기분이 들떠 잠이 오지 않는다. 민첩 +6.' },
 
   turban: { name: '사막 터번', kind: 'helm', price: 1600, stats: { def: 9, mag: 2, spd: 2 }, who: ALL, resist: { paralyze: 0.5 }, desc: '머리를 시원하게 지켜 주는 터번. 마비에 조금 강해진다.' },
+  fur_hood: { name: '털 두건', kind: 'helm', price: 2400, stats: { def: 11, mag: 2 }, who: ALL, resist: { freeze: 1 }, desc: '두툼한 털 두건. 얼어붙지 않는다.' },
+  captain_hat: { name: '선장 모자', kind: 'helm', price: 3200, stats: { def: 14, atk: 4 }, who: ALL, desc: '금실로 닻을 수놓은 선장 모자. 공격력 +4.' },
   desert_helm: { name: '모래 투구', kind: 'helm', price: 1900, stats: { def: 14 }, who: ['hero', 'bran'], desc: '모래가 들어가지 않게 만든 투구.' },
 
   // ── 장신구 ──
@@ -3263,6 +3471,11 @@ const ITEMS = {
   queen_fang: { name: '여왕의 독침', kind: 'accessory', price: 0, stats: { atk: 9, spd: 4 }, who: ALL, resist: { poison: 1 }, desc: '전갈 여왕의 독침을 다듬은 장신구. 공격 +9, 민첩 +4, 독에 걸리지 않는다.' },
   aria_chime: { name: '아리아의 방울', kind: 'accessory', price: 0, stats: { mag: 10, mp: 20, def: 5 }, who: ['mio'], healBonus: 0.2, desc: '미오의 어머니가 쓰던 작은 방울. 마력 +10, 최대 MP +20, 회복 주문 효과 +20%.' },
   sand_badge: { name: '사막의 은인 징표', kind: 'accessory', price: 0, stats: { atk: 8, def: 8, mag: 8, spd: 8 }, who: ALL, desc: '사미라 오아시스가 은인에게 주는 징표. 모든 능력 +8.' },
+  pearl_ring: { name: '진주 반지', kind: 'accessory', price: 3000, stats: { mag: 12, mp: 25 }, who: ALL, desc: '북해의 흑진주 반지. 마력 +12, 최대 MP +25.' },
+  warm_charm: { name: '온기의 부적', kind: 'accessory', price: 1200, stats: { def: 3 }, who: ALL, resist: { freeze: 1, sleep: 0.5 }, desc: '난롯불의 온기가 깃든 부적. 얼어붙지 않고, 잠에도 조금 강해진다.' },
+  sailor_knot: { name: '뱃사람의 매듭', kind: 'accessory', price: 0, stats: { atk: 6, spd: 6 }, who: ALL, resist: { bind: 1 }, desc: '풀리지 않는 매듭. 무엇에도 휘감기지 않는다. 공격·민첩 +6.' },
+  choir_locket: { name: '두 자매의 로켓', kind: 'accessory', price: 0, stats: { mag: 10, spd: 6, mp: 15 }, who: ['cassandra', 'nell'], desc: '두 자매와 엄마가 함께 그려진 낡은 로켓. 마력 +10, 민첩 +6, 최대 MP +15.' },
+  anchor_badge: { name: '마레아의 닻 징표', kind: 'accessory', price: 0, stats: { atk: 12, def: 12, mag: 12, spd: 12 }, who: ALL, desc: '항구 마을 마레아가 은인에게 주는 닻 모양 징표. 모든 능력 +12.' },
   courage_token: { name: '용기의 증표', kind: 'accessory', price: 0, stats: { atk: 4, def: 4, spd: 4 }, who: ALL, desc: '리벨 마을을 구한 영웅에게 장로가 건넨 증표. 공격·방어·민첩 +4.' },
 
   // ── 귀중품 (퀘스트) ──
@@ -3288,6 +3501,11 @@ const ITEMS = {
   aria_page: { name: '아리아의 일기 조각', kind: 'key', price: 0, desc: '모래에 바랜 일기장의 찢어진 페이지. 단정한 글씨로 「미오에게」라고 적혀 있다.' },
   sand_heart: { name: '모래의 심장', kind: 'key', price: 0, desc: '모래 종에서 빠져나온 구슬. 안에서 고운 모래가 끝없이 흘러내린다.' },
   lost_letter: { name: '대상의 편지', kind: 'key', price: 0, desc: '사막에서 길을 잃은 대상 행렬이 남긴 구조 요청 편지.' },
+  boarding_pass: { name: '승선 허가증', kind: 'key', price: 0, desc: '마도학원과 수호기사단의 인장이 찍힌 북해 항로 승선 허가증.' },
+  wave_heart: { name: '파도의 심장', kind: 'key', price: 0, desc: '파도 종에서 빠져나온 구슬. 귀에 대면 먼 바다의 파도 소리가 들린다.' },
+  frozen_letter: { name: '얼어붙은 편지', kind: 'key', price: 0, desc: '해식 동굴의 얼음 속에서 꺼낸 편지. 「마레아의 마르타에게」라고 적혀 있다.' },
+  crab_claw: { name: '집게왕의 집게발', kind: 'key', price: 0, desc: '해안을 휘젓던 거대 게의 집게발. 현상금의 증거.' },
+  osric_notebook: { name: '알드윈의 수첩', kind: 'key', price: 0, desc: '유령선 선장실에서 발견한 낡은 수첩. 겉장에 어린아이의 낙서가 있다.' },
   star: { name: '별조각', kind: 'key', price: 0, desc: '밤하늘에서 떨어졌다는 작은 별조각. 괴짜 수집가 피포가 모으고 있다.' },
 };
 for (const id in ITEMS) ITEMS[id].id = id;
@@ -3306,7 +3524,10 @@ const KIND_NAMES = { consumable: '소모품', weapon: '무기', armor: '갑옷',
 //  msg: 기술 사용 문장 ({A}=사용자, {T}=대상). 없으면 기본 문장.
 // ─────────────────────────────────────────────────────────────
 const ELEMENTS = { fire: '불', ice: '얼음', thunder: '번개', light: '빛', dark: '어둠' };
-const STATUS_NAMES = { poison: '독', sleep: '수면', paralyze: '마비', silence: '침묵' };
+const STATUS_NAMES = { poison: '독', sleep: '수면', paralyze: '마비', silence: '침묵', freeze: '빙결', bind: '속박' };
+// 전투가 끝나면 사라지는 상태 (독만 전투 밖에서도 남는다)
+const TEMP_STATUS = ['sleep', 'paralyze', 'silence', 'freeze', 'bind'];
+const STATUS_COLORS = { poison: '#c070ff', sleep: '#70a8ff', paralyze: '#ffd050', silence: '#a0a0b0', freeze: '#9fe8ff', bind: '#5ab88a' };
 const BUFF_NAMES = { atk: '공격력', def: '방어력', spd: '민첩', hit: '명중률', mag: '마력', eva: '회피율', regen: '재생' };
 
 const SKILLS = {
@@ -3360,13 +3581,13 @@ const SKILLS = {
   meteor: { name: '유성우', kind: 'spell', mp: 20, target: 'enemies', type: 'magic', element: null, power: 52, scale: 0.85, anim: 'fire', desc: '하늘에서 유성을 떨어뜨린다. 속성 없는 강력한 전체 공격.' },
 
   // ── 미오 ──
-  cure: { name: '정화', kind: 'spell', mp: 2, target: 'ally', type: 'cure', cures: ['poison', 'sleep', 'paralyze', 'silence'], anim: 'heal', field: true, desc: '아군 한 명의 독·수면·마비·침묵을 치료한다.' },
+  cure: { name: '정화', kind: 'spell', mp: 2, target: 'ally', type: 'cure', cures: ['poison', 'sleep', 'paralyze', 'silence', 'freeze', 'bind'], anim: 'heal', field: true, desc: '아군 한 명의 독·수면·마비·침묵·빙결·속박을 치료한다.' },
   protect: { name: '수호의 기도', kind: 'spell', mp: 4, target: 'allies', type: 'buff', buff: { def: 1.35 }, turns: 4, anim: 'buff', desc: '아군 전체의 방어력을 높인다. (4턴)' },
   holy_lance: { name: '빛의 창', kind: 'spell', mp: 4, target: 'enemy', type: 'magic', element: 'light', power: 22, scale: 0.7, anim: 'light', desc: '빛의 창을 내리꽂는다. 빛 속성. 언데드와 어둠의 존재에게 강하다.' },
   revive: { name: '소생', kind: 'spell', mp: 10, target: 'deadAlly', type: 'revive', pct: 0.5, anim: 'heal', field: true, desc: '쓰러진 동료를 HP 절반으로 되살린다.' },
   heal_all: { name: '치유의 비', kind: 'spell', mp: 9, target: 'allies', type: 'heal', power: 26, scale: 0.6, anim: 'heal', field: true, desc: '치유의 빛을 비처럼 내려 아군 전체를 회복한다.' },
 
-  chime_cleanse: { name: '정화의 방울', kind: 'spell', mp: 6, target: 'allies', type: 'cure', cures: ['poison', 'sleep', 'paralyze', 'silence'], anim: 'heal', field: true, desc: '별빛 방울을 울려 아군 전체의 독·수면·마비·침묵을 치료한다.' },
+  chime_cleanse: { name: '정화의 방울', kind: 'spell', mp: 6, target: 'allies', type: 'cure', cures: ['poison', 'sleep', 'paralyze', 'silence', 'freeze', 'bind'], anim: 'heal', field: true, desc: '별빛 방울을 울려 아군 전체의 독·수면·마비·침묵·빙결·속박을 치료한다.' },
   holy_burst: { name: '성광', kind: 'spell', mp: 10, target: 'enemies', type: 'magic', element: 'light', power: 30, scale: 0.7, anim: 'light', desc: '눈부신 빛을 터뜨려 적 전체에 빛 속성 피해.' },
   sanctuary: { name: '성역', kind: 'spell', mp: 10, target: 'allies', type: 'buff', buff: { def: 1.4, mag: 1.2 }, turns: 4, anim: 'buff', desc: '빛의 결계를 펼친다. 아군 전체의 방어력과 마력이 오른다. (4턴)' },
 
@@ -3388,6 +3609,22 @@ const SKILLS = {
 
   shadow_twin: { name: '그림자 분신', kind: 'skill', mp: 7, target: 'enemy', type: 'physical', mult: 1.0, hits: 2, randomTargets: true, crit: 0.2, anim: 'slash', desc: '분신과 함께 두 번 벤다. (무작위 대상, 회심이 나오기 쉽다)' },
   death_mark: { name: '사신의 표식', kind: 'skill', mp: 10, target: 'enemy', type: 'physical', mult: 2.0, status: { poison: 0.6, paralyze: 0.3 }, anim: 'slash', desc: '급소에 표식을 새긴다. 강력한 일격에 독과 마비를 노린다.' },
+  // 제4장 새 기술
+  polaris: { name: '북극성 베기', kind: 'skill', mp: 16, target: 'enemies', type: 'physical', mult: 1.3, element: 'light', anim: 'starslash', desc: '북극성처럼 흔들림 없는 빛으로 적 전체를 벤다. 빛 속성.' },
+  avalanche: { name: '눈사태', kind: 'skill', mp: 14, target: 'enemy', type: 'physical', mult: 2.6, anim: 'impact', desc: '온 체중을 실어 도끼를 내리찍는다. 매우 강력한 일격.' },
+  absolute_zero: { name: '절대영도', kind: 'spell', mp: 24, target: 'enemies', type: 'magic', element: 'ice', power: 58, scale: 0.95, status: { freeze: 0.2 }, anim: 'ice', desc: '모든 것을 얼리는 냉기. 강력한 얼음 속성 전체 공격. (확률로 빙결)' },
+  holy_wave: { name: '성스러운 물결', kind: 'spell', mp: 16, target: 'enemies', type: 'magic', element: 'light', power: 40, scale: 0.8, anim: 'light', desc: '빛의 물결로 적 전체를 씻어 낸다. 빛 속성.' },
+  shadow_bind: { name: '그림자 묶기', kind: 'skill', mp: 8, target: 'enemy', type: 'physical', mult: 1.1, status: { bind: 0.5 }, anim: 'slash', desc: '적의 그림자를 단검으로 꿰뚫어 묶는다. 확률로 속박.' },
+  // 카산드라 (노래 — 주문처럼 침묵에 막힌다)
+  song_valor: { name: '용기의 노래', kind: 'spell', mp: 8, target: 'allies', type: 'buff', buff: { atk: 1.3, mag: 1.3 }, turns: 5, anim: 'buff', desc: '힘찬 행진곡. 아군 전체의 공격력과 마력을 높인다. (5턴)' },
+  lullaby: { name: '잠의 노래', kind: 'spell', mp: 6, target: 'enemies', type: 'status', status: { sleep: 0.45 }, anim: 'mist', desc: '나지막한 노래로 적 전체를 재운다. (확률)' },
+  song_ward: { name: '수호의 노래', kind: 'spell', mp: 9, target: 'allies', type: 'buff', buff: { def: 1.35, regen: 1.06 }, turns: 5, anim: 'buff', desc: '굳건한 화음. 아군 전체의 방어력을 높이고, 턴이 끝날 때마다 HP를 조금씩 회복시킨다. (5턴)' },
+  hush_song: { name: '정적의 노래', kind: 'spell', mp: 7, target: 'enemies', type: 'status', status: { silence: 0.5 }, anim: 'debuff', desc: '모든 소리를 삼키는 노래. 적 전체의 주문을 봉인한다. (확률)' },
+  song_wind: { name: '바람의 노래', kind: 'spell', mp: 8, target: 'allies', type: 'buff', buff: { spd: 1.3 }, turns: 5, anim: 'buff', desc: '경쾌한 바람의 노래. 아군 전체의 민첩을 높인다. (5턴)' },
+  dirge: { name: '진혼가', kind: 'spell', mp: 12, target: 'enemies', type: 'magic', element: null, power: 56, scale: 1.0, anim: 'dark', desc: '잠들지 못한 것들을 위한 노래. 속성 없는 노래가 적 전체를 울린다.' },
+  song_solace: { name: '위로의 노래', kind: 'spell', mp: 12, target: 'allies', type: 'heal', power: 60, scale: 0.6, anim: 'heal', field: true, desc: '다정한 노래로 아군 전체를 회복한다.' },
+  stopped_time: { name: '멈춘 시간의 노래', kind: 'spell', mp: 10, target: 'enemies', type: 'debuff', buff: { spd: 0.6, hit: 0.8 }, turns: 4, chance: 1.0, anim: 'debuff', desc: '시계탑에서 부르던 노래. 적 전체의 민첩과 명중률을 크게 떨어뜨린다. (확률)' },
+  grand_aria: { name: '대영창', kind: 'spell', mp: 20, target: 'allies', type: 'buff', buff: { atk: 1.45, mag: 1.45, spd: 1.2 }, turns: 5, anim: 'buff', desc: '온 힘을 다한 노래. 아군 전체의 공격력·마력·민첩을 크게 높인다. (5턴)' },
 
   // ── 적 기술 ──
   tackle: { name: '몸통박치기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.25, hit: -0.05, msg: '{A|이} 몸을 날려 부딪쳐 왔다!' },
@@ -3479,6 +3716,42 @@ const SKILLS = {
   mirage_spear: { name: '사구의 창', kind: 'enemy', target: 'enemy', type: 'magic', element: 'light', power: 14, scale: 0, anim: 'light', msg: '{A|이} 모래를 굳혀 만든 창을 {T|에게} 날렸다!' },
   idle_shimmer: { name: '일렁임', kind: 'enemy', target: 'none', type: 'none', msg: '{A|의} 모습이 아지랑이처럼 일렁인다…' },
 
+  // ── 제4장: 북쪽 바다 ──
+  frost_breath: { name: '얼어붙는 숨결', kind: 'enemy', target: 'enemies', type: 'magic', element: 'ice', power: 26, scale: 0.42, status: { freeze: 0.2 }, anim: 'ice', msg: '{A|이} 얼어붙는 숨결을 내뿜었다!' },
+  snow_bite: { name: '서리 이빨', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.1, status: { freeze: 0.15 }, msg: '{A|이} 서리 낀 이빨로 {T|을} 물었다!' },
+  pinch: { name: '집게 찝기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.15, msg: '{A|이} 커다란 집게로 {T|을} 찝었다!' },
+  shell_up: { name: '껍데기 굳히기', kind: 'enemy', target: 'self', type: 'buff', buff: { def: 1.6 }, turns: 3, msg: '{A|이} 단단한 껍데기 속으로 몸을 웅크렸다!' },
+  gull_dive: { name: '급강하', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.2, msg: '{A|이} 하늘에서 {T|에게} 내리꽂혔다!' },
+  ice_shard: { name: '얼음 파편', kind: 'enemy', target: 'enemy', type: 'magic', element: 'ice', power: 34, scale: 0.6, anim: 'ice', msg: '{A|이} 날카로운 얼음 파편을 날렸다!' },
+  drowned_grab: { name: '물귀신 손', kind: 'enemy', target: 'enemy', type: 'physical', mult: 0.9, status: { bind: 0.3 }, msg: '{A|이} 축축한 손으로 {T|의} 발목을 움켜쥐었다!' },
+  lantern_wail: { name: '등불의 곡소리', kind: 'enemy', target: 'enemies', type: 'magic', element: 'dark', power: 18, scale: 0.4, status: { silence: 0.2 }, anim: 'dark', msg: '{A|이} 가느다란 곡소리를 냈다…' },
+  grey_flame: { name: '잿빛 불길', kind: 'enemy', target: 'enemies', type: 'magic', element: 'fire', power: 26, scale: 0.5, anim: 'fire', msg: '잿빛 불꽃이 차갑게 타오르며 일행을 휘감았다!' },
+  ink_spray: { name: '먹물 뿌리기', kind: 'enemy', target: 'enemies', type: 'magic', element: 'dark', power: 12, scale: 0.2, debuffAll: { hit: 0.75 }, anim: 'dark', msg: '{A|이} 시커먼 먹물을 뿜었다!' },
+  lure_light: { name: '유혹의 불빛', kind: 'enemy', target: 'enemies', type: 'status', status: { sleep: 0.3 }, anim: 'light', msg: '{A|의} 머리 위 불빛이 가물가물 흔들린다…' },
+  // 보스: 서리엄니
+  tusk_aim: { name: '엄니 겨누기', kind: 'enemy', target: 'enemy', type: 'charge', next: 'tusk_crush', msg: '{A|이} 얼음 위에서 몸을 낮추고 {T|을} 노려본다…', hint: '[y]미끄러지듯 덮쳐 올 것이다![/]' },
+  tusk_crush: { name: '빙판 돌진', kind: 'enemy', target: 'enemy', type: 'physical', mult: 2.3, anim: 'impact', msg: '{A|이} 빙판 위를 미끄러져 {T|에게} 엄니를 박았다!' },
+  ice_armor: { name: '얼음 갑옷', kind: 'enemy', target: 'self', type: 'buff', buff: { def: 1.8 }, turns: 3, msg: '{A|의} 몸이 두꺼운 얼음으로 뒤덮였다!' },
+  // 보스: 제4성부 오르카
+  anchor_aim: { name: '닻 겨누기', kind: 'enemy', target: 'enemy', type: 'charge', next: 'anchor_crash', msg: '{A|이} 녹슨 닻을 휘두르며 {T|을} 가리켰다. "다음은 너다."', hint: '[y]거대한 닻이 날아들 것이다…[/]' },
+  anchor_crash: { name: '닻 내리치기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 2.2, anim: 'impact', msg: '{A|이} 거대한 닻을 {T|에게} 내리꽂았다!' },
+  saber_slash: { name: '해군도', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.1, anim: 'slash', msg: '{A|이} 녹슨 해군도로 {T|을} 베었다!' },
+  cold_command: { name: '얼음 바다의 호령', kind: 'enemy', target: 'enemies', type: 'magic', element: 'ice', power: 30, scale: 0.5, status: { freeze: 0.15 }, anim: 'ice', msg: '{A|이} 호령하자 갑판 위로 차가운 파도가 덮쳤다!' },
+  high_tide: { name: '밀물', kind: 'enemy', target: 'none', type: 'none', msg: '{A|이} 나침반을 돌렸다. 밀물이 차오르며 그의 몸을 감싼다… 칼날도 물결에 미끄러질 것 같다.' },
+  low_tide: { name: '썰물', kind: 'enemy', target: 'none', type: 'none', msg: '{A|이} 나침반을 돌렸다. 썰물이 빠져나가며 소용돌이가 인다… 주문의 빛이 휘어진다.' },
+  crab_call: { name: '게 떼 부르기', kind: 'enemy', target: 'none', type: 'summon', summon: ['ice_crab', 'ice_crab'], msg: '{A|이} 집게를 딱딱 부딪치자 바위틈에서 게들이 몰려나왔다!' },
+  crew_call: { name: '선원 소집', kind: 'enemy', target: 'none', type: 'summon', summon: ['drowned_sailor', 'drowned_sailor'], msg: '"전원 갑판으로!" 물속에서 선원들이 기어 올라왔다!' },
+  // 보스: 심해의 수호자 레비아
+  tentacle_grab: { name: '휘감기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 0.8, status: { bind: 0.6 }, msg: '{A|이} {T|을} 휘감아 들어 올렸다!' },
+  tentacle_strike: { name: '촉수 내려치기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.0, anim: 'impact', msg: '{A|이} {T|을} 내려쳤다!' },
+  tentacle_lash: { name: '촉수 후려치기', kind: 'enemy', target: 'enemies', type: 'physical', mult: 0.5, anim: 'quake', msg: '{A|이} 일행을 후려쳤다!' },
+  wave_rise: { name: '파도 일으키기', kind: 'enemy', target: 'none', type: 'charge', next: 'tidal_wave', msg: '{A|이} 깊이 숨을 들이쉬자 바닷물이 솟구치기 시작한다…', hint: '[y]거대한 파도가 밀려온다! 파도를 끌어올리는 것들이 많을수록 높아질 것이다…[/]' },
+  tidal_wave: { name: '해일', kind: 'enemy', target: 'enemies', type: 'magic', element: null, power: 34, scale: 0.45, anim: 'wave', msg: '쿠르르르──! 낮은 해일이 일행을 덮쳤다.' },
+  great_wave: { name: '대해일', kind: 'enemy', target: 'enemies', type: 'magic', element: null, power: 46, scale: 0.52, anim: 'wave', msg: '촉수가 끌어올린 해일이 일행을 덮쳤다!' },
+  raging_wave: { name: '노도', kind: 'enemy', target: 'enemies', type: 'magic', element: null, power: 58, scale: 0.6, anim: 'wave', msg: '두 촉수가 끌어올린 거대한 노도가 일행을 집어삼켰다!' },
+  regrow: { name: '촉수 재생', kind: 'enemy', target: 'none', type: 'summon', summon: ['levia_tentacle'], msg: '{A|의} 몸에서 새 촉수가 꿈틀거리며 자라났다!' },
+  abyss_song: { name: '심해의 노래', kind: 'enemy', target: 'enemies', type: 'magic', element: 'dark', power: 24, scale: 0.4, status: { sleep: 0.3 }, anim: 'dark', msg: '{A|이} 깊은 바다 밑바닥의 노래를 불렀다…' },
+
   // ── 보스: 철엄니 ──
   tusk: { name: '엄니 찌르기', kind: 'enemy', target: 'enemy', type: 'physical', mult: 1.2, msg: '{A|이} 쇠 같은 엄니로 들이받았다!' },
   paw: { name: '돌진 준비', kind: 'enemy', target: 'enemy', type: 'charge', next: 'rampage', msg: '{A|이} 앞발로 땅을 긁으며 {T|을} 노려본다!', hint: '[y]땅을 긁는 소리… 곧 돌진이 올 것이다![/]' },
@@ -3508,7 +3781,7 @@ const CHARACTERS = {
     name: '하루', job: '이방인', look: 'hero', color: '#7cc4ff',
     base: { hp: 30, mp: 6, atk: 10, def: 6, mag: 6, spd: 8 },
     grow: { hp: 6, mp: 2.2, atk: 2.2, def: 1.6, mag: 1.5, spd: 1.5 },
-    learn: { 1: ['analyze'], 3: ['heal'], 5: ['star_slash'], 7: ['thunder'], 9: ['twin_slash'], 11: ['heal_more'], 13: ['resolve'], 15: ['starfall'], 17: ['meteor_slash'], 19: ['insight'], 22: ['stellar_blade'] },
+    learn: { 1: ['analyze'], 3: ['heal'], 5: ['star_slash'], 7: ['thunder'], 9: ['twin_slash'], 11: ['heal_more'], 13: ['resolve'], 15: ['starfall'], 17: ['meteor_slash'], 19: ['insight'], 22: ['stellar_blade'], 26: ['polaris'] },
     equip: { weapon: 'umbrella', armor: 'hoodie' },
     bio: '어느 밤 막차 버스에서 잠들었다가 이세계의 들판에서 눈을 뜬 사람. 손등에 별 모양의 낙인이 새겨져 있다. 균형 잡힌 능력과 적을 꿰뚫어 보는 「분석」이 특기.',
   },
@@ -3516,7 +3789,7 @@ const CHARACTERS = {
     name: '브란', job: '수호기사 지망생', look: 'bran', color: '#ff9a5a',
     base: { hp: 38, mp: 3, atk: 12, def: 8, mag: 1, spd: 5 },
     grow: { hp: 8, mp: 1, atk: 2.6, def: 2.0, mag: 0.4, spd: 1.0 },
-    learn: { 1: ['bash'], 3: ['cover'], 5: ['warcry'], 7: ['quake'], 9: ['ironwall'], 11: ['shield_bash'], 13: ['guardian'], 15: ['earthsplit'], 17: ['knight_oath'], 19: ['provoke'], 21: ['axe_storm'], 23: ['unbroken'] },
+    learn: { 1: ['bash'], 3: ['cover'], 5: ['warcry'], 7: ['quake'], 9: ['ironwall'], 11: ['shield_bash'], 13: ['guardian'], 15: ['earthsplit'], 17: ['knight_oath'], 19: ['provoke'], 21: ['axe_storm'], 23: ['unbroken'], 26: ['avalanche'] },
     equip: { weapon: 'club', armor: 'leather_armor', shield: 'pot_lid' },
     bio: '대장장이 드른의 아들. 대장간을 물려받기보다 왕국의 수호기사가 되기를 꿈꾼다. 힘세고 우직하지만 유령 이야기에는 약하다. 동료를 지키는 기술이 특기.',
   },
@@ -3524,7 +3797,7 @@ const CHARACTERS = {
     name: '리네트', job: '마도학자', look: 'linette', color: '#d59bff',
     base: { hp: 22, mp: 14, atk: 5, def: 4, mag: 12, spd: 7 },
     grow: { hp: 4.2, mp: 3.6, atk: 0.9, def: 1.0, mag: 2.5, spd: 1.3 },
-    learn: { 1: ['fire'], 2: ['ice'], 3: ['sleep'], 5: ['slow'], 6: ['firestorm'], 8: ['seal'], 10: ['blizzard'], 12: ['thunderstorm'], 14: ['mana_amp'], 16: ['ice_lance', 'inferno'], 19: ['thunder_lance'], 21: ['shadow_flare'], 23: ['meteor'] },
+    learn: { 1: ['fire'], 2: ['ice'], 3: ['sleep'], 5: ['slow'], 6: ['firestorm'], 8: ['seal'], 10: ['blizzard'], 12: ['thunderstorm'], 14: ['mana_amp'], 16: ['ice_lance', 'inferno'], 19: ['thunder_lance'], 21: ['shadow_flare'], 23: ['meteor'], 26: ['absolute_zero'] },
     equip: { weapon: 'oak_staff', armor: 'mage_robe', helm: 'wizard_hat' },
     bio: '왕립 마도학원의 젊은 연구자. 실종된 스승 알드윈 교수의 흔적을 좇아 종의 유적을 조사하고 있다. 말투는 날카롭지만 정이 많다. 속성 공격 주문의 전문가.',
   },
@@ -3532,7 +3805,7 @@ const CHARACTERS = {
     name: '미오', job: '종의 무녀', look: 'mio', color: '#ff8aa8',
     base: { hp: 25, mp: 12, atk: 6, def: 5, mag: 9, spd: 6 },
     grow: { hp: 4.8, mp: 3.2, atk: 1.0, def: 1.2, mag: 2.0, spd: 1.2 },
-    learn: { 1: ['heal'], 2: ['cure'], 4: ['protect'], 5: ['holy_lance'], 6: ['revive'], 8: ['heal_all'], 11: ['heal_more'], 13: ['chime_cleanse'], 15: ['holy_burst'], 17: ['sanctuary'], 19: ['regen'], 21: ['full_heal'] },
+    learn: { 1: ['heal'], 2: ['cure'], 4: ['protect'], 5: ['holy_lance'], 6: ['revive'], 8: ['heal_all'], 11: ['heal_more'], 13: ['chime_cleanse'], 15: ['holy_burst'], 17: ['sanctuary'], 19: ['regen'], 21: ['full_heal'], 25: ['holy_wave'] },
     equip: { weapon: 'oak_staff', armor: 'vestment' },
     bio: '리벨 신전의 무녀. 들판에 쓰러진 주인공을 처음 발견했다. 상냥하지만 한번 정하면 물러서지 않는다. 가끔 아무도 듣지 못하는 「종의 노래」를 듣는다.',
   },
@@ -3540,9 +3813,17 @@ const CHARACTERS = {
     name: '넬', job: '떠돌이 도적', look: 'nell', color: '#7cf08a',
     base: { hp: 26, mp: 6, atk: 9, def: 5, mag: 3, spd: 13 },
     grow: { hp: 5, mp: 1.6, atk: 1.9, def: 1.3, mag: 0.6, spd: 2.2 },
-    learn: { 1: ['steal', 'venom_strike'], 4: ['smoke'], 6: ['vital_strike'], 8: ['numb_needle'], 10: ['mug'], 12: ['shadow_step'], 14: ['poison_cloud'], 16: ['assassinate'], 19: ['shadow_twin'], 22: ['death_mark'] },
+    learn: { 1: ['steal', 'venom_strike'], 4: ['smoke'], 6: ['vital_strike'], 8: ['numb_needle'], 10: ['mug'], 12: ['shadow_step'], 14: ['poison_cloud'], 16: ['assassinate'], 19: ['shadow_twin'], 22: ['death_mark'], 25: ['shadow_bind'] },
     equip: { weapon: 'hunting_knife', armor: 'thief_garb' },
     bio: '리벨 마을에 숨어들었던 좀도둑. 날렵한 몸놀림과 독·마비 기술, 훔치기가 특기. 일행에 있으면 숨겨진 보물이 반짝여 보인다.',
+  },
+  cassandra: {
+    name: '카산드라', job: '노래하는 이', look: 'cassandra', color: '#b8a8ff',
+    base: { hp: 24, mp: 13, atk: 6, def: 5, mag: 10, spd: 9 },
+    grow: { hp: 4.6, mp: 3.3, atk: 1.0, def: 1.1, mag: 2.2, spd: 1.6 },
+    learn: { 1: ['song_valor', 'lullaby'], 3: ['song_ward'], 6: ['hush_song'], 10: ['song_wind'], 14: ['dirge'], 18: ['song_solace'], 22: ['stopped_time'], 26: ['grand_aria'] },
+    equip: { weapon: 'silver_harp', armor: 'choir_robe' },
+    bio: '넬의 친언니. 잿빛 성가대의 제2성부였지만, 장막 너머에 엄마가 없다는 것을 알고 성가대를 떠났다. 노래로 동료를 북돋우고 적을 잠재운다.',
   },
 };
 for (const id in CHARACTERS) CHARACTERS[id].id = id;
@@ -4056,8 +4337,9 @@ const MONSTERS = {
     ai(self, B) {
       const m = self.mem;
       m.turn = (m.turn || 0) + 1;
-      if (m.next) { const n = m.next; m.next = null; return { skill: n, target: m.mark }; }
-      if (m.turn % 3 === 0) { const t = B.pickTarget('party', 'weakest'); m.next = 'execution'; m.mark = t; return { skill: 'mark_doom', target: t }; }
+      if (m.next && m.aimRound !== B.round) { const n = m.next; m.next = null; return { skill: n, target: m.mark }; }
+      if (m.next) return { skill: 'attack', target: B.pickTarget('party', 'random') };
+      if (m.turn % 3 === 0) { const t = B.pickTarget('party', 'weakest'); m.next = 'execution'; m.aimRound = B.round; m.mark = t; return { skill: 'mark_doom', target: t }; }
       if (m.turn % 3 === 2) return { skill: Util.chance(0.5) ? 'blood_scythe' : 'dark_wave' };
       return { skill: 'attack', target: B.pickTarget('party', Util.chance(0.4) ? 'fragile' : 'random') };
     },
@@ -4091,7 +4373,8 @@ const MONSTERS = {
     ai(self, B) {
       const m = self.mem;
       m.turn = (m.turn || 0) + 1;
-      if (m.next) { const n = m.next; m.next = null; return { skill: n }; }
+      if (m.next && m.aimRound !== B.round) { const n = m.next; m.next = null; return { skill: n }; }
+      if (m.next) return { skill: 'dune_spear', target: B.pickTarget('party', 'random') };
       const mirages = B.enemies.filter((e) => e.alive && e.def.mirage).length;
       if ((m.phase || 1) === 1) {
         if (m.turn === 1 || (!mirages && m.turn % 4 === 0)) return { skill: 'mirage' };
@@ -4099,7 +4382,7 @@ const MONSTERS = {
         return { skill: 'dune_spear', target: B.pickTarget('party', Util.chance(0.4) ? 'fragile' : 'random') };
       }
       if (m.turn === 1) return { skill: 'spirit_call' };
-      if (m.turn % 4 === 0) { m.next = 'falling_sand'; return { skill: 'hourglass_flip' }; }
+      if (m.turn % 4 === 0) { m.next = 'falling_sand'; m.aimRound = B.round; return { skill: 'hourglass_flip' }; }
       if (!mirages && m.turn % 4 === 2) return { skill: 'mirage' };
       if (m.turn % 4 === 3) return { skill: 'sandstorm' };
       return { skill: 'dune_spear', target: B.pickTarget('party', Util.chance(0.5) ? 'fragile' : 'random') };
@@ -4112,6 +4395,212 @@ const MONSTERS = {
     elem: { ice: 1.25, thunder: 1.25, fire: 0.5, light: 0.75 }, resist: { poison: 1, sleep: 1, paralyze: 1, silence: 1 }, drops: [],
     desc: '…',
     actions: [{ s: 'idle_shimmer', w: 3 }, { s: 'mirage_spear', w: 2 }],
+  },
+
+  // ════════ 제4장: 북쪽 바다 ════════
+  frost_gull: {
+    name: '서리갈매기', art: 'crow', pal: { body: '#e8eef6', dark: '#8a9ab4', light: '#ffffff', eye: '#ffb040' },
+    hp: 360, mp: 0, atk: 116, def: 40, mag: 42, spd: 32, exp: 160, gold: 70,
+    elem: { thunder: 1.5, ice: 0.5 }, resist: {}, drops: [{ item: 'warm_soup', p: 0.1 }], steal: { item: 'warm_soup', p: 0.4 },
+    actions: [{ s: 'gull_dive', w: 3 }, { s: 'attack', w: 3 }],
+    desc: '눈보라 속을 나는 갈매기. 하늘에서 내리꽂힌다. 번개에 약하다.',
+  },
+  ice_crab: {
+    name: '얼음게', art: 'crab', pal: { body: '#5a8ab8', dark: '#2a4a78', light: '#a8d0f0', claw: '#7aaad8', eye: '#ffe040', frost: true },
+    hp: 510, mp: 0, atk: 118, def: 82, mag: 42, spd: 10, exp: 190, gold: 90,
+    elem: { fire: 1.5, thunder: 1.5, ice: 0 }, resist: { poison: 0.5 }, drops: [{ item: 'hi_potion', p: 0.1 }], steal: { item: 'warm_soup', p: 0.3 },
+    actions: [{ s: 'pinch', w: 4 }, { s: 'shell_up', w: 1 }, { s: 'attack', w: 2 }],
+    desc: '얼음처럼 단단한 등딱지를 가진 게. 껍데기를 굳히면 거의 상처가 나지 않는다. 불과 번개에 약하다.',
+  },
+  snow_wolf: {
+    name: '설원늑대', art: 'wolf', pal: { body: '#e0e6f0', dark: '#9aa8c0', light: '#ffffff', mane: '#b8c4d8', eye: '#5ab4ff' },
+    hp: 450, mp: 0, atk: 124, def: 46, mag: 32, spd: 26, exp: 180, gold: 80,
+    elem: { fire: 1.5, ice: 0 }, resist: { freeze: 1 }, drops: [{ item: 'hi_potion', p: 0.08 }], steal: { item: 'hi_potion', p: 0.3 },
+    actions: [{ s: 'snow_bite', w: 3 }, { s: 'attack', w: 3 }],
+    desc: '하얀 털의 늑대. 서리 낀 이빨에 물리면 얼어붙는다. 불에 약하다.',
+  },
+  brine_jelly: {
+    name: '소금물젤리', art: 'jelly', pal: { body: '#5ab4d8', dark: '#2a7aa8', light: '#c8f0ff' },
+    hp: 390, mp: 40, atk: 102, def: 44, mag: 66, spd: 14, exp: 160, gold: 60,
+    elem: { thunder: 1.5, ice: 0.5, fire: 0.75 }, resist: { poison: 1 }, drops: [{ item: 'hi_ether', p: 0.06 }], steal: { item: 'ether', p: 0.4 },
+    actions: [{ s: 'ice_shard', w: 3 }, { s: 'attack', w: 2 }],
+    desc: '짠 바닷물이 뭉친 젤리. 얼음 파편을 쏜다. 번개에 약하다.',
+  },
+  ice_bat: {
+    name: '얼음박쥐', art: 'bat', pal: { body: '#5a8ab8', dark: '#2a4a78', wing: '#a8d0f0', eye: '#ffffff' },
+    hp: 340, mp: 0, atk: 114, def: 38, mag: 42, spd: 36, exp: 150, gold: 60,
+    elem: { fire: 1.5, thunder: 1.25, ice: 0 }, resist: { freeze: 1 }, drops: [{ item: 'warm_soup', p: 0.1 }], steal: { item: 'warm_soup', p: 0.3 },
+    actions: [{ s: 'snow_bite', w: 3 }, { s: 'attack', w: 3 }],
+    desc: '얼음 동굴 천장에 매달려 사는 박쥐. 재빠르다.',
+  },
+  frost_golem: {
+    name: '서리 골렘', art: 'sentry', pal: { stone: '#a8d8f0', dark: '#4a88a8', light: '#e0f6ff', eye: '#ffffff' },
+    hp: 720, mp: 0, atk: 126, def: 92, mag: 52, spd: 8, exp: 240, gold: 110,
+    elem: { fire: 2.0, ice: 0, thunder: 0.75 }, resist: { poison: 1, sleep: 1, freeze: 1, silence: 1 }, drops: [{ item: 'hi_ether', p: 0.06 }], steal: { item: 'hi_ether', p: 0.15 },
+    actions: [{ s: 'attack', w: 3 }, { s: 'stone_fist', w: 3 }, { s: 'ice_armor', w: 1 }],
+    desc: '얼음 덩어리에 혼이 깃든 골렘. 무척 단단하지만 불에 녹는다.',
+  },
+  frost_wisp: {
+    name: '서리 도깨비불', art: 'echo', pal: { body: '#a8d8f0', dark: '#4a88a8', light: '#ffffff', eye: '#5ab4ff' },
+    hp: 360, mp: 60, atk: 82, def: 40, mag: 72, spd: 22, exp: 170, gold: 70,
+    elem: { fire: 1.5, light: 1.25, ice: 0 }, resist: { poison: 1, freeze: 1 }, drops: [{ item: 'hi_ether', p: 0.08 }], steal: { item: 'ether', p: 0.4 },
+    actions: [{ s: 'ice_shard', w: 3 }, { s: 'frost_breath', w: 1 }, { s: 'attack', w: 1 }],
+    desc: '동굴의 냉기가 모여 생긴 도깨비불. 숨결에 닿으면 얼어붙는다.',
+  },
+  choir_elite: {
+    name: '성가대 정예기사', art: 'knight', pal: { metal: '#5a5a68', dark: '#2a2a38', trim: '#8a8a98', cloth: '#3a1a2a', shield: '#3a3a48', blade: '#c8ccd8', plume: '#5a5a68', eye: '#c040ff' },
+    hp: 780, mp: 0, atk: 122, def: 60, mag: 40, spd: 18, exp: 300, gold: 140,
+    elem: { light: 1.5, thunder: 1.25, dark: 0 }, resist: { poison: 0.5, sleep: 0.5 }, drops: [{ item: 'hi_potion', p: 0.2 }], steal: { item: 'mega_potion', p: 0.3 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'sword_arc', w: 3 }, { s: 'knight_stance', w: 1 }],
+    desc: '오스릭 직속의 정예 기사. 일행 전체를 베는 반월 베기를 쓴다.',
+  },
+  grey_wisp: {
+    name: '잿빛 불꽃', art: 'echo', boss: true, artScale: 1.5, pal: { body: '#8a8a98', dark: '#4a4a58', light: '#d8d8e0', eye: '#c040ff' },
+    hp: 1700, mp: 999, atk: 60, def: 46, mag: 66, spd: 20, exp: 900, gold: 400,
+    elem: { ice: 1.5, light: 1.25, fire: 0, dark: 0 }, resist: { poison: 1, sleep: 1, paralyze: 1, freeze: 0.5 }, drops: [],
+    desc: '유령선을 부르는 잿빛 신호 불꽃. 차갑게 타오른다. 불로는 꺼지지 않는다.',
+    ai(self, B) {
+      const m = self.mem; m.turn = (m.turn || 0) + 1;
+      return { skill: m.turn % 2 === 0 ? 'lantern_wail' : 'grey_flame' };
+    },
+  },
+  drowned_sailor: {
+    name: '물에 빠진 선원', art: 'skeleton', pal: { bone: '#c8dcd8', dark: '#6a8a88', eye: '#5ae0b0', rust: '#3a5a6a' },
+    hp: 540, mp: 0, atk: 124, def: 50, mag: 42, spd: 16, exp: 200, gold: 90, undead: true,
+    elem: { light: 1.5, fire: 1.25, dark: 0, ice: 0.5 }, resist: { poison: 1, sleep: 1 }, drops: [{ item: 'panacea', p: 0.12 }], steal: { item: 'panacea', p: 0.4 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'drowned_grab', w: 2 }],
+    desc: '15년 전 폭풍에 가라앉은 선원. 아직도 배를 지키고 있다. 붙잡히면 꼼짝할 수 없다.',
+  },
+  ghost_lantern: {
+    name: '유령 등불', art: 'echo', pal: { body: '#5ae0b0', dark: '#2a8a6a', light: '#c8fff0', eye: '#ffe040' },
+    hp: 390, mp: 60, atk: 82, def: 40, mag: 74, spd: 20, exp: 190, gold: 80,
+    elem: { light: 2.0, dark: 0 }, resist: { poison: 1, sleep: 1 }, drops: [{ item: 'hi_ether', p: 0.08 }], steal: { item: 'ether', p: 0.4 },
+    actions: [{ s: 'lantern_wail', w: 3 }, { s: 'attack', w: 2 }],
+    desc: '유령선의 돛대에 매달린 등불. 곡소리로 주문을 막는다. 빛에 약하다.',
+  },
+  barnacle_chest: {
+    name: '따개비 탐욕상자', art: 'mimic', pal: { wood: '#5a6a6a', dark: '#2a3a3a', gold: '#c8d8d0', mouth: '#1a3a3a', tongue: '#5ae0b0' },
+    hp: 840, mp: 30, atk: 132, def: 60, mag: 52, spd: 18, exp: 420, gold: 500,
+    elem: { thunder: 1.25, light: 1.25 }, resist: { poison: 1, sleep: 0.5 }, drops: [{ item: 'elixir', p: 1 }],
+    actions: [{ s: 'gnaw', w: 5 }, { s: 'attack', w: 3 }, { s: 'curse_word', w: 2 }],
+    desc: '따개비가 잔뜩 붙은 탐욕상자. 유령선의 보물 사이에 숨어 있다.',
+  },
+  deep_jelly: {
+    name: '심해 해파리', art: 'jelly', pal: { body: '#a87ad8', dark: '#6a3aa8', light: '#e8c8ff' },
+    hp: 480, mp: 50, atk: 102, def: 46, mag: 76, spd: 16, exp: 210, gold: 90,
+    elem: { thunder: 1.5, fire: 0.75 }, resist: { poison: 1 }, drops: [{ item: 'hi_ether', p: 0.08 }], steal: { item: 'hi_ether', p: 0.3 },
+    actions: [{ s: 'ink_spray', w: 2 }, { s: 'ice_shard', w: 2 }, { s: 'attack', w: 2 }],
+    desc: '깊은 바다를 떠도는 해파리. 먹물로 눈을 가린다. 번개에 약하다.',
+  },
+  angler: {
+    name: '등불아귀', art: 'angler', pal: { body: '#3a4a6a', dark: '#1a2440', light: '#5a6a8a', eye: '#ffe040', lure: '#a8ffe0' },
+    hp: 630, mp: 30, atk: 130, def: 54, mag: 62, spd: 14, exp: 250, gold: 110,
+    elem: { thunder: 1.5, light: 1.25 }, resist: { sleep: 1 }, drops: [{ item: 'mega_potion', p: 0.1 }], steal: { item: 'mega_potion', p: 0.3 },
+    actions: [{ s: 'gnaw', w: 3 }, { s: 'lure_light', w: 2 }, { s: 'attack', w: 2 }],
+    desc: '머리 위 불빛으로 먹이를 잠재운 뒤 통째로 삼킨다.',
+  },
+  drowned_knight: {
+    name: '가라앉은 기사', art: 'knight', pal: { metal: '#3a6878', dark: '#1a3a48', trim: '#5ae0b0', cloth: '#1a3a3a', shield: '#2a5a6a', blade: '#a8d8d0', plume: '#2a8a6a', eye: '#5ae0b0' },
+    hp: 780, mp: 0, atk: 132, def: 72, mag: 42, spd: 14, exp: 280, gold: 120, undead: true,
+    elem: { light: 1.5, thunder: 1.25, dark: 0 }, resist: { poison: 1, sleep: 1 }, drops: [{ item: 'mega_potion', p: 0.12 }], steal: { item: 'mega_potion', p: 0.3 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'sword_arc', w: 2 }, { s: 'knight_stance', w: 1 }],
+    desc: '가라앉은 신전을 지키던 옛 기사. 몸이 산호로 뒤덮였다.',
+  },
+  // ── 현상수배: 집게왕 ──
+  king_crab: {
+    name: '집게왕', art: 'crab', boss: true, artScale: 1.8, pal: { body: '#c4473a', dark: '#7a2a24', light: '#f08070', claw: '#e05a4a', eye: '#ffe040', crown: '#ffd75e' },
+    hp: 3800, mp: 0, atk: 128, def: 96, mag: 52, spd: 12, exp: 2600, gold: 1500,
+    elem: { thunder: 1.5, ice: 0.5 }, resist: { poison: 0.5, sleep: 0.7, paralyze: 0.5 }, drops: [{ item: 'elixir', p: 1 }],
+    desc: '해안의 바위를 집게 한 번에 부순다는 거대한 게. 껍데기를 굳히고 있을 때는 무엇도 통하지 않는다.',
+    ai(self, B) {
+      const m = self.mem; m.turn = (m.turn || 0) + 1;
+      if (m.turn % 4 === 1 && !self.buffs.def) return { skill: 'shell_up' };
+      if (self.hp / self.maxhp < 0.5 && !m.called) { m.called = true; return { skill: 'crab_call' }; }
+      return { skill: Util.chance(0.6) ? 'pinch' : 'tentacle_lash', target: B.pickTarget('party', 'random') };
+    },
+  },
+  // ── 보스: 서리엄니 ──
+  frost_walrus: {
+    name: '서리엄니', art: 'walrus', boss: true, artScale: 1.2, pal: { body: '#8a7a6a', dark: '#5a4a3a', light: '#b8a898', muzzle: '#d8c8b0', tusk: '#f8f0e0', eye: '#5ab4ff', ice: '#c8ecff' },
+    hp: 4900, mp: 0, atk: 134, def: 52, mag: 64, spd: 14, exp: 3200, gold: 1500,
+    elem: { fire: 1.5, thunder: 1.25, ice: 0 }, resist: { poison: 0.5, sleep: 0.7, paralyze: 0.5, freeze: 1 }, drops: [{ item: 'warm_charm', p: 1 }],
+    desc: '해식 동굴의 얼음을 다스리는 거대한 바다코끼리. 얼음 갑옷을 두르면 단단해지지만, 불에는 약하다.',
+    ai(self, B) {
+      const m = self.mem; m.turn = (m.turn || 0) + 1;
+      // 예고한 공격은 다음 라운드에 (같은 라운드 2회 행동으로 몰아치지 않는다)
+      if (m.next && m.aimRound !== B.round) { const n = m.next; m.next = null; return { skill: n, target: m.mark }; }
+      if (m.next) return { skill: 'snow_bite', target: B.pickTarget('party', 'random') };
+      if (m.turn % 4 === 0) { m.next = 'tusk_crush'; m.aimRound = B.round; m.mark = B.pickTarget('party', 'fragile'); return { skill: 'tusk_aim', target: m.mark }; }
+      if (m.turn % 4 === 2) return { skill: 'frost_breath' };
+      if (m.turn % 5 === 3 && !self.buffs.def) return { skill: 'ice_armor' };
+      return { skill: Util.chance(0.5) ? 'snow_bite' : 'attack', target: B.pickTarget('party', 'random') };
+    },
+    extraActions(self) { return self.hp / self.maxhp < 0.4 && self.mem.turn % 2 === 0 ? 1 : 0; },
+  },
+  // ── 보스: 제4성부 오르카 ──
+  orca: {
+    name: '제4성부 오르카', art: 'captain', boss: true, artScale: 1.15, pal: { coat: '#2a3a5a', dark: '#141e34', shirt: '#d8d4c8', trim: '#d8b040', pants: '#2a2a38', boots: '#1a1424', skin: '#a8b8b0', beard: '#6a7a78', eye: '#5ae0b0', hat: '#1a2440', anchor: '#5a6a6a', blade: '#a8b0b8', ghost: true },
+    hp: 5600, mp: 999, atk: 138, def: 52, mag: 76, spd: 20, exp: 4800, gold: 2400,
+    elem: { thunder: 1.25, light: 1.25, dark: 0 }, resist: { poison: 0.5, sleep: 1, paralyze: 0.5, silence: 0.5, freeze: 1 }, drops: [],
+    desc: '15년 전 폭풍에 선원 전원을 잃은 해군 함장. 지금은 잿빛 성가대의 「제4성부」. 밀물과 썰물이 그를 지킨다.',
+    ai(self, B) {
+      const m = self.mem; m.turn = (m.turn || 0) + 1;
+      if (m.next && m.aimRound !== B.round) { const n = m.next; m.next = null; return { skill: n, target: m.mark }; }
+      if (m.next) return { skill: 'saber_slash', target: B.pickTarget('party', 'random') };
+      // 물때가 바뀐다: 밀물(칼날을 흘려보냄) ↔ 썰물(주문을 흩뜨림)
+      if (m.turn % 3 === 1) {
+        m.high = !m.high;
+        m.guard = m.high ? { phys: 0.5, tag: '밀물', color: '#5ab4ff', text: '밀물이 칼날을 흘려보냈다' } : { mag: 0.5, tag: '썰물', color: '#e8c070', text: '썰물의 소용돌이가 주문을 흩뜨렸다' };
+        return { skill: m.high ? 'high_tide' : 'low_tide' };
+      }
+      if (self.hp / self.maxhp < 0.6 && !m.crew1) { m.crew1 = true; return { skill: 'crew_call' }; }
+      if (self.hp / self.maxhp < 0.3 && !m.crew2) { m.crew2 = true; return { skill: 'crew_call' }; }
+      if (m.turn % 3 === 2) { m.next = 'anchor_crash'; m.aimRound = B.round; m.mark = B.pickTarget('party', 'fragile'); return { skill: 'anchor_aim', target: m.mark }; }
+      return { skill: Util.chance(0.5) ? 'cold_command' : 'saber_slash', target: B.pickTarget('party', 'random') };
+    },
+    extraActions(self) { return self.hp / self.maxhp < 0.5 && self.mem.turn % 2 === 0 ? 1 : 0; },
+  },
+  // ── 보스: 심해의 수호자 레비아 ──
+  levia: {
+    name: '심해의 수호자 레비아', art: 'kraken', boss: true, pal: { body: '#5a3a7a', dark: '#2a1a44', light: '#8a6ab0', spot: '#c8a8e8', eye: '#ffe040', flame: true },
+    hp: 7000, mp: 999, atk: 134, def: 54, mag: 80, spd: 16, exp: 6400, gold: 3000,
+    elem: { thunder: 1.5, ice: 0.5, fire: 0.75, dark: 0.5 }, resist: { poison: 0.5, sleep: 1, paralyze: 0.7, silence: 0.5, freeze: 1 }, drops: [],
+    desc: '파도 종을 지키던 심해의 수호자. 잿빛 불꽃에 물들어 날뛰고 있다. 촉수가 많을수록 파도가 높아진다.',
+    phases: [{ key: 'p2', below: 0.5 }],
+    onPhase(self, B, key) {
+      if (key !== 'p2') return [];
+      self.mem.phase = 2;
+      const ev = [{ type: 'shake', mag: 6 }, { type: 'msg', text: '레비아가 몸을 뒤틀며 깊은 바닷속의 노래를 부르기 시작했다…' }];
+      const cas = B.party.find((a) => a.id === 'cassandra' && a.alive);
+      if (cas) {
+        for (const a of B.alivePartyList) a.buffs.def = { mult: 1.3, turns: 4 };
+        ev.push({ type: 'msg', text: '[g]카산드라가 그 노래 위로 자신의 노래를 겹쳐 불렀다! 일행의 방어력이 올랐다![/]' });
+      }
+      return ev;
+    },
+    ai(self, B) {
+      const m = self.mem; m.turn = (m.turn || 0) + 1;
+      const tentacles = B.enemies.filter((e) => e.alive && e.defId === 'levia_tentacle').length;
+      // 해일: 터지는 순간 살아 있는 촉수가 있으면 대해일
+      if (m.next === 'wave' && m.aimRound !== B.round) { m.next = null; return { skill: ['tidal_wave', 'great_wave', 'raging_wave'][Math.min(2, tentacles)] }; }
+      if (m.next === 'wave') return { skill: 'ice_shard', target: B.pickTarget('party', 'random') };
+      if (tentacles < 2 && m.turn % 4 === 2 && m.turn > 2) return { skill: 'regrow' };
+      if (m.turn % 4 === 0) { m.next = 'wave'; m.aimRound = B.round; return { skill: 'wave_rise' }; }
+      if ((m.phase || 1) === 2 && m.turn % 4 === 1) return { skill: 'abyss_song' };
+      return { skill: Util.chance(0.5) ? 'ice_shard' : 'attack', target: B.pickTarget('party', 'random') };
+    },
+    extraActions(self) { return self.mem.phase === 2 && self.mem.turn % 3 === 0 ? 1 : 0; },
+  },
+  levia_tentacle: {
+    name: '레비아의 촉수', art: 'tentacle', pal: { body: '#6a4a8a', dark: '#3a2a54', sucker: '#e8c8ff' },
+    hp: 560, mp: 0, atk: 124, def: 46, mag: 40, spd: 18, exp: 0, gold: 0,
+    elem: { thunder: 1.5, fire: 1.25, ice: 0.5 }, resist: { poison: 0.5, sleep: 0.5, freeze: 0.5 }, drops: [],
+    desc: '레비아의 촉수. 사람을 휘감아 놓아주지 않는다. 쓰러뜨리면 붙잡힌 동료가 풀려난다.',
+    ai(self, B) {
+      const holding = B.party.some((a) => a.alive && a.status.bind && a.bindBy === self.uid);
+      if (!holding && Util.chance(0.5)) return { skill: 'tentacle_grab', target: B.pickTarget('party', 'random') };
+      return { skill: Util.chance(0.3) ? 'tentacle_lash' : 'tentacle_strike', target: B.pickTarget('party', 'random') };
+    },
   },
 };
 for (const id in MONSTERS) MONSTERS[id].id = id;
@@ -4220,6 +4709,35 @@ const ENCOUNTERS = {
       { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
     ],
   },
+  coast: {
+    bg: 'snowfield', rate: [14, 22],
+    groups: [
+      { w: 7, e: ['frost_gull', 'frost_gull'] }, { w: 6, e: ['snow_wolf', 'snow_wolf'] }, { w: 6, e: ['ice_crab'] },
+      { w: 5, e: ['brine_jelly', 'frost_gull'] }, { w: 4, e: ['snow_wolf', 'ice_crab'] }, { w: 3, e: ['frost_gull', 'frost_gull', 'brine_jelly'] },
+      { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
+    ],
+  },
+  icecave: {
+    bg: 'icecave', rate: [12, 20],
+    groups: [
+      { w: 7, e: ['ice_bat', 'ice_bat', 'ice_bat'] }, { w: 6, e: ['frost_golem'] }, { w: 6, e: ['frost_wisp', 'ice_bat'] },
+      { w: 5, e: ['ice_crab', 'frost_wisp'] }, { w: 3, e: ['frost_golem', 'frost_wisp'] }, { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
+    ],
+  },
+  ship: {
+    bg: 'ship', rate: [12, 20],
+    groups: [
+      { w: 7, e: ['drowned_sailor', 'drowned_sailor'] }, { w: 6, e: ['ghost_lantern', 'drowned_sailor'] }, { w: 5, e: ['ghost_lantern', 'ghost_lantern'] },
+      { w: 4, e: ['drowned_sailor', 'drowned_sailor', 'ghost_lantern'] }, { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
+    ],
+  },
+  sunken: {
+    bg: 'sunken', rate: [12, 20],
+    groups: [
+      { w: 7, e: ['deep_jelly', 'deep_jelly'] }, { w: 6, e: ['angler'] }, { w: 6, e: ['drowned_knight'] },
+      { w: 5, e: ['angler', 'deep_jelly'] }, { w: 3, e: ['drowned_knight', 'deep_jelly'] }, { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
+    ],
+  },
   cellar: {
     bg: 'cave', rate: [10, 18],
     groups: [{ w: 5, e: ['toxic_shroom'] }, { w: 4, e: ['toxic_shroom', 'toxic_shroom'] }, { w: 3, e: ['moss_jelly', 'toxic_shroom'] }],
@@ -4256,6 +4774,12 @@ const PARTY_TALK = {
     22: '미오, 다신 그런 일 없을 거야. 내 방패 뒤가 제일 안전하다고!',
     23: '{H}, 아까 그 「이번 주」라는 거… 아니다. 네가 말할 때까지 기다릴게.',
     24: '사막의 은인이래! 「별의 수호대」 이름이 점점 유명해지는 것 같아. 헤헤.',
+    25: '사막에서 바로 눈밭이라니… 갑옷이 얼어서 몸에 달라붙을 것 같아.',
+    27: '얼음 동굴… 미끄러지면 끝까지 가는 거지? 바위에 부딪히면 아프겠다… 아니, 안 무서워!',
+    29: ['카산드라 누나, 노래로 힘이 나게 해 주더라. 진짜 신기해.', '…넬, 좋겠다. 가족이 돌아와서.'],
+    30: ['오르카 함장… 아버지랑 닮았어. 지키지 못한 사람.', '나는 그렇게 안 될 거야. 지킬 거야. 끝까지.'],
+    31: '{H}. 화요일이라고 했지. 달력에 표시해 뒀어. 기사는 약속을 지켜.',
+    32: '하늘섬이라니! 날아가야 하나? 기사도 하늘을 날 수 있나?',
     dungeon: '어두운 곳은 질색이야… 아, 아니! 질색이 아니라 경계 중인 거야!',
   },
   linette: {
@@ -4278,6 +4802,12 @@ const PARTY_TALK = {
     22: '미오 말로는, 자히르는 아지랑이처럼 모습을 흐린대요. 겉모습으로 구분이 안 된다면… 「보는 눈」이 있어야겠죠.',
     23: ['교수님은 처음부터 기다리고 있었던 거예요. 우리가 심장을 모으기를.', '…그래도 멈추지 않을 거예요. 마지막에 열쇠를 쥐는 건 {H}니까.'],
     24: '북해의 파도 종… 바다에 잠긴 종이라니, 배를 구해야겠네요. 저 배멀미 하는데…',
+    25: '북쪽 바다는 겨울이 길대요. 종이 울부짖으면 바다도 얼어붙는다는 기록이 있어요.',
+    27: '얼음 위에서는 방향을 정하면 끝까지 가요. 어디서 멈출지를 먼저 생각해야 해요. …바둑 같네요.',
+    28: '등대의 잿빛 불꽃… 무언가를 부르는 신호 같아요. 렌즈는 빛을 모으는 장치니까, 그걸 거꾸로 쓴 거예요.',
+    29: '그 함장, 물때가 바뀔 때마다 몸을 감싸는 물결이 달라질 거예요. 바다 사람들 말처럼… 상황을 보고 공격 방법을 바꿔야 해요.',
+    30: ['수첩, 계속 들여다보게 돼요. 엘리의 그림이요.', '교수님한테 등불을 준 건 일곱 살 아이였어요. …저한테 등불을 준 건 교수님이었고요.'],
+    31: '하늘섬… 교수님의 수첩에 그려져 있던 그 섬이에요. 마지막 질문은 거기서 해요.',
     dungeon: '여기 마물들, 저마다 싫어하는 게 다른 것 같아요. 반응을 잘 살피면 MP를 아낄 수 있을지도요.',
   },
   mio: {
@@ -4295,6 +4825,10 @@ const PARTY_TALK = {
     22: ['자히르 님은 나쁜 사람이 아니에요. 노래하라고 하면서 계속 울고 계셨어요.', '…그리고 종 안의 그 목소리. 빨리 가야 해요.'],
     23: ['엄마의 노래, 이제 기억나요. 끝까지요.', '…헤헤. 울어서 눈이 부었어요. 보지 마세요.'],
     24: ['엄마는 노래가 되어서 기다렸대요. 십 년 동안.', '{H} 님을 기다리는 사람도… 분명 그렇게 기다리고 있을 거예요.'],
+    25: '바다의 노래가 들려요. 엄마 노래랑 달라요. 차갑고, 아주 외로운 노래예요.',
+    29: '카산드라 씨 노래, 정말 예뻐요. 엄마 노래랑 같은 곡이 있어요. 신기하죠?',
+    31: '종을 지키던 분이 아파하고 있었어요. 벨가르 씨도, 레비아도… 종지기들은 다 외로웠던 것 같아요.',
+    32: '{H} 님의 엄마도 노래를 불러 주실까요? 수술 날에. …저도 여기서 불러 드릴게요.',
     dungeon: 'HP가 줄면 망설이지 말고 말해 주세요. 치유는 제 일이에요!',
   },
   nell: {
@@ -4314,8 +4848,21 @@ const PARTY_TALK = {
     22: '미오. …아니, 그냥. 돌아와서 다행이라고.',
     23: '언니는 이번에도 없었어. 근데… 자히르 아저씨 보니까 알 것 같아. 언니도 그냥, 길을 잃은 거야.',
     24: '샘물 진짜 맛있다. 공짜 물이 이렇게 맛있는 줄 몰랐어.',
+    25: '잿빛 돛이라니. …언니가 거기 있을지도 몰라.',
+    28: '등대 위에서 노래가 들려. 저 노래… 언니야.',
+    29: ['언니가 돌아왔어. …별로 안 기뻐. 진짜야.', '…거짓말이야.'],
+    31: '{H}, 화요일까지 남은 날 세고 있지? 나도 세고 있어. 같이 세자.',
+    32: '로켓 속 엄마 그림, 언니가 그렸대. 못 그렸어. …그래도 닮았어.',
     dungeon: '보물 상자 중에 이빨 달린 놈이 있대. 빨간 상자는 조심해.',
   },
+};
+
+PARTY_TALK.cassandra = {
+  29: ['8년 동안 부른 노래는 다 엄마를 부르는 노래였어요. 이제는… 넬을 위해 부를게요.', '…넬한테는 비밀이에요.'],
+  30: ['오르카 함장은 늘 갑판에서 선원들 이름을 불렀어요. 매일 밤, 마흔 번씩.', '성가대에는 그런 사람들뿐이에요. 누군가를 너무 많이 불러 버린 사람들.'],
+  31: ['마지막 종에는 제1성부가 있어요. 성가대의 맨 처음 목소리.', '…그 사람에 대해서는, 저도 잘 몰라요. 얼굴을 본 적이 없거든요.'],
+  32: '하늘섬… 오스릭 님, 아니 교수님은 마지막에 무엇을 묻고 싶은 걸까요. 리네트 씨라면 알 것 같은데.',
+  dungeon: '노래가 필요하면 말해요. 용기의 노래, 수호의 노래… 지금은 뭐가 좋을까요?',
 };
 
 function partyTalkLine(id) {
@@ -4648,6 +5195,14 @@ const Game = (() => {
   //  9 2장 출발 · 10 베인 격파 · 11 왕도 도착 · 12 학장 면담 · 13 브란 입단 · 14 늙은 이빨 격파 · 15 카산드라 격파 · 16 2장 완료
   function progress() {
     const f = state.flags;
+    if (f.chapter4_done) return 32;
+    if (f.levia_defeated) return 31;
+    if (f.orca_defeated) return 30;
+    if (f.cassandra_joined) return 29;
+    if (f.walrus_defeated) return 28;
+    if (f.cave4_open) return 27;
+    if (f.reached_marea) return 26;
+    if (f.ch4_started) return 25;
     if (f.chapter3_done) return 24;
     if (f.zahir_defeated) return 23;
     if (f.mio_rescued) return 22;
@@ -4808,6 +5363,38 @@ const QUESTS = {
     ],
     reward: { gold: 3000, items: [['sand_badge', 1]] },
   },
+  main5: {
+    name: '파도의 종', type: 'main', giver: '오필리아 학장',
+    desc: '북해로 가는 배가 한 달째 묶여 있다. 등대가 꺼진 뒤로 안개 속에서 회색 돛을 단 배가 나타나 배들을 삼킨다고 한다.',
+    stages: [
+      { goal: '은빛 가도 북쪽 숲길을 지나 항구 마을 마레아로 간다', hint: '숲 너머 북쪽, 눈 덮인 바닷가의 항구로', target: { map: 'highway', x: 42, y: 1 } },
+      { goal: '마레아의 항만 사무소에서 항만장을 만난다', hint: '배가 묶인 사정을 아는 사람을 찾아가자', target: { map: 'marea', x: 5, y: 11 } },
+      { goal: '마을 동쪽 집의 등대지기 손녀 에다를 찾아간다', hint: '꺼진 등대를 지키던 집안을 찾아가자', target: { map: 'marea', x: 34, y: 20 } },
+      { goal: '해안 동쪽의 얼어붙은 해식 동굴을 지나 등대로 간다', hint: '무너진 절벽길 대신, 얼음 동굴을 지나 등대 곶으로', target: { map: 'coast', x: 33, y: 13 } },
+      { goal: '등대 꼭대기 등명실로 올라간다', hint: '꺼진 등대 위에서 무언가가 차갑게 타고 있다', target: { map: 'lighthouse1', x: 5, y: 1 } },
+      { goal: '마레아의 항만장 그레고르에게 돌아간다', hint: '바다 위의 그림자를 쫓으려면 배가 필요하다', target: { map: 'marea', x: 5, y: 11 } },
+      { goal: '부두 동쪽 끝의 작은 배를 타고 유령선으로 간다', hint: '부두에서 기다리는 배에 오르자', target: { map: 'marea', x: 30, y: 2 } },
+      { goal: '선창을 지나 선미 갑판의 함장을 찾는다', hint: '배의 주인은 키를 잡고 있다. 길은 배 밑바닥을 지나 이어진다', target: { map: 'ship_hold', x: 22, y: 2 } },
+      { goal: '가라앉은 신전 깊은 곳, 파도 종의 방으로 간다', hint: '바닷속 깊은 곳에서 종의 노래가 들린다', target: { map: 'sunken1', x: 12, y: 1 } },
+      { goal: '마레아의 항만장 그레고르에게 돌아간다', hint: '항구로 돌아가 소식을 전하자', target: { map: 'marea', x: 5, y: 11 } },
+    ],
+    reward: { gold: 4500, items: [['anchor_badge', 1]] },
+  },
+  s_crab: {
+    name: '집게왕 현상수배', type: 'sub', giver: '항만 사무소 게시판',
+    desc: '해안 동쪽 모래톱에 거대한 게 「집게왕」이 나타나 어구를 부수고 있다. 토벌하면 현상금 1800G.',
+    stages: [
+      { goal: '해안 동쪽 모래톱의 집게왕을 토벌한다', hint: '바닷가 모래톱에서 어구를 부수는 거대한 게를 찾아보자', target: { map: 'coast', x: 41, y: 26 } },
+      { goal: '항만장 그레고르에게 보고한다', hint: '토벌 소식을 항만 사무소에 알리자', target: { map: 'marea', x: 5, y: 11 } },
+    ],
+    reward: { gold: 1800, items: [['sailor_knot', 1]] },
+  },
+  s_frozen: {
+    name: '얼어붙은 편지', type: 'sub', giver: '해식 동굴의 얼음',
+    desc: '해식 동굴의 얼음 속에서 15년 전의 편지를 꺼냈다. 「마레아의 엘사에게 ─ 은빛 갈매기호 갑판원 한스」',
+    stages: [{ goal: '선술집 「갈매기」의 엘사에게 편지를 전한다', hint: '편지가 부르는 사람을 마을에서 찾아보자', target: { map: 'marea', x: 5, y: 20 } }],
+    reward: { items: [['pearl_ring', 1], ['elixir', 2]] },
+  },
   s_diary: {
     name: '무녀의 일기', type: 'sub', giver: '모래에 묻힌 일기장',
     desc: '사막에서 낡은 일기장의 찢어진 페이지를 발견했다. 단정한 글씨의 주인은 십 년 전 사미라에 왔던 사람인 듯하다.',
@@ -4908,8 +5495,9 @@ const Quests = (() => {
     },
     // 현재 화면에 띄울 대표 목표 (메인 우선)
     currentGoal() {
-      for (const id of ['main1', 'main2', 'main3', 'main4']) if (this.isActive(id)) return { id, text: this.goal(id), target: this.target(id) };
-      if (Game.flag('chapter3_done')) return { id: null, text: '자유 탐험 — 다음 이야기를 기다리며 남은 일을 정리해 보자', target: null };
+      for (const id of ['main1', 'main2', 'main3', 'main4', 'main5']) if (this.isActive(id)) return { id, text: this.goal(id), target: this.target(id) };
+      if (Game.flag('chapter4_done')) return { id: null, text: '자유 탐험 — 다음 이야기를 기다리며 남은 일을 정리해 보자', target: null };
+      if (Game.flag('chapter3_done')) return { id: null, text: detailed() ? '마도학원의 오필리아 학장을 찾아가 북해 배편에 대해 듣자' : '사막의 일을 왕도에 전하자. 학원에서 새 소식이 기다리고 있을지도 모른다', target: detailed() ? { map: 'capital', x: 7, y: 10 } : null };
       if (Game.flag('chapter2_done')) return { id: null, text: detailed() ? '마도학원의 오필리아 학장을 찾아가 다음 여정에 대해 듣자' : '왕도에서 쉬는 동안, 학원에서 새 소식이 기다리고 있을지도 모른다', target: detailed() ? { map: 'capital', x: 7, y: 10 } : null };
       if (Game.flag('chapter1_done')) return { id: null, text: detailed() ? '리벨의 하르도 장로에게 작별 인사를 하고 왕도로 떠나자' : '새로운 여정을 앞두고, 마을의 어른께 인사를 드리자', target: detailed() ? { map: 'rivel', x: 18, y: 5 } : null };
       return null;
@@ -4978,7 +5566,7 @@ const Save = (() => {
       time: s.playTime,
       party: s.party.slice(),
       date: Date.now(),
-      chapter: Game.flag('chapter3_done') ? '제3장 완료' : Game.flag('ch3_started') ? '제3장' : Game.flag('chapter2_done') ? '제2장 완료' : Game.flag('ch2_started') ? '제2장' : Game.flag('chapter1_done') ? '제1장 완료' : '제1장',
+      chapter: Game.flag('chapter4_done') ? '제4장 완료' : Game.flag('ch4_started') ? '제4장' : Game.flag('chapter3_done') ? '제3장 완료' : Game.flag('ch3_started') ? '제3장' : Game.flag('chapter2_done') ? '제2장 완료' : Game.flag('ch2_started') ? '제2장' : Game.flag('chapter1_done') ? '제1장 완료' : '제1장',
     };
   }
 
@@ -5123,7 +5711,7 @@ class Actor {
     if (this.isParty) return 1;
     return this.elem[el] !== undefined ? this.elem[el] : 1;
   }
-  get disabled() { return !!(this.status.sleep || this.status.paralyze); }
+  get disabled() { return !!(this.status.sleep || this.status.paralyze || this.status.freeze || this.status.bind); }
   // 도감·상성 기억에 쓰는 ID (신기루는 본체와 같은 마물로 기억한다)
   get knownId() { return this.def ? this.def.knownAs || this.defId : null; }
 }
@@ -5149,7 +5737,7 @@ class BattleCore {
     this.killed = [];
     this.recoveredGold = 0;
     // 수면·마비·침묵은 전투 한정 상태 (독은 전투 밖에서도 유지)
-    for (const a of this.party) for (const k of ['sleep', 'paralyze', 'silence']) delete a.status[k];
+    for (const a of this.party) for (const k of TEMP_STATUS) delete a.status[k];
   }
 
   addEnemy(id) {
@@ -5233,6 +5821,8 @@ class BattleCore {
     if (!a.alive || this.result) return ev;
     if (a.status.sleep) { ev.push({ type: 'msg', text: `${a.name}${Util.josa(a.name, '은')} 잠들어 있다… Zzz` }); return ev; }
     if (a.status.paralyze) { ev.push({ type: 'msg', text: `${a.name}${Util.josa(a.name, '은')} 몸이 마비되어 움직일 수 없다!` }); return ev; }
+    if (a.status.freeze) { ev.push({ type: 'msg', text: `${a.name}${Util.josa(a.name, '은')} 얼음에 갇혀 움직일 수 없다!` }); return ev; }
+    if (a.status.bind) { ev.push({ type: 'msg', text: `${a.name}${Util.josa(a.name, '은')} 단단히 휘감겨 움직일 수 없다!` }); return ev; }
 
     if (!a.isParty) {
       const act = this.chooseEnemyAction(a);
@@ -5352,6 +5942,9 @@ class BattleCore {
           ev.push({ type: 'heal', target: t, amount: t.hp - before, hpAfter: t.hp });
           ev.push({ type: 'msg', text: `${t.name}의 HP가 ${t.hp - before} 회복되었다!` });
           if (sk.regenAfter) t.buffs.regen = { mult: 1.08, turns: sk.regenAfter };
+          const thawed = (sk.cures || []).filter((st) => t.status[st]);
+          for (const st of thawed) delete t.status[st];
+          if (thawed.length) { ev.push({ type: 'status', target: t }); ev.push({ type: 'msg', text: `${t.name}의 ${thawed.map((st) => STATUS_NAMES[st]).join('·')} 상태가 나았다!` }); }
         }
         if (sk.regenAfter) ev.push({ type: 'msg', text: '부드러운 노랫소리가 일행을 감싸 안았다…' });
         break;
@@ -5508,20 +6101,21 @@ class BattleCore {
     if (!(t.def && t.def.shiny && !crit)) dmg *= (sk.mult || 1) * Util.randRange(0.88, 1.12) * em;
     if (t.defending) dmg *= 0.5;
     const bm = this.barrierMult(t);
-    dmg *= bm;
+    const gm = this.guardMult(t, 'phys');
+    dmg *= bm * gm;
     dmg = Math.max(t.def && t.def.shiny && !crit ? 0 : 1, Math.round(dmg));
     ev.push({ type: 'anim', name: sk.anim || 'slash', targets: [t], user: a, crit });
     if (crit) ev.push({ type: 'msg', text: a.isParty ? '[y]회심의 일격![/]' : '[r]통한의 일격![/]' });
     ev.push(...this.discover(t, element, em));
-    ev.push(...this.damage(t, dmg, { crit, em, physical: true, from: a, barrier: bm < 1 }));
+    ev.push(...this.damage(t, dmg, { crit, em, physical: true, from: a, barrier: bm < 1, guard: gm < 1, element }));
     if (sk.steal && a.isParty && t.def.steal && !t.stolen) ev.push(...this.trySteal(a, t));
     if (sk.type === 'drain' && dmg > 0) {
       const before = a.hp; a.hp = Math.min(a.mhp, a.hp + Math.round(dmg * 0.6));
       if (a.hp > before) { ev.push({ type: 'heal', target: a, amount: a.hp - before, hpAfter: a.hp }); ev.push({ type: 'msg', text: `${a.name}${Util.josa(a.name, '은')} HP를 ${a.hp - before} 빨아들였다!` }); }
     }
     if (t.alive) {
-      if (sk.status) ev.push(...this.inflict(t, sk.status, false));
-      if (sk.id === 'attack' && a.isParty && a.st.onHit) ev.push(...this.inflict(t, a.st.onHit, false));
+      if (sk.status) ev.push(...this.inflict(t, sk.status, false, a));
+      if (sk.id === 'attack' && a.isParty && a.st.onHit) ev.push(...this.inflict(t, a.st.onHit, false, a));
       if (sk.debuff && Util.chance(sk.debuff.chance || 0.3)) {
         t.buffs.def = { mult: sk.debuff.def, turns: sk.debuff.turns || 3 };
         ev.push({ type: 'buff', target: t, up: false });
@@ -5546,6 +6140,11 @@ class BattleCore {
     return ev;
   }
 
+  // 자세: 밀물(물리)·썰물(주문)처럼 한쪽 공격을 막는 적 (mem.guard = { phys|mag: 배율, text })
+  guardMult(t, kind) {
+    if (t.isParty || !t.mem.guard || t.mem.guard[kind] === undefined) return 1;
+    return t.mem.guard[kind];
+  }
   // 수호 결계: 보스를 지키는 하수인이 살아 있으면 받는 피해가 줄어든다
   barrierMult(t) {
     if (t.isParty || !t.def.barrier) return 1;
@@ -5556,14 +6155,15 @@ class BattleCore {
     const ev = [];
     const em = t.elemMult(sk.element);
     const bm = this.barrierMult(t);
-    let dmg = (sk.power + (sk.type === 'damage' ? 0 : a.mag * (sk.scale || 0))) * Util.randRange(0.92, 1.08) * em * bm;
+    const gm = sk.type === 'damage' ? 1 : this.guardMult(t, 'mag');
+    let dmg = (sk.power + (sk.type === 'damage' ? 0 : a.mag * (sk.scale || 0))) * Util.randRange(0.92, 1.08) * em * bm * gm;
     if (t.defending) dmg *= 0.5;
     dmg = Math.round(dmg);
     ev.push(...this.discover(t, sk.element, em));
     if (em === 0) { ev.push({ type: 'msg', text: `${t.name}에게는 ${ELEMENTS[sk.element] || ''} 속성이 전혀 통하지 않는다!` }); ev.push({ type: 'miss', target: t }); return ev; }
     dmg = Math.max(1, dmg);
-    ev.push(...this.damage(t, dmg, { em, from: a, barrier: bm < 1 }));
-    if (t.alive && sk.status) ev.push(...this.inflict(t, sk.status, false));
+    ev.push(...this.damage(t, dmg, { em, from: a, barrier: bm < 1, guard: gm < 1, element: sk.element }));
+    if (t.alive && sk.status) ev.push(...this.inflict(t, sk.status, false, a));
     return ev;
   }
 
@@ -5577,7 +6177,14 @@ class BattleCore {
     if (info.em > 1) txt += ' [y]약점을 찔렀다![/]';
     else if (info.em < 1 && info.em > 0) txt += ' [d](잘 통하지 않는다)[/]';
     if (info.barrier) txt += ' [b](결계가 피해를 줄였다)[/]';
+    if (info.guard) txt += ` [b](${t.mem.guard.text || '막혔다'})[/]`;
     ev.push({ type: 'msg', text: txt });
+    // 불 속성은 얼음을 녹인다
+    if (t.hp > 0 && t.status.freeze && info.element === 'fire') {
+      delete t.status.freeze;
+      ev.push({ type: 'status', target: t });
+      ev.push({ type: 'msg', text: `${t.name}${Util.josa(t.name, '을')} 가두던 얼음이 녹아내렸다!` });
+    }
     if (t.hp <= 0) ev.push(...this.kill(t));
     else if (!t.isParty && t.def.phases) ev.push(...this.checkPhases(t));
     return ev;
@@ -5594,12 +6201,18 @@ class BattleCore {
     t.buffs = {};
     t.charging = null;
     if (t.isParty) {
-      for (const k of ['sleep', 'paralyze', 'silence', 'poison']) delete t.status[k];
+      for (const k of TEMP_STATUS.concat('poison')) delete t.status[k];
       ev.push({ type: 'die', target: t });
       ev.push({ type: 'msg', text: `[r]${t.name}${Util.josa(t.name, '은')} 쓰러졌다…[/]` });
     } else {
       this.killed.push(t);
       for (const m of this.enemies) if (m.mirrorOf === t && m.alive) { m._hp = 0; ev.push({ type: 'die', target: m, silent: true }); }
+      // 휘감던 적이 쓰러지면 속박이 풀린다
+      for (const p of this.party) if (p.alive && p.status.bind && p.bindBy === t.uid) {
+        delete p.status.bind; p.bindBy = null;
+        ev.push({ type: 'status', target: p });
+        ev.push({ type: 'msg', text: `${p.name}${Util.josa(p.name, '이')} 풀려났다!` });
+      }
       if (t.pilfered) { Game.addGold(t.pilfered); this.recoveredGold += t.pilfered; }
       ev.push({ type: 'die', target: t });
       ev.push({ type: 'msg', text: `${t.name}${Util.josa(t.name, '을')} 쓰러뜨렸다!` + (t.pilfered ? ` [y](${t.pilfered}G를 되찾았다)[/]` : '') });
@@ -5620,16 +6233,17 @@ class BattleCore {
     return ev;
   }
 
-  inflict(t, statusMap, verbose) {
+  inflict(t, statusMap, verbose, from) {
     const ev = [];
     for (const s in statusMap) {
       if (t.status[s]) { if (verbose) ev.push({ type: 'msg', text: `${t.name}${Util.josa(t.name, '은')} 이미 ${STATUS_NAMES[s]} 상태다.` }); continue; }
       const res = t.resist(s);
       if (res >= 1) { if (verbose) ev.push({ type: 'msg', text: `${t.name}에게는 ${STATUS_NAMES[s]}${Util.josa(STATUS_NAMES[s], '이')} 통하지 않는다!` }); continue; }
       if (!Util.chance(statusMap[s] * (1 - res))) { if (verbose) ev.push({ type: 'msg', text: `${t.name}에게는 효과가 없었다.` }); continue; }
-      t.status[s] = s === 'poison' ? 1 : s === 'sleep' ? Util.randInt(2, 4) : s === 'paralyze' ? Util.randInt(1, 3) : Util.randInt(3, 4);
+      t.status[s] = { poison: 1, sleep: Util.randInt(2, 4), paralyze: Util.randInt(1, 3), freeze: Util.randInt(2, 3), bind: 3 }[s] || Util.randInt(3, 4);
+      if (s === 'bind') t.bindBy = from ? from.uid : null;
       ev.push({ type: 'status', target: t, status: s, on: true });
-      const msg = { poison: '독에 걸렸다!', sleep: '잠들어 버렸다!', paralyze: '몸이 마비되었다!', silence: '주문이 봉인되었다!' }[s];
+      const msg = { poison: '독에 걸렸다!', sleep: '잠들어 버렸다!', paralyze: '몸이 마비되었다!', silence: '주문이 봉인되었다!', freeze: '꽁꽁 얼어붙었다!', bind: '휘감겨 꼼짝도 할 수 없게 되었다!' }[s];
       ev.push({ type: 'msg', text: `${t.name}${Util.josa(t.name, '은')} ${msg}` });
     }
     return ev;
@@ -5679,14 +6293,15 @@ class BattleCore {
           if (a.hp <= 0) ev.push(...this.kill(a));
         }
       }
-      for (const s of ['sleep', 'paralyze', 'silence']) {
+      for (const s of TEMP_STATUS) {
         if (!a.status[s]) continue;
         a.status[s]--;
         const wake = s === 'sleep' && Util.chance(0.25);
         if (a.status[s] <= 0 || wake) {
           delete a.status[s];
           ev.push({ type: 'status', target: a });
-          ev.push({ type: 'msg', text: `${a.name}${Util.josa(a.name, '은')} ${{ sleep: '잠에서 깨어났다!', paralyze: '마비가 풀렸다!', silence: '다시 주문을 외울 수 있게 되었다!' }[s]}` });
+          if (s === 'bind') a.bindBy = null;
+          ev.push({ type: 'msg', text: `${a.name}${Util.josa(a.name, '은')} ${{ sleep: '잠에서 깨어났다!', paralyze: '마비가 풀렸다!', silence: '다시 주문을 외울 수 있게 되었다!', freeze: '얼음을 깨고 빠져나왔다!', bind: '몸부림쳐 빠져나왔다!' }[s]}` });
         }
       }
       if (a.buffs.regen && a.buffs.regen.turns > 0 && a.hp < a.mhp) {
@@ -5813,6 +6428,20 @@ const TILES = {
   '8': { name: 'floorTemple' },
   '9': { name: 'quicksand', solid: true },
   '/': { name: 'cliffRed', solid: true },
+  // 북쪽 바다
+  'σ': { name: 'snow' },
+  'τ': { name: 'snowPine', solid: true },
+  'ι': { name: 'ice', slide: true },            // 밟으면 막힐 때까지 미끄러진다
+  'Ψ': { name: 'wallIce', solid: true },
+  'π': { name: 'dock', road: true },
+  'δ': { name: 'deck' },
+  'ρ': { name: 'hull', solid: true },
+  'μ': { name: 'mast', solid: true },
+  'κ': { name: 'floorCoral' },
+  'Κ': { name: 'wallCoral', solid: true },
+  'ς': { name: 'seaweed', solid: true },
+  'λ': { name: 'iconLighthouse' },
+  'θ': { name: 'iconIceCave' },
   // 실내
   'I': { name: 'wallIn', solid: true },
   'w': { name: 'floorWood' },
@@ -7368,12 +7997,12 @@ const Story = {
 defMap('highway', {
   name: '은빛 가도', kind: 'field', bgm: 'field', base: '.',
   tiles: [
-    '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^', // 0
-    '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^', // 1
-    'TTY.T.TY".T.,.....,......s~~~..T.TYY..TT.T...YT..TYTYT.T', // 2
-    'TT....TT.Y...;........,...~~~.,YY.YYTY.TYTYT.....rYTY,TT', // 3
-    'T.Y.YTY.YY........."....".~~~s.TTTY..YT;TTT...r...Y.TTTT', // 4
-    'T.T,.....Y.,.............s~~~..TTTTTYTTYYT.........T.TTT', // 5
+    '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^:^^^^^^^^^^^^^', // 0
+    '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^:^^^^^^^^^^^^^', // 1
+    'TTY.T.TY".T.,.....,......s~~~..T.TYY..TT.T:..YT..TYTYT.T', // 2
+    'TT....TT.Y...;........,...~~~.,YY.YYTY.TYT:T.....rYTY,TT', // 3
+    'T.Y.YTY.YY........."....".~~~s.TTTY..YT;TT:...r...Y.TTTT', // 4
+    'T.T,.....Y.,.............s~~~..TTTTTYTTYYT:........T.TTT', // 5
     'T...YTYTTY......,.........~~~,..TT..TTYT.:::.......YTYTT', // 6
     'T.TY..T.TT;........,......~~~s.TYY.TTT,TT:T.......TT.T.T', // 7
     'T.YT.Y..Y..................~~~,.TT.YT.TYT:TYTTTY.TTYT.TT', // 8
@@ -7417,6 +8046,10 @@ defMap('highway', {
     {
       x: 48, y: 31, to: 'canyon', tx: 15, ty: 1, dir: 'down', cond: () => Game.flag('ch3_started'),
       blocked: async () => { await S.say(null, '(협곡 쪽에서 모래 섞인 바람이 사납게 몰아친다. 눈을 뜨기도 힘들다.)\n…지금은 이 너머로 갈 수 없을 것 같다.'); },
+    },
+    {
+      x: 42, y: 0, to: 'coast', tx: 24, ty: 34, dir: 'up', cond: () => Game.flag('ch4_started'),
+      blocked: async () => { await S.say(null, '(숲길 끝이 눈보라에 하얗게 막혀 있다. 북쪽에서 차가운 바닷바람이 불어온다.)\n…지금은 이 너머로 갈 이유가 없다.'); },
     },
   ],
   triggers: [
@@ -7672,7 +8305,7 @@ defMap('academy', {
   npcs: [
     {
       id: 'ophelia', x: 12, y: 3, look: 'dean', dir: 'down',
-      mark: () => P() === 11 || P() === 15 || P() === 16,
+      mark: () => P() === 11 || P() === 15 || P() === 16 || P() === 24,
       talk: () => Story.dean(),
     },
     {
@@ -8277,12 +8910,14 @@ Object.assign(Story, {
     }
     if (p === 15) { await Story.chapter2Ending(); return; }
     if (p === 16) { await Story.beginChapter3(); return; }
+    if (p === 24) { await Story.beginChapter4(); return; }
     await S.say('오필리아 학장', byP({
       12: '라인하르트는 기사단 본부에 있을 걸세. 그 고집쟁이를 설득하는 건 자네들 몫이야.',
       13: ['탑 문이 열리지 않는다고? …그렇겠지. 탑 안의 시간이 멈춰 있으니까.', '길이 없는 건 아닐세. 탑은 원래 거대한 물시계였지. 물이 드나들던 길이 어딘가에 남아 있을 게야.', '그 길을 아는 사람이 이 도시 어딘가에 있을 걸세. …신분을 증명할 만한 것을 들고 가야 말을 들어 주겠지만.'],
       14: '시계탑 위층으로 갈수록 시간의 흐름이 이상해질 거야. 조심하게.',
       17: ['사막의 모래 종… 옛 기록은 많지 않아. 다녀와서 자네들이 직접 들려주게.', '리네트, 가끔은 편지를 보내렴. 이번엔 꼭.'],
-      24: ['모래 종의 심장까지… 이제 남은 건 북해와 하늘섬이로군.', '북해로 가는 배편은 지금 알아보는 중이야. 조금만 기다려 주게.'],
+      25: ['마레아의 항구는 북쪽 숲길 끝이야. 눈이 많을 테니 조심하렴.', '리네트, 이번에도 편지 잊지 말고.'],
+      32: ['하늘섬이 떠올랐다고…? 학원 천문대가 밤새 난리야.', '하늘로 가는 길은 지금 찾고 있단다. 조금만 쉬어 가렴.'],
     }));
     if (p === 13 && Quests.isActive('main3') && Quests.stage('main3') === 5) {
       S.stage('main3', 6);
@@ -9634,6 +10269,1011 @@ Object.assign(Story, {
 });
 
 
+// ── src/maps/chapter4.js ──
+'use strict';
+// ─────────────────────────────────────────────────────────────
+// 제4장 「파도의 종」 맵: 잿빛 해안 길 · 항구 마을 마레아(+실내) · 얼어붙은 해식 동굴 · 등대 · 유령선 · 가라앉은 신전
+//  진행도(Game.progress): 25 출발 · 26 마레아 도착 · 27 동굴 개방 · 28 서리엄니 격파
+//                         29 카산드라 합류 · 30 오르카 격파 · 31 레비아 격파 · 32 4장 완료
+// ─────────────────────────────────────────────────────────────
+const SNOW_WEATHER = () => 'snow';
+
+// ── 잿빛 해안 길 ──
+defMap('coast', {
+  name: '잿빛 해안 길', kind: 'field', bgm: 'northsea', base: 'σ', weather: SNOW_WEATHER,
+  tiles: [
+    '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~', // 0
+    '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~σσσσσ~', // 1
+    '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~σσλσσ~', // 2
+    '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~σσσσσ~', // 3
+    'σσσσσσσσσσσσσσσσσσσσσσσσσσσσσσσσσσσσ~~rrr~σσσσσ~', // 4
+    'σσσσσσσσσσσσσσσσσσσσστσσστσττσστστσσ~~rrrr~~~~~~', // 5
+    'σσσσσσστrσσσσσσστσσσσσσσσσrστσσσσσrrrrrrr~~~~~~~', // 6
+    'στσσσσσσσσVσστσσσσσσσσrσrσσσσσσστσσσ~~~~~~~~~~~~', // 7
+    'σσσστσσσσσ:σσστσσσσσrσσσσrσσσσσσσσσσ~~~~~~~~~~~~', // 8
+    'σσσσστσσσσ:στσσσσστσσσσσσσσσσσ^^^^^^^^~~~~~~~~~~', // 9
+    'σσσrσσσσσσ:σσrσσσστσσσσσσσσσσσ^^^^^^^^σσσ~~~~~~~', // 10
+    'σσσσσσσσσσ:σσσσσσσσσσσσσσστσσ^^^^^^^^^σσσ~~~~~~~', // 11
+    'στσσσσσσσσ:σσrσσσσσστσσσστσσσ^^^^^^^^^τσσσ~~~~~~', // 12
+    'σσσσσσστσσ:σσσσστσστσσσστσσrτ^^^σθσ^^^σστ~~~~~~~', // 13
+    'σσσσσσσσσσ:σσrσσσσσσστσσσσσσσστσσ:σσrssssss~~~~~', // 14
+    'σσσσσσσσrσ:σσrσσσσσσσσστσσσσσσσσσ:σrσσsssσ~~~~~~', // 15
+    'σσσσrστστσ:σστσσσσσσσσrτσστσσστσσ:σσrsssss~~~~~~', // 16
+    'σσσσσστττσ:Sσσσσσσσσσσσσσστrσσσσσ:σσσσsssss~~~~~', // 17
+    'σσσσσσστσσ:::::::::::::::στσσσσσσ:σσσssssσ~~~~~~', // 18
+    'στσσσσσσσσσσσσσσσσσσσσσσ:σσσσσσσσ:σσσσssss~~~~~~', // 19
+    'σσσσσσσσσσσσσσστσσσττσσσ:σσσσσσσσ:σσσssssss~~~~~', // 20
+    'σσσσσσσσσσσστσrσσσστσσσσ:σσσσσσσσ:σσσσsssr~~~~~~', // 21
+    'σσσσσσrσσσσσσσσσσσσσσσσσ::::::::::σσσsssssss~~~~', // 22
+    'σσσσσστσσσσσσσσσσσσστrσσ:σσσσσσσσσσσσσssssss~~~~', // 23
+    'στσσσσσσσσrσσσσσσσσσσσσσ:σσσrστσσσσσσsssssss~~~~', // 24
+    'σσσσστσσσσσσσσσσσσσσσσσσ:σσστττσστσσσσssssss~~~~', // 25
+    'σσσσσσσσσσσσσσσστσσσσrσσ:σστστσσστστσsssssss~~~~', // 26
+    'σσστσσσσσσσσσσσσσσσσσστσ:σσσσσσσσσστσσssssss~~~~', // 27
+    'σσσσσσστσσσσσσσσσσσσστσσ:σσσσσσστσσσσsssssss~~~~', // 28
+    'σσσστσσσσσσσσσσσσσττσσσσ:σσσσσσστσσσσσssssss~~~~', // 29
+    'σσσσσστσσrσσrστσττσσσστσ:σσσσσσσσσσσσσσσσsssssss', // 30
+    'σσσσrσrσσσσσσσσσσσσσττσσ:σσσrσσστσσσσσσσσsssssss', // 31
+    'σσσσσσσσττσσσσσσσσσσσσσσ:σσσσσσσσσσσσrσσσsssssss', // 32
+    'σσσσσστσσσσσσσσσσσσσσσσS:στσσσσστσσσσσσσσsssssss', // 33
+    'σσσσσσσσσσστσσσσσσσστστσ:σσσσσσστσσσσστσσsssssss', // 34
+    'ττττττττττττττττττττττττ:τττττττττττττττττττττττ', // 35
+  ],
+  enc: {
+    default: 'coast',
+    zones: [
+      { x: 20, y: 29, w: 9, h: 7, enc: null },       // 숲길 출구
+      { x: 7, y: 6, w: 7, h: 6, enc: null },         // 마을 앞
+      { x: 30, y: 13, w: 7, h: 4, enc: null },       // 동굴 입구
+    ],
+  },
+  warps: [
+    { x: 24, y: 35, to: 'highway', tx: 42, ty: 1, dir: 'up' },
+    { x: 10, y: 7, to: 'marea', tx: 19, ty: 28, dir: 'up' },
+    {
+      x: 33, y: 13, to: 'icecave', tx: 12, ty: 22, dir: 'up', sfx: 'stairs', cond: () => Game.flag('cave4_open'),
+      blocked: async () => { await S.say(null, '얼음으로 뒤덮인 동굴 입구다. 안쪽에서 바닷바람이 휘파람 소리를 낸다.\n…무턱대고 들어가기엔 길을 모른다.'); },
+    },
+  ],
+  onEnter: async () => {
+    if (!Game.flag('coast_first')) {
+      Game.setFlag('coast_first');
+      await S.say(null, '(숲을 빠져나오자 하얀 눈밭 너머로 잿빛 바다가 펼쳐졌다. 차가운 바람에 소금 냄새가 섞여 있다.)');
+      await Story.line('bran', '으, 추워! 사막에선 덥다고 투덜댔는데… 다시 사막으로 보내 줘!');
+      await Story.line('linette', '북쪽 바닷가를 따라가면 항구 마을 마레아예요. 해가 지기 전에 도착해야 해요.');
+      await Story.line('mio', '…종의 노래가 들려요. 파도에 섞여서, 아주 깊은 곳에서.');
+      await Story.line('nell', '…저 멀리 등대. 불이 꺼져 있네.');
+    }
+  },
+  npcs: [
+    {
+      id: 'king_crab', x: 41, y: 26, look: 'monster:king_crab', scale: 0.4, dir: 'down', noTurn: true,
+      show: () => Quests.isActive('s_crab') && Quests.stage('s_crab') === 0,
+      talk: () => Story.kingCrab(),
+    },
+    {
+      id: 'coast_fisher', x: 22, y: 18, look: 'sailor', dir: 'down', move: 'turn',
+      talk: async () => {
+        await S.say('얼음 낚시꾼', byP({
+          25: ['이 추위에 바닷가를 걷다니, 별난 사람들이로군.', '마레아는 서쪽이야. 등대 쪽은 가지 마. 절벽길이 무너졌거든.'],
+          27: '해식 동굴로 간다고? 얼음 위에서 미끄러지면 바위에 부딪힐 때까지 못 멈춘다네. 몸조심하게.',
+          29: '등대에 불이 들어왔어! 오랜만에 밤바다가 무섭지 않군.',
+          32: '배들이 다시 나간다더군. 나도 내일은 배를 타고 고기 잡으러 갈 거야!',
+        }));
+      },
+    },
+  ],
+  objects: [
+    { type: 'sign', x: 23, y: 33, text: '↑ 항구 마을 마레아 (북서쪽)\n↓ 은빛 가도' },
+    { type: 'sign', x: 11, y: 17, text: '← 항구 마을 마레아\n→ 등대 곶 (절벽길 통행 금지)' },
+    { type: 'event', x: 34, y: 6, solid: true, run: async () => { await S.say(null, ['무너진 절벽길이다. 바위가 겹겹이 쌓여 있어 지나갈 수 없다.', '저 너머 곶 끝에 꺼진 등대가 서 있다.']); } },
+    { type: 'chest', id: 'cs_w', x: 2, y: 12, item: 'warm_soup', n: 3 },
+    { type: 'chest', id: 'cs_ne', x: 28, y: 4, item: 'fur_hood' },
+    { type: 'chest', id: 'cs_sw', x: 3, y: 33, item: 'elixir' },
+    { type: 'chest', id: 'cs_beach', x: 39, y: 31, gold: 1200 },
+    { type: 'search', id: 'cs_drift', x: 37, y: 20, item: 'pearl_ring', hidden: true, msg: '모래톱에 떠밀려 온 조개껍데기 안에서 진주 반지가 반짝인다!' },
+  ],
+});
+
+// ── 항구 마을 마레아 ──
+defMap('marea', {
+  name: '항구 마을 마레아', kind: 'town', bgm: 'harbor', base: 'σ', weather: SNOW_WEATHER,
+  tiles: [
+    '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~', // 0
+    '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ππρρρρρ~~~~', // 1
+    '~~~~ρρρ~πππππ~~~~~~~~~~~~~~~~ππρδδδρ~~~~', // 2
+    '~~~~ρδρ~ππ~~~~~~~~~~~~~~~~~~~ππρρρρρ~~~~', // 3
+    '~~~~ρρρ~ππ~~~~~~~~~~~~~~~~~~~ππ~~~~~~~~~', // 4
+    '~~~~~~~~ππ~~~~~~~~~~~~~~~~~~~ππ~~~~~~~~~', // 5
+    'ππππππππππππππππππππππππππππππππππππππππ', // 6
+    'σσXσσσσσσσXXσσσσσσσ::XxσσσσσσσσσσσσσσXxσ', // 7
+    'σσQQQQQQQQσRRRRRRRR::σQQQQQQQQσGGGGGGGGσ', // 8
+    'σσQQQQQQQQσRRRRRRRR::σQQQQQQQQσGGGGGGGGσ', // 9
+    'σσQQQQQQQQσRRRRRRRR::σQQQQQQQQσGGGGGGGGσ', // 10
+    'σσBNBDNBBBσBNBDNBBB::σBNBDNBBBσBNBDNBBBσ', // 11
+    'σσσσσ:σσσσσσσσ:σσσσ::σσσσ:σσσσσσσσ:σσσσσ', // 12
+    'σ::::::::::::::::::::::::::::::::::::::σ', // 13
+    'σ::::::::::::::::::::::::::::::::::::::σ', // 14
+    'σσσσσσσσσσσσσσlσσσσ::σσσσlσσσσσσσσσσσσσσ', // 15
+    'σσσσσσσσσσσσσσσσσσσo:σσσσσσσσσσσσσσσσσσσ', // 16
+    'σσRRRRRRRRσσσσσσσσσ::σQQQQQQσσσGGGGGGGGσ', // 17
+    'σσRRRRRRRRσσσσσσσσσ::σQQQQQQσσσGGGGGGGGσ', // 18
+    'σσRRRRRRRRσσσσσσσσσ::σQQQQQQσσσGGGGGGGGσ', // 19
+    'σσBNBDNBBBσσσσσσσσσ::σBNDBNBσσσBNBDNBBBσ', // 20
+    'σσσσσ:σσσσσσxσσσσσσ::σσσσσσσσσσσσσ:σσσσσ', // 21
+    'σσσσσ::::::::::::::::::::::::::::::σσσσσ', // 22
+    'σστσστσσσσσστσσσσσσ::σστσσσσσσσσστσσσσσσ', // 23
+    'σσσσσσσστσσσσσlσσσσ::σσσσlσxσσσσσσττστσσ', // 24
+    'σστσσσστσσσσσσσσττσ::σσσσσσσστστσσσσσστσ', // 25
+    'σσσσστσσσσσσσσσστσσ::σσσστσσσσσσσσσστσσσ', // 26
+    'σσστσσσσσσσσσσσσσσσ::Sσσσστσστσσσσσσσσσσ', // 27
+    'σσσσσσσσσσσσσσσστσσ::σσσττσσστσσσσσστσσσ', // 28
+    'τττττττττττττττττττ::τττττττττττττττττττ', // 29
+  ],
+  edge: { map: 'coast', x: 10, y: 8, dir: 'down' },
+  warps: [
+    { x: 5, y: 11, to: 'harbor_office', tx: 6, ty: 8, dir: 'up' },
+    { x: 14, y: 11, to: 'marea_inn', tx: 6, ty: 8, dir: 'up' },
+    { x: 25, y: 11, to: 'marea_shop', tx: 6, ty: 7, dir: 'up' },
+    { x: 5, y: 20, to: 'tavern', tx: 6, ty: 8, dir: 'up' },
+    { x: 34, y: 20, to: 'eda_house', tx: 4, ty: 5, dir: 'up' },
+    { x: 34, y: 11, to: 'marea', tx: 34, ty: 12, cond: () => false, blocked: async () => { await S.say(null, '창고 문은 굳게 잠겨 있다. 「출항 금지 ─ 항만장」이라는 쪽지가 붙어 있다.'); } },
+    { x: 24, y: 20, to: 'marea', tx: 24, ty: 21, cond: () => false, blocked: async () => { await S.say(null, '빈집이다. 창문 너머로 먼지 쌓인 그물이 보인다.'); } },
+  ],
+  onEnter: async () => {
+    if (!Game.flag('reached_marea')) await Story.arriveMarea();
+  },
+  npcs: [
+    {
+      id: 'dock_sailor', x: 23, y: 7, look: 'sailor', dir: 'down', move: 'turn',
+      talk: async () => {
+        await S.say('부두의 뱃사람', byP({
+          25: ['배를 타러 왔다고? 미안하지만 한 달째 출항 금지야.', '안개 낀 밤마다 회색 돛을 단 배가 나타나. 그 배를 본 배는 돌아오지 않았어.'],
+          29: '등대에 불이 켜졌어! 그런데 불빛에 비친 만 한가운데에… 그 회색 배가 떠 있더군.',
+          30: '회색 배가 가라앉았다고? 바다가 갑자기 잠잠해졌어.',
+          32: '출항이다, 출항! 한 달 치 그물을 던져야지!',
+        }));
+      },
+    },
+    {
+      id: 'marea_kid', x: 16, y: 16, look: 'northKid', dir: 'down', move: 'wander', radius: 3,
+      talk: async () => {
+        await S.say('마을 아이', byP({
+          25: '분수가 꽁꽁 얼었어. 겨울이 끝나지 않는대. 바다가 화가 났대.',
+          29: '등대 할아버지가 돌아왔대! 에다 언니가 엄청 울었대.',
+          32: '분수가 녹았어! 봐, 물이 나와!',
+        }));
+      },
+    },
+    {
+      id: 'marea_fisher', x: 30, y: 15, look: 'fisherF', dir: 'left', move: 'wander', radius: 2,
+      talk: async () => {
+        await S.say('생선 장수', byP({
+          25: ['생선이 없어. 배가 못 나가니까. 남은 건 말린 대구뿐이야.', '선술집 엘사네 수프는 아직 끓고 있을 거야. 몸 녹이고 가.'],
+          32: '오늘 아침 첫 배가 돌아왔어! 펄떡펄떡 뛰는 생선을 보니 눈물이 다 나네.',
+        }));
+      },
+    },
+    {
+      id: 'marea_old', x: 10, y: 24, look: 'oldman', dir: 'down', move: 'turn',
+      talk: async () => {
+        await S.say('늙은 어부', byP({
+          25: ['15년 전에도 이랬지. 바다가 울부짖던 해. 해군의 「은빛 갈매기호」가 그 폭풍에 가라앉았어.', '함장 오르카는 마지막까지 선원들을 구하려 했다더군. 결국 혼자 살아 돌아왔지만.'],
+          30: '회색 배의 선장이 오르카였다고…? 그 사람, 15년 동안 바다에서 선원들을 찾아 헤맸던 건가.',
+        }));
+      },
+    },
+  ],
+  objects: [
+    { type: 'sign', x: 21, y: 27, text: '항구 마을 마레아\n「등불이 꺼지지 않는 북쪽의 항구」' },
+    { type: 'event', x: 19, y: 16, solid: true, run: async () => { await S.say(null, Game.flag('chapter4_done') ? '분수가 녹아 맑은 물이 졸졸 흐른다.' : '광장의 분수가 꽁꽁 얼어 있다. 물줄기가 솟구친 모양 그대로 굳어 버렸다.'); } },
+    {
+      type: 'event', x: 31, y: 2, solid: true,
+      run: async () => {
+        if (!Game.flag('boat_ready')) { await S.say(null, '항만장의 작은 배다. 밧줄로 단단히 묶여 있다.'); return; }
+        if (Game.flag('orca_defeated')) { await S.say(null, '그레고르의 작은 배다. 이제는 갈매기들의 쉼터가 되었다.'); return; }
+        await Story.boardShip();
+      },
+    },
+    { type: 'search', id: 'mr_crate', x: 10, y: 7, item: 'warm_soup', n: 2, msg: '나무 상자 안에 「얼지 않게 품에 넣어 갈 것」이라고 적힌 수프 통이 있다.', empty: '빈 상자다.' },
+    { type: 'search', id: 'mr_barrel', x: 12, y: 21, item: 'hi_ether', msg: '술통 바닥에서 이슬병 하나가 굴러 나왔다.', empty: '얼음 낀 빈 술통이다.' },
+  ],
+});
+
+// ── 마레아 실내 ──
+defMap('harbor_office', {
+  name: '항만 사무소', kind: 'interior', bgm: 'harbor', base: 'w',
+  tiles: [
+    'IIIIIIIIIIIIII', // 0
+    'IIIIIIIIIIIIII', // 1
+    'ILLzwwttwwzLLI', // 2
+    'IwwwwwwwwwwwwI', // 3
+    'IpwwkkkkkkwwpI', // 4
+    'IwwwwwwwwwwwwI', // 5
+    'IxwwccccccwwxI', // 6
+    'IXwwccccccwwXI', // 7
+    'IpwwccccccwwpI', // 8
+    'IIIIIIEIIIIIII', // 9
+  ],
+  warps: [{ x: 6, y: 9, to: 'marea', tx: 5, ty: 12, dir: 'down' }],
+  npcs: [
+    {
+      id: 'gregor', x: 6, y: 3, look: 'gregor', dir: 'down',
+      mark: () => P() === 26 || (P() === 29 && !Game.flag('boat_ready')) || P() === 31 || (Quests.isActive('s_crab') && Quests.stage('s_crab') === 1),
+      talk: () => Story.gregor(),
+    },
+    { id: 'office_clerk', x: 11, y: 6, look: 'sailor', dir: 'left', talk: async () => { await S.say('사무소 직원', byP({ 26: '항만장님은 무뚝뚝해 보여도 마을 사람들 걱정에 한 달째 잠을 못 주무세요.', 29: '항만장님이 배를 내주신다고요? 그분 배는 돌아가신 사모님 이름을 딴 거라 아무도 못 타게 했는데…', 32: '오늘 출항 허가서만 백 장째 쓰고 있어요! 행복한 비명이에요.' })); } },
+  ],
+  objects: [
+    { type: 'event', x: 7, y: 2, solid: true, run: () => Story.bountyBoard() },
+    { type: 'event', x: 1, y: 2, solid: true, run: async () => { await S.say(null, ['벽에 북해 해도가 걸려 있다. 마레아 북쪽 바다 한가운데에 붉은 동그라미가 그려져 있다.', '동그라미 옆에는 「은빛 갈매기호 침몰 지점」이라고 적혀 있다.']); } },
+    { type: 'search', id: 'ho_drawer', x: 3, y: 2, item: 'hi_potion', n: 3, msg: '서랍장 안에 구급상자가 있다.', empty: '서랍장 안은 비어 있다.' },
+  ],
+});
+
+defMap('marea_inn', {
+  name: '여관 「등불」', kind: 'interior', bgm: 'harbor', base: 'w',
+  tiles: [
+    'IIIIIIIIIIIIII', // 0
+    'IIIIIIIIIIIIII', // 1
+    'IfwLLwpIbcbczI', // 2
+    'IwwwwwwIcccccI', // 3
+    'IkkkkwwwcccccI', // 4
+    'IwwwwwwIcccccI', // 5
+    'IwthwthIIccIII', // 6
+    'IwwwwwwwwwwwpI', // 7
+    'IpwwwwwwwwwwwI', // 8
+    'IIIIIIEIIIIIII', // 9
+  ],
+  warps: [{ x: 6, y: 9, to: 'marea', tx: 14, ty: 12, dir: 'down' }],
+  npcs: [
+    {
+      id: 'inn_hilda', x: 2, y: 3, look: 'matron', dir: 'down',
+      talk: async () => {
+        await S.say('여관 주인 힐다', byP({ 25: '「등불」에 어서 와요. 등대가 꺼진 뒤로 우리 간판 이름이 좀 민망해졌지만요.', 29: '등대에 불이 들어왔어요! 오늘은 간판도 반짝반짝 닦아야지.', 32: '바다가 열렸으니 손님이 넘쳐나겠네요. 당신들 방은 늘 비워 둘게요.' }));
+        await S.inn(Math.max(18, Game.state.party.length * 8), '여관 주인 힐다');
+      },
+    },
+    { id: 'inn_traveler', x: 4, y: 7, look: 'merchant', dir: 'right', talk: async () => { await S.say('발 묶인 상인', byP({ 25: '배가 안 떠서 한 달째 여기서 먹고 자고 있다오. 지갑이 얼어붙을 지경이야.', 30: '유령선이 가라앉았다고? 그럼 배가 뜨는 건가! 짐을 싸야겠군.' })); } },
+  ],
+  objects: [{ type: 'search', id: 'mi_dresser', x: 12, y: 2, item: 'warm_soup', n: 2, msg: '서랍 안에 보온병에 담긴 수프가 있다. 「밤바다 지킴이들에게 ─ 힐다」', empty: '서랍 안은 비어 있다.' }],
+});
+
+defMap('marea_shop', {
+  name: '잡화점 「닻과 그물」', kind: 'interior', bgm: 'harbor', base: 'w',
+  tiles: [
+    'IIIIIIIIIIIIII', // 0
+    'IIIIIIIIIIIIII', // 1
+    'IiaXwpwwiiijwI', // 2
+    'IwwwwwwwwwwwwI', // 3
+    'IkkkkkwwkkkkkI', // 4
+    'IwwwwwwwwwwwwI', // 5
+    'IxwwwwwwwwwwxI', // 6
+    'IpwwwwwwwwwwpI', // 7
+    'IIIIIIEIIIIIII', // 8
+  ],
+  warps: [{ x: 6, y: 8, to: 'marea', tx: 25, ty: 12, dir: 'down' }],
+  npcs: [
+    { id: 'shop_smith', x: 3, y: 3, look: 'capsmith', dir: 'down', talk: async () => { await S.say('대장장이 비욘', byP({ 25: '북쪽 바다에선 칼보다 먼저 손이 얼어. 장갑부터 사라고 하고 싶지만… 우린 무기만 팔지.', 32: '고래뼈 갑옷이 잘 맞나? 바다 사람들의 지혜라고.' })); await Shop.open('marea_arms'); } },
+    { id: 'shop_keeper', x: 10, y: 3, look: 'fisherF', dir: 'down', talk: async () => { await S.say('잡화점 주인 잉가', byP({ 25: '수프 사 가요, 수프! 얼어붙은 몸도 한 번에 녹아요.', 32: '바다가 열렸으니 이제 귀한 물건도 들어올 거예요!' })); await Shop.open('marea_items'); } },
+  ],
+  objects: [{ type: 'search', id: 'ms_jar', x: 11, y: 2, item: 'warm_charm', msg: '항아리 안에 따뜻한 기운이 도는 부적이 들어 있다.', empty: '소금 냄새가 난다.' }],
+});
+
+defMap('tavern', {
+  name: '선술집 「갈매기」', kind: 'interior', bgm: 'harbor', base: 'w',
+  tiles: [
+    'IIIIIIIIIIIIII', // 0
+    'IIIIIIIIIIIIII', // 1
+    'IfjjwwxxwwiiiI', // 2
+    'IwwwwwwwwwwwwI', // 3
+    'IwwwwwwwkkkkkI', // 4
+    'IwthwthwwwwwwI', // 5
+    'IwwwwwwwwwwwwI', // 6
+    'IwthwthwwthwwI', // 7
+    'IpwwwwwwwwwwpI', // 8
+    'IIIIIIEIIIIIII', // 9
+  ],
+  warps: [{ x: 6, y: 9, to: 'marea', tx: 5, ty: 21, dir: 'down' }],
+  npcs: [
+    {
+      id: 'elsa', x: 10, y: 3, look: 'innkeeper', dir: 'down',
+      mark: () => Quests.isActive('s_frozen'),
+      talk: () => Story.elsa(),
+    },
+    { id: 'tavern_sailor1', x: 2, y: 6, look: 'sailor', dir: 'right', talk: async () => { await S.say('취한 뱃사람', byP({ 25: ['해식 동굴의 서리엄니 녀석? 얼음 갑옷을 두르면 작살도 튕겨 나가지.', '그 녀석을 녹이는 건… 뻔하지 않나? 여기 엘사 수프처럼 뜨거운 거. 딸꾹.'], 30: '유령선 선장이 오르카였다니… 그 함장은 우리 아버지 세대의 영웅이었어.' })); } },
+    { id: 'tavern_sailor2', x: 5, y: 8, look: 'sailor', dir: 'up', talk: async () => { await S.say('노련한 항해사', byP({ 25: ['바다 사람들은 물때를 읽지.', '물이 차오를 땐 칼을 거두고, 물이 빠질 땐 입을 다무는 거야. 바다가 가르쳐 준 거라네.'], 32: '물때를 읽을 줄 아는 녀석들이었군. 한잔 사지!' })); } },
+  ],
+  objects: [{ type: 'search', id: 'tv_jar', x: 3, y: 2, item: 'warm_soup', n: 2, msg: '항아리 안에 수프 통조림이 있다. 「손님용 아님 ─ 엘사」 …라고 적혀 있지만.', empty: '항아리 안은 비어 있다.' }],
+});
+
+defMap('eda_house', {
+  name: '등대지기의 집', kind: 'interior', bgm: 'harbor', base: 'w',
+  tiles: [
+    'IIIIIIIIII', // 0
+    'IIIIIIIIII', // 1
+    'IfwwzwwbwI', // 2
+    'IwwwwwwwwI', // 3
+    'IwhtthwwjI', // 4
+    'IwwwwwwwpI', // 5
+    'IIIIEIIIII', // 6
+  ],
+  warps: [{ x: 4, y: 6, to: 'marea', tx: 34, ty: 21, dir: 'down' }],
+  npcs: [
+    {
+      id: 'eda', x: 6, y: 3, look: 'eda', dir: 'down',
+      mark: () => Game.flag('met_gregor') && !Game.flag('cave4_open'),
+      talk: () => Story.eda(),
+    },
+    { id: 'bartol_home', x: 2, y: 3, look: 'bartol', dir: 'down', show: () => Game.flag('cassandra_joined'), talk: () => Story.bartol() },
+  ],
+  objects: [
+    { type: 'event', x: 7, y: 2, solid: true, run: async () => { await S.say(null, '할아버지의 침대. 머리맡에 등대 렌즈를 닦던 낡은 헝겊이 개어져 있다.'); } },
+    { type: 'search', id: 'eh_jar', x: 8, y: 4, item: 'elixir', msg: '항아리 안에 「등대지기의 비상약」이라고 적힌 작은 병이 있다.', empty: '항아리 안은 비어 있다.' },
+  ],
+});
+
+// ── 얼어붙은 해식 동굴 ──
+defMap('icecave', {
+  name: '얼어붙은 해식 동굴', kind: 'dungeon', bgm: 'cave', base: 'ι',
+  tiles: [
+    'ΨΨΨΨΨΨΨΨΨΨΨΨσΨΨΨΨΨΨΨΨΨΨΨΨΨ', // 0
+    'ΨσσσσΨΨσσσσσσσσσσσσΨΨσσσσΨ', // 1
+    'ΨσσσσΨΨσσσσσσσσσσσσΨΨσσσσΨ', // 2
+    'ΨσσσσσσσσσσσσσσσσσσσσσσσσΨ', // 3
+    'ΨσσσσΨΨσσσσσσσσσσσσΨΨσσσσΨ', // 4
+    'ΨΨΨΨΨΨΨσσσσσσσσσσσσΨΨΨΨΨΨΨ', // 5
+    'ΨΨΨΨΨΨΨΨΨΨΨΨσΨΨΨΨΨΨΨΨΨΨΨΨΨ', // 6
+    'ΨιιιιιιιιιιιιιιιιιιrιιιιιΨ', // 7
+    'ΨιιιrιιιιιrιιιιιιιιιιιιιιΨ', // 8
+    'ΨισσιιιιιιιιιιιιιrιιιιιιιΨ', // 9
+    'ΨισσιιιιιιιrιιιιιιιιιιιιιΨ', // 10
+    'ΨιιιιιιιrιιιιιιιιιιιιιιιιΨ', // 11
+    'ΨrιιιιιιιιιιιιιιιιιιιιrιιΨ', // 12
+    'ΨιιιιιιιιιιιrιιιιιιιιιιιιΨ', // 13
+    'ΨιιιιrιιιιιιιιιιιιrιιιιιιΨ', // 14
+    'ΨιιιιιιιιιιrιιιιιιιιισσιιΨ', // 15
+    'ΨιιιιιιιιιιιιιιrιιιιισσιιΨ', // 16
+    'ΨιιιιιrιιιιιιιιιιιιιrιιιιΨ', // 17
+    'ΨιιιιιιιιιιιιrιιιιιιιιιιιΨ', // 18
+    'ΨΨΨΨΨΨΨΨΨΨΨΨσΨΨΨΨΨΨΨΨΨΨΨΨΨ', // 19
+    'ΨΨΨΨΨΨΨΨσσσσσσσσσΨΨΨΨΨΨΨΨΨ', // 20
+    'ΨΨΨΨΨΨΨΨσσσσσσσσσΨΨΨΨΨΨΨΨΨ', // 21
+    'ΨΨΨΨΨΨΨΨσσσσσσσσσΨΨΨΨΨΨΨΨΨ', // 22
+    'ΨΨΨΨΨΨΨΨΨΨΨΨσΨΨΨΨΨΨΨΨΨΨΨΨΨ', // 23
+  ],
+  enc: { default: 'icecave', zones: [{ x: 7, y: 19, w: 11, h: 5, enc: null }, { x: 0, y: 0, w: 26, h: 7, enc: null }] },
+  warps: [
+    { x: 12, y: 23, to: 'coast', tx: 33, ty: 14, dir: 'down', sfx: 'stairs' },
+    { x: 12, y: 0, to: 'lighthouse1', tx: 5, ty: 8, dir: 'up', sfx: 'stairs' },
+  ],
+  triggers: [{ x: 7, y: 3, w: 12, h: 3, when: () => !Game.flag('walrus_defeated'), run: () => Story.walrus() }],
+  onEnter: async () => {
+    if (!Game.flag('icecave_first')) {
+      Game.setFlag('icecave_first');
+      await S.say(null, '(동굴 바닥이 거울처럼 매끈한 얼음으로 뒤덮여 있다. 천장에서 고드름이 우는 소리가 난다.)');
+      await Story.line('linette', '전부 얼음이에요. 한번 미끄러지면… 무언가에 부딪힐 때까지 멈추지 못할 거예요.');
+      await Story.line('bran', '미끄럼틀이네! …아, 아니, 신중하게 가자. 신중하게.');
+    }
+  },
+  npcs: [
+    { id: 'walrus', x: 12, y: 1, look: 'monster:frost_walrus', scale: 0.3, dir: 'down', noTurn: true, show: () => !Game.flag('walrus_defeated'), talk: () => Story.walrus() },
+  ],
+  objects: [
+    { type: 'chest', id: 'ic_isle_w', x: 2, y: 9, item: 'frost_brand' },
+    { type: 'search', id: 'ic_letter', x: 3, y: 10, item: 'frozen_letter', msg: '얼음 속에 편지 한 통이 갇혀 있다. 조심스럽게 얼음을 깨서 꺼냈다.', empty: '얼음 조각만 남아 있다.', after: () => Story.frozenLetter() },
+    { type: 'chest', id: 'ic_isle_e', x: 22, y: 16, item: 'sealskin_coat' },
+    { type: 'search', id: 'ic_isle_e2', x: 21, y: 15, item: 'hi_ether', n: 2, hidden: true, msg: '눈 속에 파묻힌 이슬병 두 개를 찾았다!' },
+    { type: 'chest', id: 'ic_nw', x: 1, y: 1, item: 'warm_soup', n: 3 },
+    { type: 'chest', id: 'ic_ne', x: 24, y: 1, item: 'coral_shield' },
+    { type: 'chest', id: 'ic_entry', x: 16, y: 22, item: 'hi_potion', n: 3 },
+  ],
+});
+
+// ── 등대 ──
+defMap('lighthouse1', {
+  name: '등대 · 1층', kind: 'dungeon', bgm: () => (Game.flag('cassandra_joined') ? 'shrine' : 'tower'), base: '_',
+  tiles: [
+    '############', // 0
+    '#####<######', // 1
+    '###______###', // 2
+    '##________##', // 3
+    '#_x______X_#', // 4
+    '#__________#', // 5
+    '##________##', // 6
+    '###______###', // 7
+    '#####_######', // 8
+    '#####_######', // 9
+  ],
+  warps: [
+    { x: 5, y: 9, to: 'icecave', tx: 12, ty: 1, dir: 'down', sfx: 'stairs' },
+    { x: 5, y: 1, to: 'lighthouse2', tx: 5, ty: 6, dir: 'up', sfx: 'stairs' },
+  ],
+  onEnter: async () => {
+    if (!Game.flag('lighthouse_first')) {
+      Game.setFlag('lighthouse_first');
+      await S.say(null, '(등대 안은 바깥보다 더 춥다. 벽을 타고 잿빛 서리가 피어 있다. 그리고 계단 아래에…)');
+      await Story.line('mio', '누가 있어요! 사람이… 얼어붙어 있어요!');
+    }
+  },
+  npcs: [
+    { id: 'bartol_frozen', x: 3, y: 5, look: 'bartol', dir: 'up', noTurn: true, show: () => !Game.flag('cassandra_joined'), talk: async () => { await S.say(null, ['잿빛 서리에 뒤덮인 노인이다. 희미하게 숨을 쉬고 있다.', '서리는 위층에서부터 흘러내린 것 같다.']); await Story.line('linette', '이 냉기… 그냥 얼음이 아니에요. 위에 있는 무언가가 내뿜고 있어요.'); } },
+  ],
+  objects: [
+    { type: 'chest', id: 'lh_chest', x: 8, y: 6, item: 'captain_hat' },
+    { type: 'search', id: 'lh_crate', x: 9, y: 4, item: 'warm_soup', n: 2, msg: '상자 안에 등대지기의 비상식량이 있다.', empty: '빈 상자다.' },
+  ],
+});
+
+defMap('lighthouse2', {
+  name: '등대 · 등명실', kind: 'dungeon', bgm: () => (Game.flag('cassandra_joined') ? 'shrine' : 'tower'), base: '_',
+  tiles: [
+    '############', // 0
+    '####&##&####', // 1
+    '###______###', // 2
+    '##________##', // 3
+    '#__________#', // 4
+    '#__________#', // 5
+    '##________##', // 6
+    '###__>___###', // 7
+    '############', // 8
+  ],
+  warps: [{ x: 5, y: 7, to: 'lighthouse1', tx: 5, ty: 2, dir: 'down', sfx: 'stairs' }],
+  triggers: [{ x: 1, y: 4, w: 10, h: 3, when: () => !Game.flag('cassandra_joined'), run: () => Story.cassandraLighthouse() }],
+  npcs: [
+    { id: 'cass_lh', x: 6, y: 3, look: 'cassandra', dir: 'up', noTurn: true, show: () => !Game.flag('cassandra_joined'), talk: () => Story.cassandraLighthouse() },
+    { id: 'elite_lh1', x: 3, y: 4, look: 'knight', dir: 'down', show: () => false },
+    { id: 'elite_lh2', x: 8, y: 4, look: 'knight', dir: 'down', show: () => false },
+  ],
+  objects: [
+    { type: 'event', x: 5, y: 2, solid: true, art: 'lens', run: async () => { await S.say(null, Game.flag('cassandra_joined') ? '거대한 등대 렌즈가 별빛처럼 빛나며 밤바다를 비추고 있다.' : '거대한 등대 렌즈. 렌즈 안쪽에서 잿빛 불꽃이 차갑게 타고 있다.'); } },
+    { type: 'event', x: 6, y: 2, solid: true, run: async () => { await S.say(null, '렌즈를 받치는 놋쇠 받침대다. 꽁꽁 얼어 있다.'); } },
+    {
+      type: 'event', x: 9, y: 5, art: 'circle', show: () => Game.flag('cassandra_joined'),
+      run: async () => { if (await S.yesno(null, '등대 불빛 아래 마법진이 빛나고 있다. 항구 마을 마레아로 돌아갈까?')) await S.warp('marea', 19, 15, 'down', { sfx: 'chime', slow: true }); },
+    },
+  ],
+});
+
+// ── 유령선 「회색 갈매기호」 ──
+defMap('ship_deck', {
+  name: '유령선 · 갑판', kind: 'dungeon', bgm: 'ghostship', base: 'δ', weather: () => 'snow',
+  tiles: [
+    'ρρρρρρρρρρρρρρρρρρρρρρρρρρ', // 0
+    'ρρρδδδδδδδδδδδδδδρδδδρρρρρ', // 1
+    'ρρρδδδδδδδδδδδδδδρδδδρρρρρ', // 2
+    'ρδδδδδδδδδδδδδδxδρδδδδδδρρ', // 3
+    'ρδδδxxδδδδδδδδXδδρδδδδδδρρ', // 4
+    'ρδδδδδδδδμδδδδδδδρδδδδδδρρ', // 5
+    'ρδδδδδδδδδδδδδδδδρδδδδδδρρ', // 6
+    'ρδδδδδδδδδδ>δδδδδρδδδδδδρρ', // 7
+    'ρδδδδδδδδδδδδδδδδρδδδδδδρρ', // 8
+    'ρδδδδδδδδδδδδμδδδρδδδδδδρρ', // 9
+    'ρδδδxδδδδδδδδδδδδρδδδδδδρρ', // 10
+    'ρδδδδδδXδδδδδδδxδρδδδδδδρρ', // 11
+    'ρρρδδδδδδδδδδδδδδρδδδρρρρρ', // 12
+    'ρρρδδδδδδδδδδδδδδρδδδρρρρρ', // 13
+    'ρρρρρρρρρρρρρρρρρρρρρρρρρρ', // 14
+  ],
+  enc: { default: 'ship', zones: [{ x: 1, y: 5, w: 4, h: 5, enc: null }, { x: 18, y: 1, w: 7, h: 13, enc: null }] },
+  warps: [
+    { x: 11, y: 7, to: 'ship_hold', tx: 11, ty: 3, dir: 'down', sfx: 'stairs' },
+  ],
+  triggers: [{ x: 18, y: 3, w: 4, h: 9, when: () => !Game.flag('orca_defeated'), run: () => Story.orca() }],
+  onEnter: async () => {
+    if (!Game.flag('ship_first')) {
+      Game.setFlag('ship_first');
+      S.stage('main5', 7);
+      await S.say(null, '(밧줄 사다리를 타고 오르자, 축축한 갑판 위로 안개가 깔려 있다. 돛대 끝의 등불이 초록빛으로 흔들린다.)');
+      await Story.line('cassandra', ['…이 배야. 성가대가 「회색 갈매기호」라고 부르던 배.', '선장은 늘 선미 갑판에서 키를 잡고 있어. 하지만 갑판에서 바로는 못 가. 선창을 지나야 해.']);
+      await Story.line('bran', '유, 유령선… 진짜 유령선이잖아…!');
+      await S.goalUpdate('main5');
+    }
+  },
+  npcs: [
+    { id: 'orca_helm', x: 22, y: 7, look: 'orca', dir: 'left', noTurn: true, show: () => !Game.flag('orca_defeated'), talk: () => Story.orca() },
+  ],
+  objects: [
+    {
+      type: 'event', x: 1, y: 7, art: 'rope',
+      run: async () => { if (await S.yesno(null, '밧줄 사다리가 작은 배로 이어져 있다. 마레아로 돌아갈까?')) await S.warp('marea', 30, 3, 'down', { sfx: 'stairs' }); },
+    },
+    { type: 'chest', id: 'sd_bow', x: 3, y: 1, item: 'tide_axe' },
+    { type: 'chest', id: 'sd_stern', x: 20, y: 13, item: 'siren_harp' },
+    { type: 'search', id: 'sd_barrel', x: 4, y: 10, item: 'hi_ether', msg: '술통 안에 이슬병이 떠 있다. 아직 마실 수 있을 것 같다.', empty: '바닷물이 찰랑거린다.' },
+  ],
+});
+
+defMap('ship_hold', {
+  name: '유령선 · 선창', kind: 'dungeon', bgm: 'ghostship', base: 'δ',
+  tiles: [
+    'ρρρρρρρρρρρρρρρρρρρρρρρρρρ', // 0
+    'ρδδδδδδδδδδδδδρδδδδδδδδδδρ', // 1
+    'ρδXXδδδδδδδ<δδρδXXδδδδ<δδρ', // 2
+    'ρδXδδδδδδδδδδδρδδδδδδδδδδρ', // 3
+    'ρδδδδδδδδδδδδδδδδδδδδδδδδρ', // 4
+    'ρδδδδδδδδδδδδδρδxδδδδδδδXρ', // 5
+    'ρδδδδδδδδδδδXδρδδδδδδδδδδρ', // 6
+    'ρδδδxδδδδδδδδδρρρρρδρρρρρρ', // 7
+    'ρδδδδδδδδδδδδδρδδδδδδδδδδρ', // 8
+    'ρδδδδδδδδxδδδδρδttδδδδLLδρ', // 9
+    'ρδδδδδδδδδδδδδδδδδδδδδδδδρ', // 10
+    'ρδδδδδXXδδδδδδρδδδδδδδδδδρ', // 11
+    'ρδxδδδδδδδδδxδρδδδδδδδδbδρ', // 12
+    'ρρρρρρρρρρρρρρρρρρρρρρρρρρ', // 13
+  ],
+  enc: { default: 'ship', zones: [{ x: 9, y: 1, w: 5, h: 4, enc: null }, { x: 15, y: 8, w: 10, h: 5, enc: null }] },
+  warps: [
+    { x: 11, y: 2, to: 'ship_deck', tx: 11, ty: 8, dir: 'up', sfx: 'stairs' },
+    { x: 22, y: 2, to: 'ship_deck', tx: 20, ty: 7, dir: 'up', sfx: 'stairs' },
+  ],
+  objects: [
+    { type: 'search', id: 'sh_notebook', x: 22, y: 9, item: 'osric_notebook', msg: '책장 사이에 낡은 수첩 한 권이 꽂혀 있다. 이 배의 항해일지는 아닌 것 같다.', empty: '젖은 해도와 항해일지만 꽂혀 있다.', after: () => Story.osricNotebook() },
+    { type: 'chest', id: 'sh_cabin', x: 16, y: 12, item: 'whale_mail' },
+    { type: 'chest', id: 'sh_mimic', x: 18, y: 11, item: 'sailor_knot', color: 'red', mimic: true, monster: 'barnacle_chest', bg: 'ship' },
+    { type: 'chest', id: 'sh_fore', x: 1, y: 12, item: 'coral_dagger' },
+    { type: 'chest', id: 'sh_mid', x: 13, y: 1, item: 'mega_potion', n: 3 },
+    { type: 'chest', id: 'sh_aft', x: 24, y: 1, item: 'pearl_staff' },
+    { type: 'event', x: 23, y: 12, solid: true, run: async () => { await S.say(null, ['선장의 침대. 베개맡에 빛바랜 사진 한 장이 놓여 있다.', '마흔 명 남짓한 선원들이 갑판에 모여 웃고 있다. 가운데에 젊은 함장이 서 있다.']); } },
+  ],
+});
+
+// ── 가라앉은 신전 ──
+defMap('sunken1', {
+  name: '가라앉은 신전', kind: 'dungeon', bgm: 'ghostship', base: 'κ',
+  tiles: [
+    'ΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚ', // 0
+    'Κκκκκκκκκκκκ>κςκκκκκκκκΚ', // 1
+    'ΚκκκκκκκκςκκκκςκκκκκκκκΚ', // 2
+    'ΚκκPκκκκκκςκκκκκκκκκPκκΚ', // 3
+    'ΚκκςκκκκςκκκκκκκκκκκκκκΚ', // 4
+    'ΚκκςκκκκκκκκκκκκκκκκκςκΚ', // 5
+    'ΚΚΚΚΚκΚΚΚΚκκκκΚΚΚΚκΚΚΚΚΚ', // 6
+    'ΚκκκκκκκκκκΚΚκκκκκκκκκκΚ', // 7
+    'ΚκκκκκκκκςκΚΚκκςκκκκκκκΚ', // 8
+    'ΚκκPκκκκκκκΚΚκκςκκκκPκςΚ', // 9
+    'ΚκκκκκκκκκκΚΚκκςκςκκκκκΚ', // 10
+    'ΚκκκκκκκκκκΚΚκκκκκκκκκκΚ', // 11
+    'ΚκκκκκκΚΚΚΚΚΚΚΚΚΚκκκκςκΚ', // 12
+    'ΚςκκκκκκκκκκκκκκκκκκκκκΚ', // 13
+    'ΚκκκκκκκκκκκκκςκκκκκκκκΚ', // 14
+    'ΚκκκκκκκPκκκκκςPκκκκκκκΚ', // 15
+    'ΚκςPκκκκκκκκκκκκκκκκPκκΚ', // 16
+    'ΚκκκκκκκκκκκκκκκκκκκκκκΚ', // 17
+    'ΚκκκκκκκκκκκκκκκςκκκκκκΚ', // 18
+    'ΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚ', // 19
+  ],
+  enc: { default: 'sunken', zones: [{ x: 9, y: 14, w: 7, h: 6, enc: null }, { x: 9, y: 1, w: 7, h: 3, enc: null }] },
+  warps: [{ x: 12, y: 1, to: 'sunken2', tx: 9, ty: 11, dir: 'up', sfx: 'stairs' }],
+  onEnter: async () => {
+    if (!Game.flag('sunken_first')) {
+      Game.setFlag('sunken_first');
+      await S.say(null, '(정신을 차리자, 일행은 거대한 공기 방울 안에 서 있었다. 머리 위로 물고기 떼가 지나간다.)');
+      await Story.line('mio', '숨을 쉴 수 있어요…! 종이… 우리를 받아 준 거예요.');
+      await Story.line('linette', '바닷속 신전이에요. 파도 종이 이 깊은 곳에 있었던 거예요.');
+    }
+  },
+  objects: [
+    { type: 'event', x: 8, y: 15, solid: true, art: 'plaque', run: async () => { await S.say(null, ['벽에 새겨진 오래된 벽화. 거대한 문어 같은 수호자가 종을 감싸 안고 있다.', '「수호자의 팔이 많을수록 바다는 높이 일어난다. 팔을 거두어라, 그러면 파도도 눕는다.」', '그 아래에 반쯤 지워진 글귀가 이어진다. 「…하늘이 으르렁대는 밤이면, 수호자는 깊은 곳으로 몸을 숨겼다…」']); } },
+    { type: 'chest', id: 'sk_ne', x: 22, y: 1, item: 'seafoam_robe' },
+    { type: 'chest', id: 'sk_nw', x: 1, y: 1, item: 'elixir' },
+    { type: 'chest', id: 'sk_w', x: 1, y: 11, item: 'mega_potion', n: 3 },
+    { type: 'chest', id: 'sk_e', x: 22, y: 11, item: 'pearl_ring' },
+    { type: 'search', id: 'sk_shell', x: 15, y: 17, item: 'elixir', hidden: true, msg: '커다란 조개가 입을 벌리자 안에서 영약이 반짝인다!' },
+  ],
+});
+
+defMap('sunken2', {
+  name: '파도 종의 방', kind: 'dungeon', bgm: () => (Game.flag('levia_defeated') ? 'shrine' : 'ghostship'), base: 'κ',
+  tiles: [
+    'ΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚ', // 0
+    'ΚΚΚΚΚΚΚΚOOΚΚΚΚΚΚΚΚ', // 1
+    'ΚΚΚΚΚΚΚOOOOΚΚΚΚΚΚΚ', // 2
+    'ΚΚΚκκκκccccκκκκΚΚΚ', // 3
+    'ΚΚΚκκκκccccκκκκΚΚΚ', // 4
+    'ΚΚΚκPκκccccκκPκΚΚΚ', // 5
+    'ΚΚΚκκκκccccκκκκΚΚΚ', // 6
+    'ΚΚΚκςκκccccκκςκΚΚΚ', // 7
+    'ΚΚΚκκκκccccκκκκΚΚΚ', // 8
+    'ΚΚΚκPκκccccκκPκΚΚΚ', // 9
+    'ΚΚΚκκκκccccκκκκΚΚΚ', // 10
+    'ΚΚΚκκκκccccκκκκΚΚΚ', // 11
+    'ΚΚΚκκκκcc<cκκκκΚΚΚ', // 12
+    'ΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚΚ', // 13
+  ],
+  warps: [{ x: 9, y: 12, to: 'sunken1', tx: 12, ty: 2, dir: 'down' }],
+  triggers: [{ x: 3, y: 3, w: 12, h: 7, when: () => !Game.flag('levia_defeated'), run: () => Story.levia() }],
+  npcs: [
+    { id: 'levia_npc', x: 9, y: 4, look: 'monster:levia', scale: 0.28, dir: 'down', noTurn: true, show: () => !Game.flag('levia_defeated'), talk: () => Story.levia() },
+    { id: 'osric_sea', x: 9, y: 11, look: 'osric', dir: 'up', show: () => false },
+  ],
+  objects: [
+    { type: 'deco', x: 9, y: 2, draw: 'wavebell' },
+    {
+      type: 'event', x: 12, y: 11, art: 'circle', show: () => Game.flag('levia_defeated'),
+      run: async () => { if (await S.yesno(null, '파도 종이 남긴 마법진이 빛나고 있다. 항구 마을 마레아로 돌아갈까?')) await S.warp('marea', 19, 15, 'down', { sfx: 'chime', slow: true }); },
+    },
+  ],
+});
+
+
+// ── src/maps/story4.js ──
+'use strict';
+// ─────────────────────────────────────────────────────────────
+// 제4장 「파도의 종」 스토리 이벤트
+//  네 번째 종은 북해 깊은 곳에 가라앉은 파도 종.
+//  넬은 언니 카산드라와 다시 만나고, 카산드라는 성가대를 떠나 동료가 된다.
+//  유령선의 함장 오르카, 그리고 마지막 종이 있는 하늘섬이 모습을 드러낸다.
+// ─────────────────────────────────────────────────────────────
+Object.assign(Story, {
+  // ── 4장 시작: 북해 배편 ──
+  async beginChapter4() {
+    if (Quests.get('main5')) return;
+    await S.say('오필리아 학장', ['돌아왔구나! 사막 이야기는 사미라에서 온 편지로 먼저 들었단다. …모래의 심장까지. 수고했다.', '북해로 가는 배편 말인데. 알아보긴 했는데, 좋은 소식은 아니야.']);
+    await S.say('오필리아 학장', ['북쪽 해안의 항구 마을 마레아에서 북해로 가는 배가 뜬다네. 그런데 한 달째 출항 금지래.', '등대가 꺼진 뒤로 안개 낀 밤마다 회색 돛을 단 배가 나타나 배들을 삼킨다는군.']);
+    await Story.line('bran', '회, 회색 돛…? 그거 혹시 유령선 같은 건 아니죠…?');
+    await Story.line('nell', '…잿빛이면 성가대야. 언제나 그랬어.');
+    await S.say('오필리아 학장', ['이건 학원과 기사단의 승선 허가증이야. 바다가 열리면 이걸 보여 주렴.', '마레아로 가는 길은 은빛 가도 북쪽 숲길 끝에서 이어져. 눈이 많을 테니 따뜻하게 입고 가렴.']);
+    await S.give('boarding_pass', 1);
+    await S.say('오필리아 학장', '…그리고 넬. 왕도 보육원의 그레타 원장이 전해 달라더구나. 「언니 방은 늘 비워 두고 있다」고.');
+    await Story.line('nell', '…알아. 바보 언니.');
+    Game.setFlag('ch4_started');
+    await S.startQuest('main5');
+  },
+
+  // ── 항구 마을 마레아 도착 ──
+  async arriveMarea() {
+    Game.setFlag('reached_marea');
+    Game.state.respawn = { map: 'marea_inn', x: 9, y: 7, dir: 'up', who: '여관 주인 힐다' };
+    Sound.sfx('chime');
+    await S.say(null, ['(눈 덮인 지붕 아래 등불들이 줄지어 있다. 부두에는 밧줄에 묶인 배들이 얼어붙은 바다 위에서 삐걱거린다.)', '(광장의 분수는 물줄기가 솟구친 모양 그대로 얼어 있다.)']);
+    await Story.line('mio', '사람들이 다 바다를 보고 있어요. 기다리는 얼굴로…');
+    await Story.line('linette', '항만 사무소부터 가 봐요. 배가 왜 묶여 있는지 알아야 해요.');
+    S.stage('main5', 1);
+    await S.goalUpdate('main5', '\n[d](쓰러지면 이제 마레아의 여관에서 깨어난다.)[/]');
+  },
+
+  // ── 항만장 그레고르 ──
+  async gregor() {
+    const p = Game.progress();
+    if (Quests.isActive('s_crab') && Quests.stage('s_crab') === 1) {
+      await S.say('항만장 그레고르', ['집게왕을 잡았다고? …이 집게발, 틀림없군. 해안 어부들이 한시름 놓겠어.', '약속한 현상금이다. 그리고 이건 덤이야. 바다 사람들의 매듭이지.']);
+      Game.removeItem('crab_claw', 1);
+      await S.completeQuest('s_crab');
+      if (p !== 26 && p !== 31 && !(p === 29 && !Game.flag('boat_ready'))) return;
+    }
+    if (p === 26) {
+      await S.say('항만장 그레고르', ['…승선 허가증? 학원과 기사단 인장이라. 별의 수호대라는 게 당신들이군.', '미안하지만 지금은 어떤 배도 못 띄워. 등대가 꺼진 뒤로 안개 속에서 회색 배가 나타나거든.']);
+      await S.say('항만장 그레고르', ['그 배를 본 어선은 하나도 돌아오지 않았어. 등대만 다시 켜지면 안개 속에 숨지 못할 텐데…', '등대지기 바르톨 영감이 불을 고치러 곶에 간 지 일주일째야. 소식이 없어.', '영감의 손녀 에다가 마을 동쪽 집에 살아. 등대 일이라면 그 아이가 제일 잘 알 거다.']);
+      Game.setFlag('met_gregor');
+      S.stage('main5', 2);
+      await S.goalUpdate('main5');
+      return;
+    }
+    if (p === 29 && !Game.flag('boat_ready')) {
+      await S.say('항만장 그레고르', ['등대가… 켜졌어! 십 년 넘게 본 불빛인데, 오늘처럼 반가운 적이 없군.', '그리고 그 불빛에 만 한가운데 떠 있는 회색 배가 비쳤지. 숨을 곳을 잃은 거야.']);
+      await Story.line('cassandra', ['「회색 갈매기호」예요. 선장은 제4성부 오르카.', '…15년 전에 이 바다에서 선원 마흔 명을 잃은 함장이에요.']);
+      await S.say('항만장 그레고르', ['…오르카? 은빛 갈매기호의 오르카 함장 말인가.', '(그레고르는 한참 동안 말이 없었다.)', '그 사람은 내 은인이야. 폭풍 속에서 내 고깃배를 끌어 주고, 자기 배로 돌아갔지. 그게 마지막이었어.']);
+      await S.say('항만장 그레고르', ['부두 동쪽 끝에 내 배가 있어. 죽은 마누라 이름을 붙인 배라 아무도 안 태웠지만… 당신들은 타.', '그 사람을… 쉬게 해 줘.']);
+      Game.setFlag('boat_ready');
+      S.stage('main5', 6);
+      await S.goalUpdate('main5');
+      return;
+    }
+    if (p === 31) { await Story.chapter4Ending(); return; }
+    await S.say('항만장 그레고르', byP({
+      25: '항만 사무소다. 출항 금지 중이니 볼일이 없으면 돌아가.',
+      27: '에다에게 이야기 들었나? 해식 동굴은 얼음판이야. 무턱대고 들어가면 벽에 처박힐 거다.',
+      28: '동굴을 지났다고? 등대는 어떻게 됐나?',
+      29: '부두 동쪽 끝의 배를 써. 노는 저어 두었다.',
+      30: '회색 배가 가라앉았다더군. …오르카 함장, 이제 편히 쉬시오.',
+      32: ['배들이 나간다. 한 달 만에. …바다가 이렇게 조용한 줄 몰랐어.', '마레아는 당신들을 잊지 않을 거다.'],
+    }));
+  },
+  async bountyBoard() {
+    await S.say(null, ['현상수배 게시판이다.', '「해안 동쪽 모래톱에 거대한 게가 나타나 어구를 부수고 있음. 일명 집게왕. 토벌 시 현상금 1800G ─ 항만장」']);
+    if (!Quests.get('s_crab') && Game.progress() >= 26) await S.startQuest('s_crab');
+  },
+
+  // ── 등대지기의 손녀 에다 ──
+  async eda() {
+    if (Game.flag('met_gregor') && !Game.flag('cave4_open')) {
+      await S.say('에다', ['…항만장님이 보내셨어요? 할아버지 일로요?', '할아버지는 등대 불이 꺼진 날, 렌즈를 고치러 곶에 가셨어요. 그 뒤로 일주일째 안 돌아오세요.']);
+      await S.say('에다', ['곶으로 가는 절벽길은 지난겨울에 무너졌어요. 이제는 바닷가의 해식 동굴로만 갈 수 있어요.', '동굴 바닥은 전부 얼음이에요. 할아버지는 늘 그러셨어요.', '「얼음 위에선 멈추고 싶은 데서 멈출 수 없다. 멈춰 줄 것을 찾아라.」']);
+      await Story.line('mio', '할아버지는 꼭 무사하실 거예요. 저희가 모셔 올게요.');
+      await S.say('에다', ['…고마워요. 이거 가져가세요. 할아버지가 동굴에 갈 때마다 챙기시던 수프예요.', '동굴 입구는 해안 동쪽, 절벽 아래예요.']);
+      await S.give('warm_soup', 3);
+      Game.setFlag('cave4_open');
+      S.stage('main5', 3);
+      await S.goalUpdate('main5');
+      return;
+    }
+    await S.say('에다', byP({
+      25: '…누구세요? 할아버지는 지금 안 계세요.',
+      28: '동굴을 지나셨어요? 할아버지는요? 할아버지는…!',
+      29: ['할아버지가 돌아오셨어요! 흐아앙… 고마워요, 정말 고마워요.', '등대 불빛이 다시 바다를 비추고 있어요. 할아버지는 그게 제일 기쁘대요.'],
+      32: '바다가 조용해졌어요. 할아버지가 그러는데, 이렇게 맑은 북해는 처음이래요.',
+    }));
+  },
+  async bartol() {
+    await S.say('등대지기 바르톨', byP({
+      29: ['자네들이 날 녹여 줬다고? 허허, 이 늙은이가 얼음 조각이 될 뻔했군.', '그 잿빛 불꽃 말이야. 렌즈에 그걸 피운 순간부터 등대는 길을 비추는 게 아니라, 무언가를 부르기 시작했지.'],
+      30: ['오르카 함장… 그 사람은 물때를 읽는 데 바다 제일이었지.', '바다 사람들은 말하지. 물이 차오를 땐 칼을 거두고, 물이 빠질 땐 입을 다물라고. …이제 다 끝난 얘기지만.'],
+      32: '등대는 다시 밤바다를 지킬 거네. 자네들이 돌아오는 밤에도 말이야.',
+    }));
+    if (!Game.flag('bartol_gift')) {
+      Game.setFlag('bartol_gift');
+      await S.say('등대지기 바르톨', '이건 내 감사의 표시일세. 등대지기의 비상약이지. 몸이 얼어붙거든 들이켜게.');
+      await S.give('elixir', 2);
+    }
+  },
+
+  // ── 해식 동굴: 서리엄니 ──
+  async walrus() {
+    if (Game.flag('walrus_defeated')) return;
+    S.facePlayer('up');
+    Sound.stop();
+    S.sfx('roar');
+    await S.say(null, ['(동굴 출구 앞, 거대한 바다코끼리가 얼음 위에 몸을 누이고 있다. 엄니에 서리가 꽃처럼 피어 있다.)', '(바다코끼리가 천천히 고개를 들었다. 그 등 뒤로 등대로 이어지는 계단이 보인다.)']);
+    await Story.line('nell', '…길을 막고 있어. 비켜 줄 생각은 없어 보이고.');
+    await Story.line('bran', '덤벼라, 커다란 물개! 아, 바다코끼리였나? 아무튼!');
+    const r = await S.battle(['frost_walrus'], { bg: 'icecave', bgm: 'boss', boss: true, canEscape: false, intro: '얼음 동굴의 주인 서리엄니' });
+    if (r !== 'win') return;
+    Game.setFlag('walrus_defeated');
+    S.hideNpc('walrus');
+    Sound.bgm('cave');
+    await S.say(null, '(서리엄니가 쓰러지자, 동굴 천장의 고드름들이 녹아 똑똑 떨어지기 시작했다.)');
+    await Story.line('linette', '이 바다코끼리… 날뛰던 게 아니라 무언가를 피해 이 동굴에 숨어 있었던 것 같아요. 등대 쪽에서 내려오는 냉기를요.');
+    S.stage('main5', 4);
+    await S.goalUpdate('main5');
+  },
+
+  // ── 등대 꼭대기: 카산드라 ──
+  async cassandraLighthouse() {
+    if (Game.flag('cassandra_joined')) return;
+    S.facePlayer('up');
+    Sound.stop();
+    await S.say(null, '(등명실 한가운데, 거대한 렌즈 안에서 잿빛 불꽃이 차갑게 타오르고 있다. 그 앞에 한 여인이 등을 돌리고 서 있다.)');
+    Sound.sfx('chime');
+    await S.say('???', '…♪ 별이 잠들면 시계도 잠들고… 엄마가 오면… ♪');
+    await S.say(null, '(노래가 중간에 끊겼다. 여인이 천천히 돌아섰다.)');
+    if (Game.inParty('nell')) {
+      await S.say('넬', '…언니.');
+      await S.say('카산드라', ['넬. 역시 왔구나. 이 불을 켜면 네가 올 것 같았어.', '…아니, 거짓말이야. 오지 않기를 바랐어.']);
+    } else {
+      await S.say('카산드라', '…열쇠님. 넬은 같이 안 왔나요? 다행이에요. 그 아이한테는 보이고 싶지 않았으니까.');
+    }
+    await S.say('카산드라', ['이 잿빛 불꽃은 신호예요. 안개 속의 배를 이 바다로 부르는.', '오스릭 님의 명령이었어요. 「파도의 종으로 가는 배를 불러라」.']);
+    await Story.line('linette', '그런데… 왜 불 앞에서 망설이고 있는 거예요?');
+    await S.say('카산드라', ['…시계탑에서요. 종이 열쇠님에게 환영을 보여 줬을 때, 저한테도 보였어요.', '엄마가 있었어요. 마지막 날의 엄마. 침대에서 제 손을 잡고 이렇게 말했어요.', '「카스, 넬을 부탁해.」']);
+    await S.say('카산드라', ['장막 너머에 엄마는 없었어요. 엄마가 남긴 건, 넬이었어요.', '그런데 나는 8년 동안 넬을 혼자 두고… 엄마를 찾겠다고…']);
+    if (Game.inParty('nell')) {
+      await S.say('넬', ['…바보 언니. 8년 늦었어.', '그래도… 늦어도 괜찮아. 이제 같이 가.']);
+    }
+    await S.say('카산드라', '……이 불은 끌게요. 내 손으로.');
+    Sound.sfx('mist');
+    await S.say(null, '(카산드라가 렌즈에 손을 뻗는 순간── 잿빛 불꽃이 거세게 일어나며 사람의 모양을 이루었다!)');
+    const e1 = Field.npc('elite_lh1'), e2 = Field.npc('elite_lh2');
+    if (e1) e1.visible = true; if (e2) e2.visible = true;
+    await S.say('성가대 정예기사', ['제2성부. 배신은 처형이다. 오스릭 님의 명이다.', '신호의 불꽃이여, 배를 부르는 노래를 멈추지 마라!']);
+    await Story.line('bran', '언니든 누구든 상관없어! 노래하는 사람한테 칼을 들이대는 놈들은 용서 못 해!');
+    const r = await S.battle(['choir_elite', 'grey_wisp', 'choir_elite'], { bg: 'lighthouse', bgm: 'boss', boss: true, canEscape: false, intro: '잿빛 신호 불꽃과 성가대 정예기사' });
+    if (r !== 'win') return;
+    S.hideNpc('elite_lh1'); S.hideNpc('elite_lh2');
+    Sound.bgm('sad');
+    await S.say(null, '(잿빛 불꽃이 사그라들자, 렌즈는 텅 빈 채 어둠 속에 남았다.)');
+    await S.say('카산드라', ['…불이 꺼졌어요. 하지만 이대로면 등대는 그냥 어두운 탑이에요.', '렌즈에 진짜 빛을 넣어야 해요. 별빛 같은 빛을.']);
+    await Story.line('mio', '{H} 님, 손등이…!');
+    Sound.sfx('chime'); Engine.flash('#fff4c0', 0.7);
+    await S.say(null, ['({H}의 손등의 낙인이 저절로 빛나기 시작했다. 빛은 손등을 떠나 렌즈 한가운데로 날아들었다.)', '(──번쩍. 거대한 렌즈가 별빛을 머금고, 하얀 빛줄기가 밤바다를 가로질렀다.)']);
+    Game.setFlag('cassandra_joined');
+    Field.refreshNpcs();
+    Sound.bgm('shrine');
+    await S.say(null, '(빛줄기 끝, 안개가 걷힌 만 한가운데에… 회색 돛을 단 거대한 배가 떠 있다.)');
+    await S.say('카산드라', ['「회색 갈매기호」. 제4성부 오르카의 배예요.', '…열쇠님. 저를 데려가 주세요. 성가대가 무엇을 하려는지, 저는 알아요. 그리고 넬 옆에 있고 싶어요.']);
+    await S.join('cassandra');
+    if (Game.inParty('nell')) {
+      await S.say('넬', '…어서 와, 언니.');
+      await S.say('카산드라', ['…응. 다녀왔어, 넬.', '이거, 엄마 로켓이야. 8년 동안 내가 가지고 있었는데… 이제 우리 둘 거야.']);
+      await S.give('choir_locket', 1);
+    }
+    await Story.line('linette', '아래층의 할아버지! 냉기가 사라졌으니까──');
+    await S.say(null, '(1층에서 얼음이 깨지는 소리와 함께, 노인의 기침 소리가 들려왔다.)');
+    S.stage('main5', 5);
+    await S.goalUpdate('main5', '\n[d](등대지기 바르톨은 마을로 돌아갔다. 렌즈 옆의 마법진으로 마레아까지 돌아갈 수 있다.)[/]');
+  },
+
+  // ── 유령선에 오르기 ──
+  async boardShip() {
+    if (!(await S.yesno(null, '그레고르의 배를 타고 만 한가운데의 회색 배로 갈까?'))) return;
+    await Engine.fadeOut(500);
+    Sound.sfx('step');
+    await S.say(null, '(노 젓는 소리만이 얼어붙은 바다 위에 울린다. 회색 돛이 점점 가까워진다…)');
+    await S.warp('ship_deck', 2, 7, 'right', { sfx: 'stairs' });
+  },
+
+  // ── 선장실: 알드윈의 수첩 ──
+  async osricNotebook() {
+    await S.say(null, ['(수첩을 펼치자, 첫 장에 크레용으로 그린 그림이 있다. 안경 쓴 남자와 작은 여자아이가 손을 잡고 있다.)', '(그림 아래 서툰 글씨: 「아빠, 질문은 등불이야! 모르는 게 있으면 불을 켜는 거야! ─ 엘리」)']);
+    if (Game.inParty('linette')) {
+      await Story.line('linette', ['……질문은 등불.', '교수님이 강의 첫날마다 하시던 말이에요. 제 인생을 바꾼 말이었어요.', '그게… 엘리가 한 말이었어요. 일곱 살 엘리가.']);
+      await Story.line('linette', ['교수님은 엘리가 켜 준 등불을 들고, 20년 동안 같은 질문만 하신 거예요. 「왜 엘리가 죽어야 했나」.', '…그 수첩, 제가 가지고 있을게요. 마지막에 돌려드려야 하니까.']);
+    }
+    await S.say(null, '(뒷장에는 다섯 개의 종과 「열쇠」, 그리고 하늘에 떠 있는 섬 하나가 그려져 있다.)');
+  },
+
+  // ── 선미 갑판: 제4성부 오르카 ──
+  async orca() {
+    if (Game.flag('orca_defeated')) return;
+    S.facePlayer('right');
+    Sound.stop();
+    await S.say(null, '(키를 잡은 사내가 천천히 돌아섰다. 낡은 해군 외투가 바람에 펄럭인다. 그 뒤로 초록빛 안개 속에서 선원들의 그림자가 일렁인다.)');
+    await S.say('오르카', ['…등대를 켠 게 너희로군. 덕분에 안개가 걷혔다.', '나는 이 배의 함장, 잿빛 성가대의 제4성부 오르카.']);
+    if (Game.inParty('cassandra')) await S.say('오르카', '제2성부. 노래를 그만두었다고 들었다. …아쉽군. 네 노래는 선원들이 좋아했는데.');
+    await S.say('오르카', ['15년 전 오늘 같은 밤이었다. 바다가 울부짖고, 은빛 갈매기호는 두 동강이 났지.', '나는 마지막 한 명까지 끌어올리려 했다. 그러나 살아남은 건… 함장인 나 하나뿐이었다.']);
+    await S.say('오르카', ['장막이 열리면 선원들이 돌아온다. 마흔 명 모두. 이번에는 내가 한 명도 놓치지 않는다.', '그러기 위해 파도의 종이 필요하다. 그리고 열쇠, 너도.']);
+    if (Game.inParty('bran')) {
+      await Story.line('bran', ['…우리 아버지도 동료를 잃었어. 지키지 못했다고, 기사를 그만두고 대장간을 열었어.', '아버지는 도끼를 내려놨는데… 당신은 닻을 들고 유령이 됐구나.']);
+      await S.say('오르카', '…네 아버지는 현명했군. 나는 내려놓을 줄을 몰랐다.');
+    }
+    await S.say('오르카', '전원, 전투 배치!');
+    const r = await S.battle(['orca'], { bg: 'ship', bgm: 'boss', boss: true, canEscape: false, intro: '잿빛 성가대 제4성부 오르카' });
+    if (r !== 'win') return;
+    Game.setFlag('orca_defeated');
+    await Story.afterOrca();
+  },
+  async afterOrca() {
+    Sound.bgm('sad');
+    await S.say(null, '(오르카가 키에 기대어 무릎을 꿇었다. 손에서 녹슨 닻이 미끄러져 떨어졌다.)');
+    await S.say('오르카', ['…15년. 15년 동안 매일 밤, 이 갑판에서 선원들의 이름을 불렀다.', '대답은… 한 번도 없었지.']);
+    await S.say(null, ['(그때, 안개 속 그림자들이 하나둘 함장 곁으로 다가왔다. 그림자들은 아무 말 없이 함장의 어깨에 손을 얹었다.)', '(마흔 개의 손이 함장을 감쌌다.)']);
+    await S.say('오르카', ['……너희는. 계속 여기 있었나. 내가 부르는 동안, 내내…', '그래. 그래, 이제 됐다. 다 같이 가자.']);
+    if (Game.inParty('cassandra')) await Story.line('cassandra', '…진혼가를 불러 드릴게요. 선원들이 좋아하던 노래로.');
+    Sound.sfx('chime');
+    await S.say(null, '(노랫소리 속에서, 함장과 선원들의 그림자가 초록빛 안개와 함께 흩어졌다.)');
+    Sound.sfx('thunder'); Engine.shake(8, 1.2);
+    await S.say(null, '(콰아앙──! 함장이 사라진 순간, 배가 크게 기울었다. 갑판 틈으로 바닷물이 쏟아져 들어온다!)');
+    await Story.line('bran', '가, 가라앉는다아아!!');
+    await Story.line('mio', '아니에요…! 이 배, 우리를 데려가려는 거예요. 바닷속에서… 종이 부르고 있어요!');
+    S.hideNpc('orca_helm');
+    await Engine.fadeOut(900, '#0a2a3a');
+    Sound.stop();
+    await S.say(null, ['(차가운 물이 온몸을 감쌌다. 숨이 막히는 순간, 투명한 막이 일행을 감쌌다.)', '(배는 천천히, 아주 천천히 바다 밑으로 가라앉아 갔다──)']);
+    S.stage('main5', 8);
+    await S.warp('sunken1', 12, 18, 'up', { slow: true });
+    await S.goalUpdate('main5');
+  },
+
+  // ── 파도 종의 방: 심해의 수호자 레비아 ──
+  async levia() {
+    if (Game.flag('levia_defeated')) return;
+    S.facePlayer('up');
+    Sound.stop();
+    S.sfx('roar');
+    await S.say(null, ['(청록빛 종 아래, 거대한 그림자가 똬리를 틀고 있다. 수많은 팔이 종을 휘감고, 몸 곳곳에서 잿빛 불꽃이 피어오른다.)', '(그림자가 눈을 떴다. 두 개의 거대한 눈동자가 일행을 내려다본다.)']);
+    await Story.line('mio', ['종을 지키는 수호자예요…! 그런데 아파하고 있어요. 잿빛 불꽃이 몸을 태우고 있어요.', '벨가르 씨처럼… 원래는 종을 지키던 분이에요.']);
+    if (Game.inParty('cassandra')) await Story.line('cassandra', '성가대가 등대에서 부른 불꽃이에요. 신호를 따라 종까지 흘러들어 온 거예요. …제 탓이에요.');
+    await Story.line('linette', '「수호자의 팔이 많을수록 바다는 높이 일어난다」… 벽화가 그랬어요!');
+    const r = await S.battle(['levia_tentacle', 'levia', 'levia_tentacle'], { bg: 'sunken', bgm: 'boss', boss: true, canEscape: false, intro: '심해의 수호자 레비아' });
+    if (r !== 'win') return;
+    Game.setFlag('levia_defeated');
+    await Story.afterLevia();
+  },
+  async afterLevia() {
+    Sound.stop();
+    S.hideNpc('levia_npc');
+    await S.say(null, '(레비아의 몸에서 잿빛 불꽃이 빠져나와 흩어졌다. 거대한 수호자는 조용히 팔을 거두고, 종을 한 번 쓰다듬은 뒤 깊은 어둠 속으로 가라앉았다.)');
+    if (Game.inParty('mio') && Game.inParty('cassandra')) {
+      await Story.line('mio', '카산드라 씨. …같이 불러 주실래요? 종이 잠들 수 있게.');
+      await Story.line('cassandra', '…응. 같이 부르자.');
+      Sound.sfx('chime');
+      await S.say(null, '(두 사람의 노래가 겹쳐지자, 파도 종이 맑게 떨리기 시작했다.)');
+    }
+    Sound.sfx('bell');
+    Engine.flash('#c8fff8', 0.6);
+    await S.say(null, '──데에엥.\n(파도 종이 울렸다. 바닷속 깊은 곳까지, 잔잔하고 깊게.)');
+    Sound.bgm('shrine');
+    Engine.flash('#a8fff0', 0.4);
+    Sound.jingle('item');
+    await S.say(null, '[y]파도의 심장[/]이 {H}의 손에 내려앉았다. 귀를 기울이면 먼 바다의 파도 소리가 들린다.');
+    Game.addItem('wave_heart', 1);
+    await S.say(null, '(시간의 심장, 모래의 심장, 그리고 파도의 심장. 세 개의 구슬이 손안에서 서로를 부르듯 울린다.)');
+    // 오스릭 등장
+    Sound.sfx('hit'); await S.wait(250); Sound.sfx('hit');
+    const os = Field.npc('osric_sea');
+    if (os) { os.visible = true; os.x = os.fromX = 9; os.y = os.fromY = 11; }
+    await S.walkNpc('osric_sea', ['up'], 3);
+    await S.say('오스릭', ['네 번째 심장도 열쇠에게 모였군. 오르카는… 편히 쉬었나.', '그는 좋은 함장이었다. 선원들을 너무 사랑했을 뿐.']);
+    if (Game.inParty('cassandra')) {
+      await S.say('오스릭', '카산드라. 네 노래가 그리울 거다.');
+      await Story.line('cassandra', '…저는 이제 제 노래를 불러요, 오스릭 님. 아니, 알드윈 교수님.');
+    }
+    if (Game.inParty('linette')) {
+      await Story.line('linette', ['교수님. 「회색 갈매기호」 선장실에서 교수님 수첩을 찾았어요.', '「질문은 등불」. …엘리가 한 말이었죠.']);
+      await S.say('오스릭', ['……그 수첩을 보았나.', '(오스릭은 처음으로 대답을 망설였다.)', '…그래. 엘리가 켜 준 등불이었다. 나는 20년 동안 그 불빛 하나로 어둠을 걸어왔지.']);
+      await Story.line('linette', '그 등불은 엘리를 되살리라고 켜 준 게 아니에요. 계속 질문하라고 켜 준 거예요. 교수님이 저한테 그랬던 것처럼.');
+      await S.say('오스릭', '…마지막 종에서 다시 물어라, 리네트. 그때는 답해 주마.');
+    }
+    await S.say('오스릭', ['마지막 종은 하늘에 있다. 들리나? 네 개의 심장이 부르는 소리가.', '보아라.']);
+    Sound.sfx('thunder'); Engine.shake(6, 1.4); Engine.flash('#ffffff', 0.8);
+    await S.say(null, ['(신전 천장 너머, 아득한 해수면 위로 빛이 쏟아졌다.)', '(바다 위 구름이 갈라지고── 거대한 섬 하나가 하늘로 떠오르는 것이 보였다.)']);
+    await S.say('오스릭', ['「하늘섬 셀레스」. 다섯 번째, 마지막 종의 자리다.', '{H}. 저편의 시계 소리가 들리나? 서두르는 게 좋을 거다.']);
+    // 환영: 원래 세계
+    await Engine.fadeOut(600, '#ffffff');
+    Sound.stop();
+    await S.say(null, ['…삐─, 삐─, 삐─.', '「{H}, 의사 선생님이 수술을 해 보자고 하셨어. 다음 주 화요일이야.」', '「엄마는 무서워. 그래도… 너는 늘 엄마보다 용감했잖아. 그러니까, 꼭 깨어나야 해.」', '손을 잡은 손이 떨리고 있다──']);
+    Sound.sfx('chime');
+    await Engine.fadeIn(600, '#ffffff');
+    S.hideNpc('osric_sea');
+    await S.say(null, '(정신을 차리자 오스릭의 모습은 사라지고 없었다.)');
+    Sound.bgm('shrine');
+    const c = await S.ask(null, '(다음 주 화요일…)', ['…수술이래. 다음 주.', '…아무것도 아니야.'], 1);
+    if (c === 0) {
+      await Story.line('nell', '…다음 주. 그 전에 끝내자. 우리가 같이 있잖아.');
+      await Story.line('bran', '기사의 약속이야. 화요일 전에 데려다줄게. 그러니까 그런 얼굴 하지 마!');
+    } else {
+      await Story.line('mio', '{H} 님. 말하지 않아도 알아요. …그래도 다음엔 말해 주세요.');
+    }
+    if (Game.inParty('cassandra')) await Story.line('cassandra', '…기다리는 사람이 있다는 거, 좋은 거예요. 늦기 전에 돌아가요. 저처럼 8년이나 늦지 말고.');
+    S.stage('main5', 9);
+    await S.goalUpdate('main5', '\n[d](종 옆의 마법진으로 마레아까지 돌아갈 수 있다.)[/]');
+  },
+
+  // ── 서브: 집게왕 현상수배 ──
+  async kingCrab() {
+    S.sfx('roar');
+    await S.say(null, '(모래톱 위에 집채만 한 게가 버티고 있다. 집게 하나가 어선의 노를 장난감처럼 부러뜨린다.)');
+    if (!(await S.yesno(null, '집게왕이 집게를 딱딱 부딪친다! 싸울까?'))) return;
+    const r = await S.battle(['king_crab'], { bg: 'snowfield', bgm: 'boss', boss: true, canEscape: false, intro: '해안의 무법자 집게왕' });
+    if (r !== 'win') return;
+    S.hideNpc('king_crab');
+    await S.say(null, '(집게왕이 거품을 물고 쓰러졌다. 거대한 집게발 하나가 모래 위에 떨어져 있다.)');
+    await S.give('crab_claw', 1);
+    S.stage('s_crab', 1);
+    await S.goalUpdate('s_crab');
+  },
+
+  // ── 서브: 얼어붙은 편지 ──
+  async frozenLetter() {
+    await S.say(null, ['(겉봉에 번진 글씨: 「마레아의 엘사에게」)', '(뒷면에는 「은빛 갈매기호 갑판원 한스」라고 적혀 있다.)']);
+    await Story.line('linette', '은빛 갈매기호… 15년 전에 가라앉은 배예요. 이 편지, 15년 동안 얼음 속에 있었던 거예요.');
+    if (!Quests.get('s_frozen')) await S.startQuest('s_frozen');
+  },
+  async elsa() {
+    if (Quests.isActive('s_frozen') && Game.count('frozen_letter')) {
+      await S.say('엘사', ['…이 글씨. 한스의 글씨야.', '(엘사는 떨리는 손으로 편지를 펼쳤다.)']);
+      await S.say(null, '「엘사. 이번 항해가 끝나면 그 반지를 정식으로 끼워 줄게. 갈매기호가 돌아오는 날, 등대 불빛 아래에서 기다려 줘. ─ 한스」');
+      await S.say('엘사', ['…바보. 15년이나 늦었잖아.', '(엘사는 한참 동안 울다가, 앞치마에 얼굴을 닦고 웃었다.)', '고마워요. 이제야 기다림을 끝낼 수 있겠어요. 이건… 그 사람이 주려던 반지예요. 바다로 나가는 당신들이 가져가요.']);
+      Game.removeItem('frozen_letter', 1);
+      await S.completeQuest('s_frozen');
+      return;
+    }
+    await S.say('엘사', byP({
+      25: ['「갈매기」에 어서 와요. 수프 한 그릇 하고 가요. 몸이 녹을 거예요.', '…등대가 꺼지니까 이상하게 옛날 생각이 나네요.'],
+      30: '유령선의 선장이 오르카 함장이었다고요? …그럼 그 배에는 한스도.',
+      32: '등대 불빛 아래에서 15년 기다렸어요. 이제 바다를 미워하지 않을래요.',
+    }));
+  },
+
+  // ── 4장 엔딩 ──
+  async chapter4Ending() {
+    await S.say('항만장 그레고르', ['돌아왔군…! 회색 배가 가라앉고 나서 바다가 거짓말처럼 잠잠해졌어.', '오늘 아침 첫 배가 나갔다. 한 달 만이야.']);
+    await S.say(null, '(일행은 바닷속에서 있었던 일을 이야기했다. 오르카와 선원들, 레비아, 그리고 하늘로 떠오른 섬.)');
+    await S.say('항만장 그레고르', ['…오르카 함장이 선원들과 함께 갔다고. 그래, 그 사람다운 끝이야.', '하늘섬이라… 오늘 새벽, 북쪽 하늘에 섬 그림자가 보였다고 어부들이 떠들더군. 술에 취한 줄 알았는데.']);
+    await Story.line('linette', '네 개의 심장… 이제 마지막 하나예요. 교수님도 거기서 기다리고 있을 거예요.');
+    if (Game.inParty('cassandra')) await Story.line('cassandra', '마지막 종에는 제1성부가 있어요. 성가대에서 오스릭 님 다음으로 강한 사람. …다들 각오해요.');
+    await Story.line('nell', '언니가 있으니까 이번엔 좀 든든하네. …조금.');
+    await Story.line('bran', '{H}, 화요일 전이야. 잊지 마!');
+    await S.say('항만장 그레고르', '마레아는 당신들을 잊지 않을 거다. 이건 북해의 은인에게 주는 징표야.');
+    await S.completeQuest('main5');
+    Game.setFlag('chapter4_done');
+    await Story.chapterCard({ num: '제4장', title: '파도의 종', next: 'To be continued ─ 제5장 「하늘의 종」', bgm: 'harbor' });
+    await S.say('항만장 그레고르', ['하늘섬까지 가는 길은… 글쎄, 배로는 못 가겠지. 왕도 학장이라면 뭔가 알지도 모르겠군.', '그때까지 쉬어 가. 마레아의 등불은 이제 꺼지지 않으니까.']);
+    if (await S.yesno(null, '여기까지의 모험을 기록할까요?')) await Menu.saveScreen();
+  },
+});
+
+
 // ── src/scenes/events.js ──
 'use strict';
 // ─────────────────────────────────────────────────────────────
@@ -9818,7 +11458,7 @@ const GameOver = {
 const Field = (() => {
   const TS = 16, VW = 20, VH = 15;
   const DIRV = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
-  const SPEED_WALK = 4.6, SPEED_RUN = 7.6, NPC_SPEED = 2.6;
+  const SPEED_WALK = 4.6, SPEED_RUN = 7.6, SPEED_SLIDE = 9, NPC_SPEED = 2.6;
 
   let map = null, rt = null;
   const pl = { x: 0, y: 0, dir: 'down', fromX: 0, fromY: 0, t: 1, moving: false, phase: 0, speed: SPEED_WALK };
@@ -9992,7 +11632,7 @@ const Field = (() => {
   }
 
   // ── 이동 ──
-  function startMove(dir) {
+  function startMove(dir, sliding) {
     pl.dir = dir;
     const [dx, dy] = DIRV[dir];
     const nx = pl.x + dx, ny = pl.y + dy;
@@ -10020,9 +11660,11 @@ const Field = (() => {
     pl.fromX = pl.x; pl.fromY = pl.y;
     pl.x = nx; pl.y = ny;
     pl.t = 0; pl.moving = true;
-    pl.speed = (Input.isHeld('run') ? !Settings.get('autoRun') : Settings.get('autoRun')) ? SPEED_RUN : SPEED_WALK;
+    pl.speed = sliding ? SPEED_SLIDE : (Input.isHeld('run') ? !Settings.get('autoRun') : Settings.get('autoRun')) ? SPEED_RUN : SPEED_WALK;
     return true;
   }
+  // 얼음 칸: 밟으면 같은 방향으로 막힐 때까지 미끄러진다
+  const slideAt = (x, y) => { const t = TILES[tileAt(x, y)]; return !!(t && t.slide); };
   function bump() {
     if (bumpT <= 0) { Sound.sfx('bump'); bumpT = 0.3; }
   }
@@ -10073,9 +11715,9 @@ const Field = (() => {
         return true;
       }
     }
-    // 인카운터
+    // 인카운터 (미끄러지는 동안은 없음)
     const z = encZone(pl.x, pl.y);
-    if (z && grace <= 0 && st.ward <= 0 && !Game.flag('debug_noenc')) {
+    if (z && grace <= 0 && st.ward <= 0 && !Game.flag('debug_noenc') && !slideAt(pl.x, pl.y)) {
       encLeft -= TILES[tileAt(pl.x, pl.y)].road ? 0.6 : 1;
       if (encLeft <= 0) {
         resetEnc();
@@ -10220,14 +11862,18 @@ const Field = (() => {
       for (const dname of ['up', 'down', 'left', 'right']) {
         const [dx, dy] = DIRV[dname];
         const nx = cx + dx, ny = cy + dy;
-        const k = key(nx, ny);
-        if (prev.has(k) || !inBounds(nx, ny)) continue;
+        if (!inBounds(nx, ny)) continue;
         if (blocked(nx, ny, 'player')) continue;
         // 워프 칸은 목적지일 때만 통과
         if (warpAt(nx, ny) && !(nx === tx && ny === ty)) continue;
+        // 얼음 위에서는 멈출 때까지 미끄러진 곳이 다음 칸
+        let sx = nx, sy = ny;
+        while (slideAt(sx, sy) && !warpAt(sx, sy) && inBounds(sx + dx, sy + dy) && !blocked(sx + dx, sy + dy, 'player')) { sx += dx; sy += dy; }
+        const k = key(sx, sy);
+        if (prev.has(k)) continue;
         prev.set(k, [cx, cy, dname]);
-        if (goal(nx, ny)) { found = [nx, ny]; q.length = 0; break; }
-        q.push([nx, ny]);
+        if (goal(sx, sy)) { found = [sx, sy]; q.length = 0; break; }
+        q.push([sx, sy]);
       }
     }
     if (!found) return null;
@@ -10294,7 +11940,8 @@ const Field = (() => {
         if (pl.onArrive) { const cb = pl.onArrive; pl.onArrive = null; cb(); }
         else {
           const stop = onStepEnd();
-          if (!stop && canControl && !busy) continueMove();
+          if (!stop && !busy && slideAt(pl.x, pl.y) && startMove(pl.dir, true)) { /* 미끄러지는 중 */ }
+          else if (!stop && canControl && !busy) continueMove();
         }
       }
     } else if (canControl) {
@@ -10419,6 +12066,9 @@ const Field = (() => {
       else if (o.type === 'deco' && o.draw === 'bell') g.drawImage(ObjArt.bell(!!Game.flag('velgar_defeated')), sx - 24, sy - 30);
       else if (o.type === 'deco' && o.draw === 'sandbell') g.drawImage(ObjArt.sandbell(!!Game.flag('zahir_defeated'), T), sx - 24, sy - 30);
       else if (o.type === 'hourglass') g.drawImage(ObjArt.hourglass(!!Game.flag('hg_flip')), sx, sy);
+      else if (o.type === 'deco' && o.draw === 'wavebell') g.drawImage(ObjArt.wavebell(!!Game.flag('levia_defeated'), T), sx - 24, sy - 30);
+      else if (o.art === 'lens') g.drawImage(ObjArt.lens(!!Game.flag('cassandra_joined'), T), sx, sy - 16);
+      else if (o.art === 'rope') g.drawImage(ObjArt.rope(), sx, sy);
       else if (o.type === 'search' && o.hidden && hasNell() && !Game.flag('got:' + o.id)) g.drawImage(ObjArt.sparkle(T + o.x), sx, sy);
       else if (o.art === 'circle') {
         // 귀환의 마법진
@@ -10469,6 +12119,16 @@ const Field = (() => {
     }
     // 날씨: 모래바람
     const weather = typeof map.weather === 'function' ? map.weather() : map.weather;
+    if (weather === 'snow') {
+      g.fillStyle = 'rgba(200,220,255,0.12)'; g.fillRect(0, 0, Engine.LW, Engine.LH);
+      g.fillStyle = 'rgba(255,255,255,0.85)';
+      for (let i = 0; i < 46; i++) {
+        const sp = 18 + (i % 4) * 7;
+        const y = (i * 41 + T * sp) % (Engine.LH + 8) - 4;
+        const x = (i * 67 + Math.sin(T * 1.3 + i) * 10 + T * 6) % Engine.LW;
+        g.fillRect(x, y, i % 3 ? 1 : 2, i % 3 ? 1 : 2);
+      }
+    }
     if (weather === 'sand') {
       g.fillStyle = 'rgba(220,170,90,0.16)'; g.fillRect(0, 0, Engine.LW, Engine.LH);
       g.fillStyle = 'rgba(250,220,160,0.55)';
@@ -10646,6 +12306,46 @@ const BattleBG = (() => {
       g.fillStyle = 'rgba(232,192,112,0.5)'; for (let i = 0; i < 30; i++) g.fillRect((i * 37) % 320, (i * 23) % 110, 1, 3);
       for (const x of [26, 280]) { p.rect(x, 10, 14, 102, '#8a6a40'); p.rect(x, 10, 3, 102, '#b89868'); }
       p.rect(0, 112, 320, 128, '#a88048'); p.rect(110, 112, 100, 128, '#7a3a2a'); p.rect(110, 112, 3, 128, '#e8c070'); p.rect(207, 112, 3, 128, '#e8c070');
+    },
+    // ── 제4장 ──
+    snowfield(p, g) {
+      sky(p, '#6a7a98', '#d8e0ec', 110);
+      g.fillStyle = '#8a9ab4'; g.beginPath(); g.moveTo(0, 96); for (let x = 0; x <= 320; x += 16) g.lineTo(x, 70 + Math.sin(x * 0.03) * 14); g.lineTo(320, 110); g.lineTo(0, 110); g.fill();
+      g.fillStyle = '#3c6a9a'; g.fillRect(0, 98, 320, 14); g.fillStyle = '#d8ecff'; for (let x = 0; x < 320; x += 24) g.fillRect(x + ((x / 24) % 2) * 8, 102, 10, 1);
+      p.rect(0, 112, 320, 128, '#e6edf6'); p.noise(['#d2dbe8', '#f6f9fd'], 0.06, 301, [0, 112, 320, 128]);
+      for (let i = 0; i < 6; i++) p.ellipse(30 + i * 55, 150 + (i % 2) * 14, 24, 4, 'rgba(150,170,200,0.35)');
+      g.fillStyle = 'rgba(255,255,255,0.8)'; for (let i = 0; i < 40; i++) g.fillRect((i * 53) % 320, (i * 29) % 112, 1, 1);
+    },
+    icecave(p, g) {
+      p.rect(0, 0, 320, 240, '#14283a');
+      for (let i = 0; i < 14; i++) { const x = i * 24; g.fillStyle = i % 2 ? '#4a88a8' : '#7ab8d8'; g.beginPath(); g.moveTo(x, 0); g.lineTo(x + 12, 20 + (i * 17) % 28); g.lineTo(x + 24, 0); g.fill(); }
+      g.fillStyle = 'rgba(160,220,255,0.15)'; g.beginPath(); g.moveTo(120, 0); g.lineTo(200, 0); g.lineTo(250, 112); g.lineTo(70, 112); g.fill();
+      for (const x of [40, 270]) { g.fillStyle = '#a8dcf0'; g.beginPath(); g.moveTo(x - 10, 112); g.lineTo(x, 50); g.lineTo(x + 10, 112); g.fill(); }
+      p.rect(0, 112, 320, 128, '#a8d8f0'); p.noise(['#98cce8', '#bce4f6'], 0.06, 311, [0, 112, 320, 128]);
+      for (let i = 0; i < 8; i++) p.rect(20 + i * 40, 130 + (i % 3) * 30, 18, 1, '#d8f2ff');
+    },
+    lighthouse(p, g) {
+      sky(p, '#0a0c1e', '#283a5a', 112);
+      g.fillStyle = 'rgba(255,240,160,0.18)'; g.beginPath(); g.moveTo(160, 40); g.lineTo(0, 10); g.lineTo(0, 70); g.fill(); g.beginPath(); g.moveTo(160, 40); g.lineTo(320, 20); g.lineTo(320, 80); g.fill();
+      for (let i = 0; i < 40; i++) { g.fillStyle = `rgba(255,255,255,${0.3 + (i % 3) * 0.2})`; g.fillRect((i * 71) % 320, (i * 37) % 100, 1, 1); }
+      p.rect(0, 100, 320, 12, '#3a3a48'); for (let x = 0; x < 320; x += 20) p.rect(x, 96, 3, 16, '#5a5a68');
+      p.rect(0, 112, 320, 128, '#4b4759'); for (let x = 0; x < 320; x += 32) p.rect(x, 112, 1, 128, '#3c384a'); for (let y = 112; y < 240; y += 16) p.rect(0, y, 320, 1, '#3c384a');
+    },
+    ship(p, g) {
+      sky(p, '#101828', '#3a4a5a', 112);
+      g.fillStyle = 'rgba(200,220,220,0.12)'; for (let i = 0; i < 5; i++) g.fillRect(0, 30 + i * 16, 320, 6);
+      for (const x of [70, 250]) { p.rect(x, 0, 8, 112, '#3a2414'); p.rect(x - 40, 20, 88, 3, '#3a2414'); g.fillStyle = 'rgba(200,190,170,0.35)'; g.beginPath(); g.moveTo(x - 36, 24); g.lineTo(x + 44, 24); g.lineTo(x + 30, 88); g.lineTo(x - 22, 88); g.fill(); }
+      p.rect(0, 104, 320, 8, '#4a3020'); for (let x = 4; x < 320; x += 16) p.rect(x, 96, 3, 10, '#5a3c28');
+      p.rect(0, 112, 320, 128, '#6a4a30'); for (let x = 0; x < 320; x += 16) p.rect(x, 112, 1, 128, '#4a3020');
+      g.fillStyle = 'rgba(120,200,160,0.25)'; g.fillRect(0, 112, 320, 4);
+    },
+    sunken(p, g) {
+      sky(p, '#06141c', '#1a4a5a', 240);
+      g.fillStyle = 'rgba(160,230,255,0.08)'; for (let i = 0; i < 6; i++) { g.beginPath(); g.moveTo(40 + i * 50, 0); g.lineTo(60 + i * 50, 0); g.lineTo(90 + i * 50, 112); g.lineTo(70 + i * 50, 112); g.fill(); }
+      for (const x of [30, 280]) { p.rect(x, 10, 16, 102, '#3a6878'); p.rect(x, 10, 4, 102, '#5a8a98'); p.rect(x - 4, 6, 24, 6, '#5a8a98'); }
+      g.fillStyle = 'rgba(200,240,255,0.5)'; for (let i = 0; i < 24; i++) { g.beginPath(); g.arc((i * 41) % 320, (i * 67) % 200, 1 + (i % 3), 0, Math.PI * 2); g.fill(); }
+      p.rect(0, 112, 320, 128, '#2e5a68'); p.noise(['#28505e', '#3a6a78'], 0.08, 321, [0, 112, 320, 128]);
+      for (let i = 0; i < 5; i++) p.ellipse(40 + i * 64, 170, 26, 4, 'rgba(10,30,40,0.4)');
     },
   };
   function get(name) {
@@ -10839,6 +12539,7 @@ const Battle = (() => {
       } else g.drawImage(flash ? Pix.silhouette(d.img) : d.img, dx, d.y + bob);
       g.globalAlpha = 1;
       if (e.status.sleep) { g.fillStyle = '#ffffff'; g.font = '8px sans-serif'; g.fillText('z', d.x + d.w - 6, d.y + 6 + Math.sin(Engine.time * 3) * 2); }
+      if (e.status.freeze) { g.fillStyle = 'rgba(170,230,255,0.4)'; g.fillRect(dx + 2, d.y + bob + 2, d.w - 4, d.h - 4); }
     }
     Engine.blitLow(ctx);
     if (darken > 0) { ctx.fillStyle = `rgba(0,0,0,${darken})`; ctx.fillRect(0, 0, Engine.W, Engine.H); }
@@ -10849,7 +12550,8 @@ const Battle = (() => {
       const cx = (d.x + d.w / 2) * 2, top = d.y * 2;
       const tags = [];
       if (e.charging) tags.push(['!!', '#ff5050']);
-      for (const s of ['poison', 'sleep', 'paralyze', 'silence']) if (e.status[s]) tags.push([STATUS_NAMES[s], { poison: '#c070ff', sleep: '#70a8ff', paralyze: '#ffd050', silence: '#a0a0b0' }[s]]);
+      for (const s of ['poison'].concat(TEMP_STATUS)) if (e.status[s]) tags.push([STATUS_NAMES[s], STATUS_COLORS[s]]);
+      if (e.mem.guard && e.mem.guard.tag) tags.push([e.mem.guard.tag, e.mem.guard.color || '#7cc4ff']);
       if (e.buffs.atk && e.buffs.atk.mult > 1) tags.push(['공↑', '#ff8a5a']);
       if (e.buffs.def && e.buffs.def.mult > 1) tags.push(['방↑', '#ffd050']);
       if (e.buffs.spd && e.buffs.spd.mult < 1) tags.push(['속↓', '#70a8ff']);
@@ -10923,7 +12625,7 @@ const Battle = (() => {
     // 상태 태그
     const tags = [];
     if (dead) tags.push(['전투불능', Theme.red]);
-    for (const s of ['poison', 'sleep', 'paralyze', 'silence']) if (a.status[s]) tags.push([STATUS_NAMES[s], { poison: '#c070ff', sleep: '#70a8ff', paralyze: '#ffd050', silence: '#a0a0b0' }[s]]);
+    for (const s of ['poison'].concat(TEMP_STATUS)) if (a.status[s]) tags.push([STATUS_NAMES[s], STATUS_COLORS[s]]);
     if (a.defending) tags.push(['방어', '#7cc4ff']);
     if (a.buffs.atk) tags.push(a.buffs.atk.mult >= 1 ? ['공↑', '#ff8a5a'] : ['공↓', '#a0a0b0']);
     if (a.buffs.def && a.buffs.def.mult > 1) tags.push(['방↑', '#ffd050']);
@@ -11330,7 +13032,7 @@ const Battle = (() => {
     await Engine.fadeOut(260);
     Engine.remove(layer);
     // 전투 후 상태 정리 (일시 상태 제거)
-    for (const id of Game.state.party) { const m = Game.state.members[id]; for (const k of ['sleep', 'paralyze', 'silence']) delete m.status[k]; }
+    for (const id of Game.state.party) { const m = Game.state.members[id]; for (const k of TEMP_STATUS) delete m.status[k]; }
     if (result !== 'lose' && Field.map) Sound.bgm(typeof Field.map.bgm === 'function' ? Field.map.bgm() : Field.map.bgm);
     if (result !== 'lose') await Engine.fadeIn(260);
     core = null;
@@ -11386,7 +13088,7 @@ const Menu = (() => {
       UI.drawWindow(ctx, 176, 12, 452, 388);
       const st = Game.state;
       const ids = st.party.concat(st.reserve);
-      const rowH = ids.length > 4 ? 72 : 90;
+      const rowH = ids.length > 5 ? 60 : ids.length > 4 ? 72 : 90;
       ids.forEach((id, i) => memberRow(ctx, id, 196, 30 + i * rowH, 412, { reserve: i >= st.party.length }));
       UI.drawWindow(ctx, 176, 406, 452, 62);
       Text.draw(ctx, `[y]${Game.gold}G[/]`, 196, 416, { size: 20, bold: true });
@@ -11579,6 +13281,7 @@ const Menu = (() => {
       const towns = [{ label: '리벨 마을', value: ['rivel', 19, 27, 'up'] }];
       if (Game.flag('reached_capital')) towns.push({ label: '왕도 아스테리온', value: ['capital', 23, 37, 'up'] });
       if (Game.flag('reached_samira')) towns.push({ label: '오아시스 사미라', value: ['samira', 17, 25, 'up'] });
+      if (Game.flag('reached_marea')) towns.push({ label: '항구 마을 마레아', value: ['marea', 19, 15, 'down'] });
       let dest = towns[0].value;
       if (towns.length > 1) {
         const r = await UI.list({ x: 220, y: 160, w: 220, items: towns, title: '어디로 돌아갈까?', cancel: true });
@@ -11744,7 +13447,8 @@ const Menu = (() => {
           Text.draw(ctx, '주문·특기', 440, 150, { size: 15, color: Theme.gold });
           // 기술이 많으면 두 줄로 나눠 적는다
           const two = m.skills.length > 6;
-          m.skills.slice(0, 14).forEach((sk, i) => Text.draw(ctx, `${SKILLS[sk].kind === 'spell' ? '◆' : '◇'} ${SKILLS[sk].name}`, 440 + (two ? Math.floor(i / 7) * 92 : 0), 174 + (two ? i % 7 : i) * 21, { size: two ? 13 : 14, maxW: two ? 88 : 180 }));
+          const rows = m.skills.length > 14 ? 8 : 7, lh = rows === 8 ? 18 : 21;
+          m.skills.slice(0, rows * 2).forEach((sk, i) => Text.draw(ctx, `${SKILLS[sk].kind === 'spell' ? '◆' : '◇'} ${SKILLS[sk].name}`, 440 + (two ? Math.floor(i / rows) * 92 : 0), 174 + (two ? i % rows : i) * (two ? lh : 21), { size: two ? (rows === 8 ? 12 : 13) : 14, maxW: two ? 88 : 180 }));
           const nextLearn = Object.keys(def.learn).map(Number).filter((l) => l > m.level).sort((a, b) => a - b)[0];
           if (nextLearn) Text.draw(ctx, `Lv ${nextLearn}: ???`, 440, two ? 322 : 174 + m.skills.length * 21, { size: 13, color: Theme.dim });
           const lines = Text.layout(ctx, def.bio.replace('주인공', Game.heroName()), 570, 15);
@@ -11944,6 +13648,17 @@ const SHOPS = {
     stock: ['flame_saber', 'sand_axe', 'scorpion_dagger', 'sun_staff', 'desert_mail', 'mirage_robe', 'sand_garb', 'sun_shield', 'turban', 'desert_helm', 'mythril_sword', 'war_axe', 'rune_staff', 'mythril_mail', 'knight_shield', 'silver_helm'],
     bye: '칼날에 모래가 끼지 않게 잘 닦아 두게.',
   },
+  marea_arms: {
+    name: '「닻과 그물」 무기 진열대', keeper: '비욘',
+    stock: ['frost_brand', 'tide_axe', 'coral_dagger', 'pearl_staff', 'siren_harp', 'silver_harp', 'whale_mail', 'seafoam_robe', 'sealskin_coat', 'coral_shield', 'fur_hood', 'captain_hat'],
+    bye: '손 얼지 않게 조심해라.',
+  },
+  marea_items: {
+    name: '「닻과 그물」 잡화', keeper: '잉가',
+    stock: ['hi_potion', 'mega_potion', 'ether', 'hi_ether', 'warm_soup', 'antidote', 'smelling', 'panacea', 'feather', 'sand_bomb', 'return_wing', 'incense', 'warm_charm'],
+    extra: [{ when: () => Game.flag('cassandra_joined'), items: ['elixir', 'pearl_ring'] }],
+    bye: '따뜻하게 입고 다녀요!',
+  },
   bazaar_items: {
     name: '바자르 「모래 별 상회」', keeper: '알리',
     stock: ['potion', 'hi_potion', 'mega_potion', 'ether', 'hi_ether', 'antidote', 'smelling', 'panacea', 'feather', 'sand_bomb', 'return_wing', 'incense'],
@@ -12107,6 +13822,8 @@ const MapView = (() => {
     highway: [[3, 16, '← 평원'], [14, 11, '역참'], [27, 15, '은빛 다리'], [46, 4, '늑대 굴'], [51, 16, '왕도'], [48, 29, '붉은 협곡 ↓']],
     canyon: [[15, 1, '↑ 은빛 가도'], [7, 41, '↓ 사막']],
     desert: [[30, 2, '↑ 협곡'], [18, 20, '사미라'], [48, 8, '옛 우물'], [30, 34, '모래시계 사원'], [50, 32, '바위 야영지']],
+    coast: [[24, 33, '↓ 은빛 가도'], [10, 6, '마레아'], [33, 12, '해식 동굴'], [44, 4, '등대 곶'], [41, 25, '모래톱']],
+    marea: [[5, 7, '항만 사무소'], [14, 7, '여관'], [25, 7, '잡화점'], [5, 16, '선술집'], [34, 16, '에다의 집'], [32, 0, '부두'], [19, 17, '분수']],
     samira: [[17, 3, '족장의 집'], [5, 4, '여관'], [29, 4, '물의 사당'], [5, 18, '바자르'], [30, 18, '나디아의 집'], [17, 10, '샘']],
     capital: [[7, 8, '마도학원'], [23, 3, '왕성'], [40, 8, '기사단'], [6, 19, '여관'], [40, 19, '강철 사자'], [40, 32, '약방'], [6, 32, '보육원'], [16, 31, '음유시인'], [23, 18, '분수 광장'], [9, 37, '맨홀']],
     rivel: [[18, 3, '장로의 집'], [29, 3, '신전'], [6, 8, '여관'], [6, 15, '대장간'], [32, 9, '도구점'], [31, 15, '빵집'], [5, 21, '오웬의 집'], [12, 21, '풍차'], [32, 22, '피포의 집'], [19, 14, '우물']],
@@ -12122,7 +13839,9 @@ const MapView = (() => {
   const ENTRY = {
     rivel: ['field', 31, 38], cellar: ['rivel', 19, 14], ruins1: ['field', 31, 5], ruins2: ['field', 31, 5], bell: ['field', 31, 5],
     capital: ['highway', 52, 16], sewer1: ['capital', 9, 37], sewer2: ['capital', 9, 37], tower1: ['capital', 7, 9], tower2: ['capital', 7, 9], tower3: ['capital', 7, 9],
-    canyon: ['highway', 48, 31], desert: ['canyon', 7, 43], samira: ['desert', 18, 21], sandcave: ['desert', 48, 9], temple1: ['desert', 30, 35], temple2: ['desert', 30, 35], temple3: ['desert', 30, 35],
+    canyon: ['highway', 48, 31], desert: ['canyon', 7, 43],
+    coast: ['highway', 42, 0], marea: ['coast', 10, 7], icecave: ['coast', 33, 13], lighthouse1: ['coast', 44, 2], lighthouse2: ['coast', 44, 2],
+    ship_deck: ['marea', 30, 2], ship_hold: ['marea', 30, 2], sunken1: ['marea', 30, 2], sunken2: ['marea', 30, 2], samira: ['desert', 18, 21], sandcave: ['desert', 48, 9], temple1: ['desert', 30, 35], temple2: ['desert', 30, 35], temple3: ['desert', 30, 35],
   };
   // [지도, x, y] 를 바깥쪽으로 따라간 사슬
   function chain(mapId, x, y) {
@@ -12159,6 +13878,7 @@ const MapView = (() => {
     if (!views.some((v) => v.map === 'field')) views.push({ map: 'field', at: [62, 30] });
     if (Game.flag('highway_first') && !views.some((v) => v.map === 'highway')) views.push({ map: 'highway', at: [1, 16] });
     if (Game.flag('desert_first') && !views.some((v) => v.map === 'desert')) views.push({ map: 'desert', at: [30, 1] });
+    if (Game.flag('coast_first') && !views.some((v) => v.map === 'coast')) views.push({ map: 'coast', at: [24, 34] });
 
     let vi = 0;
     Sound.sfx('menu');
@@ -12284,7 +14004,8 @@ const Title = (() => {
       Text.draw(ctx, '별빛 종의 이방인', 320, 92, { size: 50, bold: true, align: 'center', color: '#ffe9a8', shadow: false });
       ctx.restore();
       Text.draw(ctx, '─ Stranger of the Starlit Bell ─', 320, 156, { size: 17, align: 'center', color: '#bcd0ff' });
-      Text.draw(ctx, '제1장 잠든 종의 유적 · 제2장 왕도로 가는 길 · 제3장 사막의 종', 320, 184, { size: 15, align: 'center', color: Theme.dim });
+      Text.draw(ctx, '제1장 잠든 종의 유적 · 제2장 왕도로 가는 길', 320, 180, { size: 15, align: 'center', color: Theme.dim });
+      Text.draw(ctx, '제3장 사막의 종 · 제4장 파도의 종', 320, 202, { size: 15, align: 'center', color: Theme.dim });
       ctx.globalAlpha = 1;
       if (!pressed && t > 0.8 && Math.floor(t * 1.6) % 2 === 0) Text.draw(ctx, '화면을 누르거나 아무 키나 누르세요', 320, 300, { size: 18, align: 'center' });
       Text.draw(ctx, '© 2026 · 모든 그래픽과 음악은 코드로 생성되었습니다', 320, 456, { size: 11, align: 'center', color: '#6a6a90' });

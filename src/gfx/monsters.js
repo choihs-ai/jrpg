@@ -313,6 +313,58 @@ const MonsterArt = (() => {
       L(g, 31, 26, 38, 32, p.skin, 3); Poly(g, [36, 32, 44, 14, 42, 12, 34, 30], p.blade); Poly(g, [43, 13, 44, 8, 40, 12], p.blade);
       L(g, 13, 26, 8, 34, p.skin, 3);
     } },
+
+    // ── 제4장 ──
+    crab: { w: 64, h: 44, draw(g, p) {
+      for (let i = 0; i < 3; i++) { L(g, 22 + i * 6, 32, 14 + i * 5, 42, p.dark, 2.5); L(g, 42 - i * 6, 32, 50 - i * 5, 42, p.dark, 2.5); }
+      E(g, 32, 28, 17, 10, p.dark); E(g, 32, 27, 16, 9, p.body); E(g, 28, 23, 8, 3, p.light);
+      L(g, 27, 20, 25, 12, p.dark, 2); L(g, 37, 20, 39, 12, p.dark, 2); eye(g, 25, 11, 2.2, '#140c1c', p.eye); eye(g, 39, 11, 2.2, '#140c1c', p.eye);
+      L(g, 18, 26, 8, 18, p.body, 4); E(g, 6, 13, 7, 6, p.claw); Poly(g, [0, 8, 6, 6, 4, 13], p.dark); E(g, 9, 10, 2, 1.5, p.light);
+      L(g, 46, 26, 56, 18, p.body, 4); E(g, 58, 13, 7, 6, p.claw); Poly(g, [64, 8, 58, 6, 60, 13], p.dark); E(g, 55, 10, 2, 1.5, p.light);
+      if (p.frost) { for (let i = 0; i < 6; i++) R(g, 20 + i * 4, 20 + (i % 2) * 2, 2, 1, '#ffffff'); }
+      if (p.crown) Poly(g, [24, 19, 25, 12, 28, 16, 32, 10, 36, 16, 39, 12, 40, 19], p.crown);
+    } },
+    walrus: { w: 96, h: 76, draw(g, p) {
+      E(g, 48, 72, 40, 4, 'rgba(160,200,230,0.4)');
+      E(g, 52, 50, 38, 22, p.dark); E(g, 50, 48, 37, 21, p.body); E(g, 40, 40, 20, 10, p.light);
+      E(g, 20, 66, 12, 5, p.dark); E(g, 80, 68, 12, 5, p.dark);
+      E(g, 26, 34, 20, 18, p.body); E(g, 24, 40, 12, 8, p.muzzle); for (let i = 0; i < 6; i++) R(g, 16 + i * 3, 40 + (i % 2), 1, 1, p.dark);
+      eye(g, 18, 26, 2.4, '#140c1c', p.eye); eye(g, 32, 25, 2.4, '#140c1c', p.eye);
+      Poly(g, [18, 44, 22, 44, 19, 66], p.tusk); Poly(g, [28, 44, 32, 44, 31, 66], p.tusk);
+      if (p.ice) { for (let i = 0; i < 5; i++) Poly(g, [50 + i * 8, 30, 54 + i * 8, 18 - (i % 2) * 6, 58 + i * 8, 30], p.ice); }
+    } },
+    captain: { w: 56, h: 76, draw(g, p) {
+      E(g, 28, 74, 16, 3, 'rgba(120,200,180,0.3)');
+      R(g, 18, 50, 8, 22, p.pants); R(g, 30, 50, 8, 22, p.pants); R(g, 16, 70, 11, 4, p.boots); R(g, 29, 70, 11, 4, p.boots);
+      Poly(g, [10, 70, 14, 26, 42, 26, 46, 70], p.coat); Poly(g, [28, 26, 42, 26, 46, 70, 30, 70], p.dark);
+      R(g, 24, 26, 8, 30, p.shirt); for (let i = 0; i < 4; i++) E(g, 22, 30 + i * 7, 1.2, 1.2, p.trim); R(g, 12, 46, 32, 3, p.trim);
+      R(g, 10, 26, 8, 4, p.trim); R(g, 38, 26, 8, 4, p.trim);
+      E(g, 28, 17, 8, 9, p.skin); R(g, 21, 20, 14, 6, p.beard); E(g, 25, 16, 1.4, 1.2, p.eye); E(g, 31, 16, 1.4, 1.2, p.eye); R(g, 30, 13, 4, 1, p.dark);
+      Poly(g, [12, 10, 28, 2, 44, 10, 40, 13, 16, 13], p.hat); R(g, 16, 11, 24, 2, p.trim); E(g, 28, 7, 2, 2, p.trim);
+      L(g, 44, 34, 52, 44, p.coat, 4); L(g, 52, 44, 50, 70, p.anchor, 3); Poly(g, [42, 66, 58, 66, 56, 72, 50, 68, 44, 72], p.anchor); R(g, 46, 46, 8, 2, p.anchor);
+      L(g, 12, 34, 4, 46, p.coat, 4); L(g, 4, 46, 2, 30, p.blade, 2);
+      if (p.ghost) { g.fillStyle = 'rgba(120,220,190,0.25)'; g.fillRect(8, 0, 40, 74); }
+    } },
+    kraken: { w: 120, h: 100, draw(g, p) {
+      for (let k = 0; k < 4; k++) { const x0 = 30 + k * 20; for (let i = 0; i < 10; i++) E(g, x0 + Math.sin(i * 0.8 + k) * 8, 70 + i * 3, 6 - i * 0.4, 4, i % 2 ? p.body : p.dark); }
+      E(g, 60, 44, 44, 34, p.dark); E(g, 60, 42, 42, 32, p.body); E(g, 48, 26, 22, 12, p.light);
+      for (let i = 0; i < 7; i++) E(g, 32 + i * 9, 58 + (i % 2) * 3, 3, 2, p.spot);
+      eye(g, 42, 46, 7, '#140c1c', p.eye); eye(g, 78, 46, 7, '#140c1c', p.eye);
+      E(g, 60, 66, 14, 6, '#140c1c'); for (let i = 0; i < 6; i++) Poly(g, [48 + i * 5, 62, 51 + i * 5, 62, 49.5 + i * 5, 68], '#f0e8d0');
+      if (p.flame) { g.fillStyle = 'rgba(160,160,170,0.45)'; for (let i = 0; i < 5; i++) { g.beginPath(); g.moveTo(36 + i * 12, 14); g.lineTo(42 + i * 12, 0); g.lineTo(48 + i * 12, 14); g.fill(); } }
+    } },
+    tentacle: { w: 40, h: 80, draw(g, p) {
+      for (let i = 0; i < 16; i++) { const t = i / 15; E(g, 20 + Math.sin(t * 5) * 8, 76 - t * 70, 9 - t * 6, 6 - t * 3, i % 2 ? p.body : p.dark); }
+      for (let i = 1; i < 14; i += 2) { const t = i / 15; E(g, 14 + Math.sin(t * 5) * 8, 76 - t * 70, 2 - t, 2 - t, p.sucker); }
+    } },
+    angler: { w: 60, h: 48, draw(g, p) {
+      Poly(g, [52, 24, 60, 12, 60, 36], p.dark);
+      E(g, 30, 26, 24, 18, p.dark); E(g, 30, 25, 23, 17, p.body); E(g, 26, 18, 12, 6, p.light);
+      E(g, 12, 32, 12, 8, '#140c1c'); for (let i = 0; i < 6; i++) { Poly(g, [3 + i * 4, 26, 6 + i * 4, 26, 4.5 + i * 4, 31], '#f0e8d0'); Poly(g, [3 + i * 4, 38, 6 + i * 4, 38, 4.5 + i * 4, 34], '#f0e8d0'); }
+      eye(g, 22, 18, 3, '#140c1c', p.eye);
+      L(g, 24, 9, 16, 0, p.dark, 1.5); L(g, 16, 0, 6, 4, p.dark, 1.5); E(g, 5, 6, 4, 4, p.lure); E(g, 5, 6, 2, 2, '#ffffff');
+      Poly(g, [32, 40, 40, 48, 44, 40], p.dark); Poly(g, [32, 10, 40, 2, 44, 10], p.dark);
+    } },
   };
 
   const cache = new Map();

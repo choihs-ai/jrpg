@@ -59,7 +59,7 @@ class Actor {
     if (this.isParty) return 1;
     return this.elem[el] !== undefined ? this.elem[el] : 1;
   }
-  get disabled() { return !!(this.status.sleep || this.status.paralyze); }
+  get disabled() { return !!(this.status.sleep || this.status.paralyze || this.status.freeze || this.status.bind); }
   // 도감·상성 기억에 쓰는 ID (신기루는 본체와 같은 마물로 기억한다)
   get knownId() { return this.def ? this.def.knownAs || this.defId : null; }
 }
@@ -85,7 +85,7 @@ class BattleCore {
     this.killed = [];
     this.recoveredGold = 0;
     // 수면·마비·침묵은 전투 한정 상태 (독은 전투 밖에서도 유지)
-    for (const a of this.party) for (const k of ['sleep', 'paralyze', 'silence']) delete a.status[k];
+    for (const a of this.party) for (const k of TEMP_STATUS) delete a.status[k];
   }
 
   addEnemy(id) {
@@ -169,6 +169,8 @@ class BattleCore {
     if (!a.alive || this.result) return ev;
     if (a.status.sleep) { ev.push({ type: 'msg', text: `${a.name}${Util.josa(a.name, '은')} 잠들어 있다… Zzz` }); return ev; }
     if (a.status.paralyze) { ev.push({ type: 'msg', text: `${a.name}${Util.josa(a.name, '은')} 몸이 마비되어 움직일 수 없다!` }); return ev; }
+    if (a.status.freeze) { ev.push({ type: 'msg', text: `${a.name}${Util.josa(a.name, '은')} 얼음에 갇혀 움직일 수 없다!` }); return ev; }
+    if (a.status.bind) { ev.push({ type: 'msg', text: `${a.name}${Util.josa(a.name, '은')} 단단히 휘감겨 움직일 수 없다!` }); return ev; }
 
     if (!a.isParty) {
       const act = this.chooseEnemyAction(a);
@@ -288,6 +290,9 @@ class BattleCore {
           ev.push({ type: 'heal', target: t, amount: t.hp - before, hpAfter: t.hp });
           ev.push({ type: 'msg', text: `${t.name}의 HP가 ${t.hp - before} 회복되었다!` });
           if (sk.regenAfter) t.buffs.regen = { mult: 1.08, turns: sk.regenAfter };
+          const thawed = (sk.cures || []).filter((st) => t.status[st]);
+          for (const st of thawed) delete t.status[st];
+          if (thawed.length) { ev.push({ type: 'status', target: t }); ev.push({ type: 'msg', text: `${t.name}의 ${thawed.map((st) => STATUS_NAMES[st]).join('·')} 상태가 나았다!` }); }
         }
         if (sk.regenAfter) ev.push({ type: 'msg', text: '부드러운 노랫소리가 일행을 감싸 안았다…' });
         break;
@@ -444,20 +449,21 @@ class BattleCore {
     if (!(t.def && t.def.shiny && !crit)) dmg *= (sk.mult || 1) * Util.randRange(0.88, 1.12) * em;
     if (t.defending) dmg *= 0.5;
     const bm = this.barrierMult(t);
-    dmg *= bm;
+    const gm = this.guardMult(t, 'phys');
+    dmg *= bm * gm;
     dmg = Math.max(t.def && t.def.shiny && !crit ? 0 : 1, Math.round(dmg));
     ev.push({ type: 'anim', name: sk.anim || 'slash', targets: [t], user: a, crit });
     if (crit) ev.push({ type: 'msg', text: a.isParty ? '[y]회심의 일격![/]' : '[r]통한의 일격![/]' });
     ev.push(...this.discover(t, element, em));
-    ev.push(...this.damage(t, dmg, { crit, em, physical: true, from: a, barrier: bm < 1 }));
+    ev.push(...this.damage(t, dmg, { crit, em, physical: true, from: a, barrier: bm < 1, guard: gm < 1, element }));
     if (sk.steal && a.isParty && t.def.steal && !t.stolen) ev.push(...this.trySteal(a, t));
     if (sk.type === 'drain' && dmg > 0) {
       const before = a.hp; a.hp = Math.min(a.mhp, a.hp + Math.round(dmg * 0.6));
       if (a.hp > before) { ev.push({ type: 'heal', target: a, amount: a.hp - before, hpAfter: a.hp }); ev.push({ type: 'msg', text: `${a.name}${Util.josa(a.name, '은')} HP를 ${a.hp - before} 빨아들였다!` }); }
     }
     if (t.alive) {
-      if (sk.status) ev.push(...this.inflict(t, sk.status, false));
-      if (sk.id === 'attack' && a.isParty && a.st.onHit) ev.push(...this.inflict(t, a.st.onHit, false));
+      if (sk.status) ev.push(...this.inflict(t, sk.status, false, a));
+      if (sk.id === 'attack' && a.isParty && a.st.onHit) ev.push(...this.inflict(t, a.st.onHit, false, a));
       if (sk.debuff && Util.chance(sk.debuff.chance || 0.3)) {
         t.buffs.def = { mult: sk.debuff.def, turns: sk.debuff.turns || 3 };
         ev.push({ type: 'buff', target: t, up: false });
@@ -482,6 +488,11 @@ class BattleCore {
     return ev;
   }
 
+  // 자세: 밀물(물리)·썰물(주문)처럼 한쪽 공격을 막는 적 (mem.guard = { phys|mag: 배율, text })
+  guardMult(t, kind) {
+    if (t.isParty || !t.mem.guard || t.mem.guard[kind] === undefined) return 1;
+    return t.mem.guard[kind];
+  }
   // 수호 결계: 보스를 지키는 하수인이 살아 있으면 받는 피해가 줄어든다
   barrierMult(t) {
     if (t.isParty || !t.def.barrier) return 1;
@@ -492,14 +503,15 @@ class BattleCore {
     const ev = [];
     const em = t.elemMult(sk.element);
     const bm = this.barrierMult(t);
-    let dmg = (sk.power + (sk.type === 'damage' ? 0 : a.mag * (sk.scale || 0))) * Util.randRange(0.92, 1.08) * em * bm;
+    const gm = sk.type === 'damage' ? 1 : this.guardMult(t, 'mag');
+    let dmg = (sk.power + (sk.type === 'damage' ? 0 : a.mag * (sk.scale || 0))) * Util.randRange(0.92, 1.08) * em * bm * gm;
     if (t.defending) dmg *= 0.5;
     dmg = Math.round(dmg);
     ev.push(...this.discover(t, sk.element, em));
     if (em === 0) { ev.push({ type: 'msg', text: `${t.name}에게는 ${ELEMENTS[sk.element] || ''} 속성이 전혀 통하지 않는다!` }); ev.push({ type: 'miss', target: t }); return ev; }
     dmg = Math.max(1, dmg);
-    ev.push(...this.damage(t, dmg, { em, from: a, barrier: bm < 1 }));
-    if (t.alive && sk.status) ev.push(...this.inflict(t, sk.status, false));
+    ev.push(...this.damage(t, dmg, { em, from: a, barrier: bm < 1, guard: gm < 1, element: sk.element }));
+    if (t.alive && sk.status) ev.push(...this.inflict(t, sk.status, false, a));
     return ev;
   }
 
@@ -513,7 +525,14 @@ class BattleCore {
     if (info.em > 1) txt += ' [y]약점을 찔렀다![/]';
     else if (info.em < 1 && info.em > 0) txt += ' [d](잘 통하지 않는다)[/]';
     if (info.barrier) txt += ' [b](결계가 피해를 줄였다)[/]';
+    if (info.guard) txt += ` [b](${t.mem.guard.text || '막혔다'})[/]`;
     ev.push({ type: 'msg', text: txt });
+    // 불 속성은 얼음을 녹인다
+    if (t.hp > 0 && t.status.freeze && info.element === 'fire') {
+      delete t.status.freeze;
+      ev.push({ type: 'status', target: t });
+      ev.push({ type: 'msg', text: `${t.name}${Util.josa(t.name, '을')} 가두던 얼음이 녹아내렸다!` });
+    }
     if (t.hp <= 0) ev.push(...this.kill(t));
     else if (!t.isParty && t.def.phases) ev.push(...this.checkPhases(t));
     return ev;
@@ -530,12 +549,18 @@ class BattleCore {
     t.buffs = {};
     t.charging = null;
     if (t.isParty) {
-      for (const k of ['sleep', 'paralyze', 'silence', 'poison']) delete t.status[k];
+      for (const k of TEMP_STATUS.concat('poison')) delete t.status[k];
       ev.push({ type: 'die', target: t });
       ev.push({ type: 'msg', text: `[r]${t.name}${Util.josa(t.name, '은')} 쓰러졌다…[/]` });
     } else {
       this.killed.push(t);
       for (const m of this.enemies) if (m.mirrorOf === t && m.alive) { m._hp = 0; ev.push({ type: 'die', target: m, silent: true }); }
+      // 휘감던 적이 쓰러지면 속박이 풀린다
+      for (const p of this.party) if (p.alive && p.status.bind && p.bindBy === t.uid) {
+        delete p.status.bind; p.bindBy = null;
+        ev.push({ type: 'status', target: p });
+        ev.push({ type: 'msg', text: `${p.name}${Util.josa(p.name, '이')} 풀려났다!` });
+      }
       if (t.pilfered) { Game.addGold(t.pilfered); this.recoveredGold += t.pilfered; }
       ev.push({ type: 'die', target: t });
       ev.push({ type: 'msg', text: `${t.name}${Util.josa(t.name, '을')} 쓰러뜨렸다!` + (t.pilfered ? ` [y](${t.pilfered}G를 되찾았다)[/]` : '') });
@@ -556,16 +581,17 @@ class BattleCore {
     return ev;
   }
 
-  inflict(t, statusMap, verbose) {
+  inflict(t, statusMap, verbose, from) {
     const ev = [];
     for (const s in statusMap) {
       if (t.status[s]) { if (verbose) ev.push({ type: 'msg', text: `${t.name}${Util.josa(t.name, '은')} 이미 ${STATUS_NAMES[s]} 상태다.` }); continue; }
       const res = t.resist(s);
       if (res >= 1) { if (verbose) ev.push({ type: 'msg', text: `${t.name}에게는 ${STATUS_NAMES[s]}${Util.josa(STATUS_NAMES[s], '이')} 통하지 않는다!` }); continue; }
       if (!Util.chance(statusMap[s] * (1 - res))) { if (verbose) ev.push({ type: 'msg', text: `${t.name}에게는 효과가 없었다.` }); continue; }
-      t.status[s] = s === 'poison' ? 1 : s === 'sleep' ? Util.randInt(2, 4) : s === 'paralyze' ? Util.randInt(1, 3) : Util.randInt(3, 4);
+      t.status[s] = { poison: 1, sleep: Util.randInt(2, 4), paralyze: Util.randInt(1, 3), freeze: Util.randInt(2, 3), bind: 3 }[s] || Util.randInt(3, 4);
+      if (s === 'bind') t.bindBy = from ? from.uid : null;
       ev.push({ type: 'status', target: t, status: s, on: true });
-      const msg = { poison: '독에 걸렸다!', sleep: '잠들어 버렸다!', paralyze: '몸이 마비되었다!', silence: '주문이 봉인되었다!' }[s];
+      const msg = { poison: '독에 걸렸다!', sleep: '잠들어 버렸다!', paralyze: '몸이 마비되었다!', silence: '주문이 봉인되었다!', freeze: '꽁꽁 얼어붙었다!', bind: '휘감겨 꼼짝도 할 수 없게 되었다!' }[s];
       ev.push({ type: 'msg', text: `${t.name}${Util.josa(t.name, '은')} ${msg}` });
     }
     return ev;
@@ -615,14 +641,15 @@ class BattleCore {
           if (a.hp <= 0) ev.push(...this.kill(a));
         }
       }
-      for (const s of ['sleep', 'paralyze', 'silence']) {
+      for (const s of TEMP_STATUS) {
         if (!a.status[s]) continue;
         a.status[s]--;
         const wake = s === 'sleep' && Util.chance(0.25);
         if (a.status[s] <= 0 || wake) {
           delete a.status[s];
           ev.push({ type: 'status', target: a });
-          ev.push({ type: 'msg', text: `${a.name}${Util.josa(a.name, '은')} ${{ sleep: '잠에서 깨어났다!', paralyze: '마비가 풀렸다!', silence: '다시 주문을 외울 수 있게 되었다!' }[s]}` });
+          if (s === 'bind') a.bindBy = null;
+          ev.push({ type: 'msg', text: `${a.name}${Util.josa(a.name, '은')} ${{ sleep: '잠에서 깨어났다!', paralyze: '마비가 풀렸다!', silence: '다시 주문을 외울 수 있게 되었다!', freeze: '얼음을 깨고 빠져나왔다!', bind: '몸부림쳐 빠져나왔다!' }[s]}` });
         }
       }
       if (a.buffs.regen && a.buffs.regen.turns > 0 && a.hp < a.mhp) {

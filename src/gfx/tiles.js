@@ -5,9 +5,11 @@
 const Tiles = (() => {
   const S = 16;
   const cache = new Map();
+  // 벽면(앞면) 판정에 쓰는 벽 문자들
+  const WALLS = '#&%017ΨΚρ';
   // 바닥 위에 올려 그리는 물체 타일
-  const OBJ = new Set(['T', 'Y', 'Z', 'r', 'F', 'e', 'l', 'S', 'o', 'x', 'X', 'j', 'P', 'g', 'b', 't', 'h', 'p', 'a', 'z', '*', 'A', 'V', 'U', 'K', 'C', '|', 'O', '@', 'J', 'd', '3', '4', '6', '?', '(', ')']);
-  const ANIM = new Set(['~', '&', 'f', '*', 'V', 'C', '@', 'v', '1', 'Z', '9', '?']);
+  const OBJ = new Set(['T', 'Y', 'Z', 'r', 'F', 'e', 'l', 'S', 'o', 'x', 'X', 'j', 'P', 'g', 'b', 't', 'h', 'p', 'a', 'z', '*', 'A', 'V', 'U', 'K', 'C', '|', 'O', '@', 'J', 'd', '3', '4', '6', '?', '(', ')', 'τ', 'μ', 'ς', 'λ', 'θ']);
+  const ANIM = new Set(['~', '&', 'f', '*', 'V', 'C', '@', 'v', '1', 'Z', '9', '?', 'ς', 'λ', 'ι']);
 
   const C = {
     g0: '#5fae4c', g1: '#4f9b3f', g2: '#76c45e', g3: '#3f8a35',
@@ -363,11 +365,11 @@ const Tiles = (() => {
       p.px(4, 5, '#e8d0a0'); p.px(11, 6, '#e8d0a0');
     },
     '7': (p, v, f, nb) => {
-      const face = nb && nb.d !== undefined && !'#&%017'.includes(nb.d);
+      const face = nb && nb.d !== undefined && !WALLS.includes(nb.d);
       if (face) { bricks(p, '#b89868', '#8a6a40', '#d8b884', 4); p.rect(0, 0, 16, 2, '#4a3a24'); p.rect(0, 15, 16, 1, '#3a2a18'); p.px(4 + v, 7, '#e8c070'); }
       else {
         p.fill('#4a3a24'); p.noise(['#5a4830', '#3a2a18'], 0.18, 161 + v);
-        if (nb) { const open = (c) => c !== undefined && !'#&%017 '.includes(c); if (open(nb.l)) p.rect(0, 0, 1, 16, '#6a5838'); if (open(nb.r)) p.rect(15, 0, 1, 16, '#6a5838'); if (open(nb.u)) p.rect(0, 0, 16, 1, '#6a5838'); }
+        if (nb) { const open = (c) => c !== undefined && !(WALLS + ' ').includes(c); if (open(nb.l)) p.rect(0, 0, 1, 16, '#6a5838'); if (open(nb.r)) p.rect(15, 0, 1, 16, '#6a5838'); if (open(nb.u)) p.rect(0, 0, 16, 1, '#6a5838'); }
       }
     },
     '8': (p, v) => {
@@ -473,14 +475,14 @@ const Tiles = (() => {
     },
     // 던전
     '#': (p, v, f, nb) => {
-      const face = nb && nb.d !== undefined && !'#&%017'.includes(nb.d);
+      const face = nb && nb.d !== undefined && !WALLS.includes(nb.d);
       if (face) {
         bricks(p, C.dWall, C.dWallD, C.dWallL, 4);
         p.rect(0, 0, 16, 2, C.dTop); p.rect(0, 15, 16, 1, '#1e1b28');
       } else {
         p.fill(C.dTop); p.noise(['#2f2c3a', '#1d1a26'], 0.18, 91 + v);
         if (nb) {
-          const open = (c) => c !== undefined && !'#&%017 '.includes(c);
+          const open = (c) => c !== undefined && !(WALLS + ' ').includes(c);
           if (open(nb.l)) p.rect(0, 0, 1, 16, '#3a3648');
           if (open(nb.r)) p.rect(15, 0, 1, 16, '#3a3648');
           if (open(nb.u)) p.rect(0, 0, 16, 1, '#3a3648');
@@ -524,6 +526,89 @@ const Tiles = (() => {
     '$': (p, v) => { p.fill('#07050c'); p.noise(['#2a1a40', '#1a1028'], 0.05, 97 + v); },
     'y': (p, v) => { p.fill('#5a4a3a'); p.noise(['#4a3c2e', '#6a5a48'], 0.15, 99 + v); },
     'O': (p) => { p.rect(0, 2, 16, 14, '#6a6680'); p.rect(0, 2, 16, 2, '#9a96b0'); p.rect(0, 14, 16, 2, '#3a3648'); p.rect(3, 6, 10, 1, '#c4a050'); },
+    // 북쪽 바다
+    'σ': (p, v) => {
+      p.fill('#e6edf6'); p.noise(['#d2dbe8', '#f6f9fd'], 0.12, 201 + v);
+      if (v % 2) { p.px(4, 5, '#c4cfe0'); p.px(5, 5, '#c4cfe0'); p.px(11, 11, '#c4cfe0'); }
+      p.px(3 + v * 3, 9, '#ffffff');
+    },
+    'τ': (p) => {
+      p.ellipse(8, 14, 5, 2, 'rgba(60,80,110,0.25)');
+      p.rect(7, 12, 2, 3, '#5a3a24');
+      for (let y = 1; y < 13; y++) { const w = Math.floor(1 + (y % 5) * 0.9 + y * 0.35); p.rect(8 - w, y, w * 2, 1, y % 5 === 0 ? '#e8f0fa' : y % 5 === 1 ? '#f6f9fd' : '#2a5a46'); }
+      p.px(8, 0, '#f6f9fd'); p.px(5, 6, '#f6f9fd'); p.px(11, 11, '#f6f9fd');
+    },
+    'ι': (p, v, f) => {
+      p.fill('#a8d8f0'); p.noise(['#98cce8', '#bce4f6'], 0.08, 211 + v);
+      p.line(2 + v, 13, 9 + v, 6, '#d8f2ff'); p.line(5, 15, 13, 7, '#c8ecfc');
+      p.px(11 - v, 3, '#78b0d0'); p.px(12 - v, 4, '#78b0d0');
+      if (f && v === 1) p.px(4, 4, '#ffffff');
+    },
+    'Ψ': (p, v, f, nb) => {
+      const face = nb && nb.d !== undefined && !WALLS.includes(nb.d);
+      if (face) {
+        bricks(p, '#7ab8d8', '#4a88a8', '#a8dcf0', 4); p.rect(0, 0, 16, 2, '#1e3a52'); p.rect(0, 15, 16, 1, '#163048');
+        p.line(3 + v, 3, 5 + v, 12, '#d8f2ff');
+      } else {
+        p.fill('#1e3a52'); p.noise(['#28485e', '#163048'], 0.18, 221 + v);
+        if (nb) { const open = (c) => c !== undefined && !(WALLS + ' ').includes(c); if (open(nb.l)) p.rect(0, 0, 1, 16, '#4a7898'); if (open(nb.r)) p.rect(15, 0, 1, 16, '#4a7898'); if (open(nb.u)) p.rect(0, 0, 16, 1, '#4a7898'); }
+      }
+    },
+    'π': (p, v) => {
+      p.fill('#8a6a4a');
+      for (let y = 0; y < 16; y += 4) { p.rect(0, y + 3, 16, 1, '#5a4430'); p.rect(0, y, 16, 1, '#a8885e'); p.px(((y / 4 + v) % 2) * 8 + 2, y + 1, '#4a3420'); }
+    },
+    'δ': (p, v) => {
+      p.fill('#6a4a30');
+      for (let x = 0; x < 16; x += 4) { p.rect(x + 3, 0, 1, 16, '#4a3020'); p.rect(x, 0, 1, 16, '#80603e'); }
+      p.px(5 + v * 2, (v * 5) % 16, '#3a2414'); p.noise(['#5a3e28'], 0.04, 231 + v);
+    },
+    'ρ': (p, v, f, nb) => {
+      const face = nb && nb.d !== undefined && !WALLS.includes(nb.d);
+      if (face) {
+        p.fill('#4a3020');
+        for (let y = 2; y < 16; y += 3) { p.rect(0, y, 16, 1, '#2e1c10'); p.rect(0, y + 1, 16, 1, '#5a3c28'); }
+        p.rect(0, 0, 16, 2, '#7a5a3a'); p.rect(0, 0, 16, 1, '#a08060'); p.px(3 + v * 3, 8, '#8a8a98');
+      } else {
+        p.fill('#24160c'); p.noise(['#2e1c10', '#1a0e06'], 0.15, 241 + v);
+        if (nb) { const open = (c) => c !== undefined && !(WALLS + ' ').includes(c); if (open(nb.l)) p.rect(0, 0, 2, 16, '#7a5a3a'); if (open(nb.r)) p.rect(14, 0, 2, 16, '#7a5a3a'); if (open(nb.u)) p.rect(0, 0, 16, 2, '#7a5a3a'); }
+      }
+    },
+    'μ': (p) => {
+      p.ellipse(8, 14, 5, 2, 'rgba(0,0,0,0.3)');
+      p.rect(6, 0, 4, 15, '#5a3a20'); p.rect(6, 0, 1, 15, '#8a6040'); p.rect(4, 12, 8, 3, '#3a2414');
+      p.line(1, 0, 6, 6, '#c8b890'); p.line(15, 0, 10, 6, '#c8b890');
+    },
+    'κ': (p, v) => {
+      p.fill('#2e5a68'); p.noise(['#28505e', '#3a6a78'], 0.12, 251 + v);
+      p.ellipse(4 + v * 2, 11, 2, 1, '#4a8090'); p.px(12 - v, 4, '#88c8d8');
+    },
+    'Κ': (p, v, f, nb) => {
+      const face = nb && nb.d !== undefined && !WALLS.includes(nb.d);
+      if (face) {
+        bricks(p, '#3a6878', '#20485a', '#5a8a98', 4); p.rect(0, 0, 16, 2, '#0e2a34'); p.rect(0, 15, 16, 1, '#0a2028');
+        p.px(4 + v * 2, 6, '#e87a8a'); p.px(5 + v * 2, 5, '#e87a8a'); p.px(11, 10, '#f0a0a8');
+      } else {
+        p.fill('#0e2a34'); p.noise(['#143440', '#0a2028'], 0.18, 261 + v);
+        if (nb) { const open = (c) => c !== undefined && !(WALLS + ' ').includes(c); if (open(nb.l)) p.rect(0, 0, 1, 16, '#2a5a6a'); if (open(nb.r)) p.rect(15, 0, 1, 16, '#2a5a6a'); if (open(nb.u)) p.rect(0, 0, 16, 1, '#2a5a6a'); }
+      }
+    },
+    'ς': (p, v, f) => {
+      p.ellipse(8, 14, 5, 1, 'rgba(0,0,0,0.3)');
+      const sw = f ? 1 : -1;
+      for (const [x0, h, c] of [[4, 11, '#2a8a5a'], [8, 13, '#3aa86a'], [12, 9, '#2a8a5a']]) {
+        for (let y = 0; y < h; y++) p.px(x0 + Math.round(Math.sin((y + x0) * 0.6) * 1.2 * sw), 14 - y, c);
+      }
+    },
+    'λ': (p, v, f) => {
+      p.ellipse(8, 15, 5, 1, 'rgba(60,80,110,0.3)');
+      for (let y = 4; y < 15; y++) { const w = 2 + Math.floor((y - 4) * 0.3); p.rect(8 - w, y, w * 2, 1, Math.floor(y / 3) % 2 ? '#c4473a' : '#f4f4f4'); }
+      p.rect(5, 2, 6, 2, '#3a3a48'); p.rect(6, 0, 4, 2, f ? '#fff4a0' : '#ffd75e');
+    },
+    'θ': (p) => {
+      p.ellipse(8, 9, 7, 6, '#7ab8d8'); p.ellipse(8, 8, 6, 5, '#a8dcf0'); p.ellipse(8, 11, 3, 3, '#10202e'); p.rect(5, 11, 6, 3, '#10202e');
+      p.px(3, 6, '#ffffff'); p.px(12, 5, '#ffffff'); p.line(6, 3, 7, 6, '#d8f2ff');
+    },
     ' ': (p) => p.fill('#000'),
   };
 
@@ -541,7 +626,7 @@ const Tiles = (() => {
     }
   }
 
-  const NB_TILES = new Set(['~', 'I', '#', '&', '%', 'R', 'Q', 'G', 'c', 'v', '1', '7', '[']);
+  const NB_TILES = new Set(['~', 'I', '#', '&', '%', 'R', 'Q', 'G', 'c', 'v', '1', '7', '[', 'Ψ', 'Κ', 'ρ']);
 
   function get(ch, v, f, nbKey, nb) {
     const key = ch + v + '|' + f + '|' + (nbKey || '');
@@ -575,7 +660,7 @@ const Tiles = (() => {
       else if (ch === 'c') nbKey = ['u', 'd', 'l', 'r'].map((k) => (nb[k] === undefined || nb[k] === 'c' ? 0 : 1)).join('');
       else if (ch === '[') nbKey = (nb.d === '[' ? 'T' : 'F') + (nb.u === '[' ? 'T' : 'F');
       else if (ch === 'I') nbKey = nb.d !== undefined && nb.d !== 'I' ? 'F' : 'T';
-      else nbKey = (nb.d !== undefined && !'#&%017'.includes(nb.d) ? 'F' : 'T') + ['u', 'l', 'r'].map((k) => (nb[k] !== undefined && !'#&%017 '.includes(nb[k]) ? 1 : 0)).join('');
+      else nbKey = (nb.d !== undefined && !WALLS.includes(nb.d) ? 'F' : 'T') + ['u', 'l', 'r'].map((k) => (nb[k] !== undefined && !(WALLS + ' ').includes(nb[k]) ? 1 : 0)).join('');
     }
     g.drawImage(get(ch, OBJ.has(ch) ? 0 : v, f, nbKey, nb), sx, sy);
   }
@@ -591,6 +676,8 @@ const Tiles = (() => {
     '2': '#e2cd90', '3': '#3f9a4a', '4': '#4a9a4a', '5': '#d8b884', '6': '#c4473a', '[': '#e8d0a0', '?': '#3c7fd6', '(': '#ffd75e', ')': '#8a6a40', '7': '#4a3a24', '8': '#c8a878', '9': '#8a6a3a', '/': '#a8583a',
     'C': '#ffd75e', 'M': '#d8d4cc', '@': '#3c7fd6', 'J': '#bcbcca', 'd': '#c4473a', 'v': '#4a5a2a', '+': '#5a5a66', '1': '#c4a050',
     'O': '#6a6680', 'P': '#9d9cab', '|': '#55556a', '0': '#6a6680', '&': '#25222f', '%': '#25222f', 'k': '#c8925a', 'L': '#5e3818',
+    'σ': '#e6edf6', 'τ': '#2a5a46', 'ι': '#a8d8f0', 'Ψ': '#1e3a52', 'π': '#8a6a4a', 'δ': '#6a4a30', 'ρ': '#24160c', 'μ': '#5a3a20',
+    'κ': '#2e5a68', 'Κ': '#0e2a34', 'ς': '#3aa86a', 'λ': '#ffd75e', 'θ': '#7ab8d8',
   };
 
   return { get, drawAt, OBJ, MINI, S };

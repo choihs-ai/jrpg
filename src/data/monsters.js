@@ -499,8 +499,9 @@ const MONSTERS = {
     ai(self, B) {
       const m = self.mem;
       m.turn = (m.turn || 0) + 1;
-      if (m.next) { const n = m.next; m.next = null; return { skill: n, target: m.mark }; }
-      if (m.turn % 3 === 0) { const t = B.pickTarget('party', 'weakest'); m.next = 'execution'; m.mark = t; return { skill: 'mark_doom', target: t }; }
+      if (m.next && m.aimRound !== B.round) { const n = m.next; m.next = null; return { skill: n, target: m.mark }; }
+      if (m.next) return { skill: 'attack', target: B.pickTarget('party', 'random') };
+      if (m.turn % 3 === 0) { const t = B.pickTarget('party', 'weakest'); m.next = 'execution'; m.aimRound = B.round; m.mark = t; return { skill: 'mark_doom', target: t }; }
       if (m.turn % 3 === 2) return { skill: Util.chance(0.5) ? 'blood_scythe' : 'dark_wave' };
       return { skill: 'attack', target: B.pickTarget('party', Util.chance(0.4) ? 'fragile' : 'random') };
     },
@@ -534,7 +535,8 @@ const MONSTERS = {
     ai(self, B) {
       const m = self.mem;
       m.turn = (m.turn || 0) + 1;
-      if (m.next) { const n = m.next; m.next = null; return { skill: n }; }
+      if (m.next && m.aimRound !== B.round) { const n = m.next; m.next = null; return { skill: n }; }
+      if (m.next) return { skill: 'dune_spear', target: B.pickTarget('party', 'random') };
       const mirages = B.enemies.filter((e) => e.alive && e.def.mirage).length;
       if ((m.phase || 1) === 1) {
         if (m.turn === 1 || (!mirages && m.turn % 4 === 0)) return { skill: 'mirage' };
@@ -542,7 +544,7 @@ const MONSTERS = {
         return { skill: 'dune_spear', target: B.pickTarget('party', Util.chance(0.4) ? 'fragile' : 'random') };
       }
       if (m.turn === 1) return { skill: 'spirit_call' };
-      if (m.turn % 4 === 0) { m.next = 'falling_sand'; return { skill: 'hourglass_flip' }; }
+      if (m.turn % 4 === 0) { m.next = 'falling_sand'; m.aimRound = B.round; return { skill: 'hourglass_flip' }; }
       if (!mirages && m.turn % 4 === 2) return { skill: 'mirage' };
       if (m.turn % 4 === 3) return { skill: 'sandstorm' };
       return { skill: 'dune_spear', target: B.pickTarget('party', Util.chance(0.5) ? 'fragile' : 'random') };
@@ -555,6 +557,212 @@ const MONSTERS = {
     elem: { ice: 1.25, thunder: 1.25, fire: 0.5, light: 0.75 }, resist: { poison: 1, sleep: 1, paralyze: 1, silence: 1 }, drops: [],
     desc: '…',
     actions: [{ s: 'idle_shimmer', w: 3 }, { s: 'mirage_spear', w: 2 }],
+  },
+
+  // ════════ 제4장: 북쪽 바다 ════════
+  frost_gull: {
+    name: '서리갈매기', art: 'crow', pal: { body: '#e8eef6', dark: '#8a9ab4', light: '#ffffff', eye: '#ffb040' },
+    hp: 360, mp: 0, atk: 116, def: 40, mag: 42, spd: 32, exp: 160, gold: 70,
+    elem: { thunder: 1.5, ice: 0.5 }, resist: {}, drops: [{ item: 'warm_soup', p: 0.1 }], steal: { item: 'warm_soup', p: 0.4 },
+    actions: [{ s: 'gull_dive', w: 3 }, { s: 'attack', w: 3 }],
+    desc: '눈보라 속을 나는 갈매기. 하늘에서 내리꽂힌다. 번개에 약하다.',
+  },
+  ice_crab: {
+    name: '얼음게', art: 'crab', pal: { body: '#5a8ab8', dark: '#2a4a78', light: '#a8d0f0', claw: '#7aaad8', eye: '#ffe040', frost: true },
+    hp: 510, mp: 0, atk: 118, def: 82, mag: 42, spd: 10, exp: 190, gold: 90,
+    elem: { fire: 1.5, thunder: 1.5, ice: 0 }, resist: { poison: 0.5 }, drops: [{ item: 'hi_potion', p: 0.1 }], steal: { item: 'warm_soup', p: 0.3 },
+    actions: [{ s: 'pinch', w: 4 }, { s: 'shell_up', w: 1 }, { s: 'attack', w: 2 }],
+    desc: '얼음처럼 단단한 등딱지를 가진 게. 껍데기를 굳히면 거의 상처가 나지 않는다. 불과 번개에 약하다.',
+  },
+  snow_wolf: {
+    name: '설원늑대', art: 'wolf', pal: { body: '#e0e6f0', dark: '#9aa8c0', light: '#ffffff', mane: '#b8c4d8', eye: '#5ab4ff' },
+    hp: 450, mp: 0, atk: 124, def: 46, mag: 32, spd: 26, exp: 180, gold: 80,
+    elem: { fire: 1.5, ice: 0 }, resist: { freeze: 1 }, drops: [{ item: 'hi_potion', p: 0.08 }], steal: { item: 'hi_potion', p: 0.3 },
+    actions: [{ s: 'snow_bite', w: 3 }, { s: 'attack', w: 3 }],
+    desc: '하얀 털의 늑대. 서리 낀 이빨에 물리면 얼어붙는다. 불에 약하다.',
+  },
+  brine_jelly: {
+    name: '소금물젤리', art: 'jelly', pal: { body: '#5ab4d8', dark: '#2a7aa8', light: '#c8f0ff' },
+    hp: 390, mp: 40, atk: 102, def: 44, mag: 66, spd: 14, exp: 160, gold: 60,
+    elem: { thunder: 1.5, ice: 0.5, fire: 0.75 }, resist: { poison: 1 }, drops: [{ item: 'hi_ether', p: 0.06 }], steal: { item: 'ether', p: 0.4 },
+    actions: [{ s: 'ice_shard', w: 3 }, { s: 'attack', w: 2 }],
+    desc: '짠 바닷물이 뭉친 젤리. 얼음 파편을 쏜다. 번개에 약하다.',
+  },
+  ice_bat: {
+    name: '얼음박쥐', art: 'bat', pal: { body: '#5a8ab8', dark: '#2a4a78', wing: '#a8d0f0', eye: '#ffffff' },
+    hp: 340, mp: 0, atk: 114, def: 38, mag: 42, spd: 36, exp: 150, gold: 60,
+    elem: { fire: 1.5, thunder: 1.25, ice: 0 }, resist: { freeze: 1 }, drops: [{ item: 'warm_soup', p: 0.1 }], steal: { item: 'warm_soup', p: 0.3 },
+    actions: [{ s: 'snow_bite', w: 3 }, { s: 'attack', w: 3 }],
+    desc: '얼음 동굴 천장에 매달려 사는 박쥐. 재빠르다.',
+  },
+  frost_golem: {
+    name: '서리 골렘', art: 'sentry', pal: { stone: '#a8d8f0', dark: '#4a88a8', light: '#e0f6ff', eye: '#ffffff' },
+    hp: 720, mp: 0, atk: 126, def: 92, mag: 52, spd: 8, exp: 240, gold: 110,
+    elem: { fire: 2.0, ice: 0, thunder: 0.75 }, resist: { poison: 1, sleep: 1, freeze: 1, silence: 1 }, drops: [{ item: 'hi_ether', p: 0.06 }], steal: { item: 'hi_ether', p: 0.15 },
+    actions: [{ s: 'attack', w: 3 }, { s: 'stone_fist', w: 3 }, { s: 'ice_armor', w: 1 }],
+    desc: '얼음 덩어리에 혼이 깃든 골렘. 무척 단단하지만 불에 녹는다.',
+  },
+  frost_wisp: {
+    name: '서리 도깨비불', art: 'echo', pal: { body: '#a8d8f0', dark: '#4a88a8', light: '#ffffff', eye: '#5ab4ff' },
+    hp: 360, mp: 60, atk: 82, def: 40, mag: 72, spd: 22, exp: 170, gold: 70,
+    elem: { fire: 1.5, light: 1.25, ice: 0 }, resist: { poison: 1, freeze: 1 }, drops: [{ item: 'hi_ether', p: 0.08 }], steal: { item: 'ether', p: 0.4 },
+    actions: [{ s: 'ice_shard', w: 3 }, { s: 'frost_breath', w: 1 }, { s: 'attack', w: 1 }],
+    desc: '동굴의 냉기가 모여 생긴 도깨비불. 숨결에 닿으면 얼어붙는다.',
+  },
+  choir_elite: {
+    name: '성가대 정예기사', art: 'knight', pal: { metal: '#5a5a68', dark: '#2a2a38', trim: '#8a8a98', cloth: '#3a1a2a', shield: '#3a3a48', blade: '#c8ccd8', plume: '#5a5a68', eye: '#c040ff' },
+    hp: 780, mp: 0, atk: 122, def: 60, mag: 40, spd: 18, exp: 300, gold: 140,
+    elem: { light: 1.5, thunder: 1.25, dark: 0 }, resist: { poison: 0.5, sleep: 0.5 }, drops: [{ item: 'hi_potion', p: 0.2 }], steal: { item: 'mega_potion', p: 0.3 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'sword_arc', w: 3 }, { s: 'knight_stance', w: 1 }],
+    desc: '오스릭 직속의 정예 기사. 일행 전체를 베는 반월 베기를 쓴다.',
+  },
+  grey_wisp: {
+    name: '잿빛 불꽃', art: 'echo', boss: true, artScale: 1.5, pal: { body: '#8a8a98', dark: '#4a4a58', light: '#d8d8e0', eye: '#c040ff' },
+    hp: 1700, mp: 999, atk: 60, def: 46, mag: 66, spd: 20, exp: 900, gold: 400,
+    elem: { ice: 1.5, light: 1.25, fire: 0, dark: 0 }, resist: { poison: 1, sleep: 1, paralyze: 1, freeze: 0.5 }, drops: [],
+    desc: '유령선을 부르는 잿빛 신호 불꽃. 차갑게 타오른다. 불로는 꺼지지 않는다.',
+    ai(self, B) {
+      const m = self.mem; m.turn = (m.turn || 0) + 1;
+      return { skill: m.turn % 2 === 0 ? 'lantern_wail' : 'grey_flame' };
+    },
+  },
+  drowned_sailor: {
+    name: '물에 빠진 선원', art: 'skeleton', pal: { bone: '#c8dcd8', dark: '#6a8a88', eye: '#5ae0b0', rust: '#3a5a6a' },
+    hp: 540, mp: 0, atk: 124, def: 50, mag: 42, spd: 16, exp: 200, gold: 90, undead: true,
+    elem: { light: 1.5, fire: 1.25, dark: 0, ice: 0.5 }, resist: { poison: 1, sleep: 1 }, drops: [{ item: 'panacea', p: 0.12 }], steal: { item: 'panacea', p: 0.4 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'drowned_grab', w: 2 }],
+    desc: '15년 전 폭풍에 가라앉은 선원. 아직도 배를 지키고 있다. 붙잡히면 꼼짝할 수 없다.',
+  },
+  ghost_lantern: {
+    name: '유령 등불', art: 'echo', pal: { body: '#5ae0b0', dark: '#2a8a6a', light: '#c8fff0', eye: '#ffe040' },
+    hp: 390, mp: 60, atk: 82, def: 40, mag: 74, spd: 20, exp: 190, gold: 80,
+    elem: { light: 2.0, dark: 0 }, resist: { poison: 1, sleep: 1 }, drops: [{ item: 'hi_ether', p: 0.08 }], steal: { item: 'ether', p: 0.4 },
+    actions: [{ s: 'lantern_wail', w: 3 }, { s: 'attack', w: 2 }],
+    desc: '유령선의 돛대에 매달린 등불. 곡소리로 주문을 막는다. 빛에 약하다.',
+  },
+  barnacle_chest: {
+    name: '따개비 탐욕상자', art: 'mimic', pal: { wood: '#5a6a6a', dark: '#2a3a3a', gold: '#c8d8d0', mouth: '#1a3a3a', tongue: '#5ae0b0' },
+    hp: 840, mp: 30, atk: 132, def: 60, mag: 52, spd: 18, exp: 420, gold: 500,
+    elem: { thunder: 1.25, light: 1.25 }, resist: { poison: 1, sleep: 0.5 }, drops: [{ item: 'elixir', p: 1 }],
+    actions: [{ s: 'gnaw', w: 5 }, { s: 'attack', w: 3 }, { s: 'curse_word', w: 2 }],
+    desc: '따개비가 잔뜩 붙은 탐욕상자. 유령선의 보물 사이에 숨어 있다.',
+  },
+  deep_jelly: {
+    name: '심해 해파리', art: 'jelly', pal: { body: '#a87ad8', dark: '#6a3aa8', light: '#e8c8ff' },
+    hp: 480, mp: 50, atk: 102, def: 46, mag: 76, spd: 16, exp: 210, gold: 90,
+    elem: { thunder: 1.5, fire: 0.75 }, resist: { poison: 1 }, drops: [{ item: 'hi_ether', p: 0.08 }], steal: { item: 'hi_ether', p: 0.3 },
+    actions: [{ s: 'ink_spray', w: 2 }, { s: 'ice_shard', w: 2 }, { s: 'attack', w: 2 }],
+    desc: '깊은 바다를 떠도는 해파리. 먹물로 눈을 가린다. 번개에 약하다.',
+  },
+  angler: {
+    name: '등불아귀', art: 'angler', pal: { body: '#3a4a6a', dark: '#1a2440', light: '#5a6a8a', eye: '#ffe040', lure: '#a8ffe0' },
+    hp: 630, mp: 30, atk: 130, def: 54, mag: 62, spd: 14, exp: 250, gold: 110,
+    elem: { thunder: 1.5, light: 1.25 }, resist: { sleep: 1 }, drops: [{ item: 'mega_potion', p: 0.1 }], steal: { item: 'mega_potion', p: 0.3 },
+    actions: [{ s: 'gnaw', w: 3 }, { s: 'lure_light', w: 2 }, { s: 'attack', w: 2 }],
+    desc: '머리 위 불빛으로 먹이를 잠재운 뒤 통째로 삼킨다.',
+  },
+  drowned_knight: {
+    name: '가라앉은 기사', art: 'knight', pal: { metal: '#3a6878', dark: '#1a3a48', trim: '#5ae0b0', cloth: '#1a3a3a', shield: '#2a5a6a', blade: '#a8d8d0', plume: '#2a8a6a', eye: '#5ae0b0' },
+    hp: 780, mp: 0, atk: 132, def: 72, mag: 42, spd: 14, exp: 280, gold: 120, undead: true,
+    elem: { light: 1.5, thunder: 1.25, dark: 0 }, resist: { poison: 1, sleep: 1 }, drops: [{ item: 'mega_potion', p: 0.12 }], steal: { item: 'mega_potion', p: 0.3 },
+    actions: [{ s: 'attack', w: 4 }, { s: 'sword_arc', w: 2 }, { s: 'knight_stance', w: 1 }],
+    desc: '가라앉은 신전을 지키던 옛 기사. 몸이 산호로 뒤덮였다.',
+  },
+  // ── 현상수배: 집게왕 ──
+  king_crab: {
+    name: '집게왕', art: 'crab', boss: true, artScale: 1.8, pal: { body: '#c4473a', dark: '#7a2a24', light: '#f08070', claw: '#e05a4a', eye: '#ffe040', crown: '#ffd75e' },
+    hp: 3800, mp: 0, atk: 128, def: 96, mag: 52, spd: 12, exp: 2600, gold: 1500,
+    elem: { thunder: 1.5, ice: 0.5 }, resist: { poison: 0.5, sleep: 0.7, paralyze: 0.5 }, drops: [{ item: 'elixir', p: 1 }],
+    desc: '해안의 바위를 집게 한 번에 부순다는 거대한 게. 껍데기를 굳히고 있을 때는 무엇도 통하지 않는다.',
+    ai(self, B) {
+      const m = self.mem; m.turn = (m.turn || 0) + 1;
+      if (m.turn % 4 === 1 && !self.buffs.def) return { skill: 'shell_up' };
+      if (self.hp / self.maxhp < 0.5 && !m.called) { m.called = true; return { skill: 'crab_call' }; }
+      return { skill: Util.chance(0.6) ? 'pinch' : 'tentacle_lash', target: B.pickTarget('party', 'random') };
+    },
+  },
+  // ── 보스: 서리엄니 ──
+  frost_walrus: {
+    name: '서리엄니', art: 'walrus', boss: true, artScale: 1.2, pal: { body: '#8a7a6a', dark: '#5a4a3a', light: '#b8a898', muzzle: '#d8c8b0', tusk: '#f8f0e0', eye: '#5ab4ff', ice: '#c8ecff' },
+    hp: 4900, mp: 0, atk: 134, def: 52, mag: 64, spd: 14, exp: 3200, gold: 1500,
+    elem: { fire: 1.5, thunder: 1.25, ice: 0 }, resist: { poison: 0.5, sleep: 0.7, paralyze: 0.5, freeze: 1 }, drops: [{ item: 'warm_charm', p: 1 }],
+    desc: '해식 동굴의 얼음을 다스리는 거대한 바다코끼리. 얼음 갑옷을 두르면 단단해지지만, 불에는 약하다.',
+    ai(self, B) {
+      const m = self.mem; m.turn = (m.turn || 0) + 1;
+      // 예고한 공격은 다음 라운드에 (같은 라운드 2회 행동으로 몰아치지 않는다)
+      if (m.next && m.aimRound !== B.round) { const n = m.next; m.next = null; return { skill: n, target: m.mark }; }
+      if (m.next) return { skill: 'snow_bite', target: B.pickTarget('party', 'random') };
+      if (m.turn % 4 === 0) { m.next = 'tusk_crush'; m.aimRound = B.round; m.mark = B.pickTarget('party', 'fragile'); return { skill: 'tusk_aim', target: m.mark }; }
+      if (m.turn % 4 === 2) return { skill: 'frost_breath' };
+      if (m.turn % 5 === 3 && !self.buffs.def) return { skill: 'ice_armor' };
+      return { skill: Util.chance(0.5) ? 'snow_bite' : 'attack', target: B.pickTarget('party', 'random') };
+    },
+    extraActions(self) { return self.hp / self.maxhp < 0.4 && self.mem.turn % 2 === 0 ? 1 : 0; },
+  },
+  // ── 보스: 제4성부 오르카 ──
+  orca: {
+    name: '제4성부 오르카', art: 'captain', boss: true, artScale: 1.15, pal: { coat: '#2a3a5a', dark: '#141e34', shirt: '#d8d4c8', trim: '#d8b040', pants: '#2a2a38', boots: '#1a1424', skin: '#a8b8b0', beard: '#6a7a78', eye: '#5ae0b0', hat: '#1a2440', anchor: '#5a6a6a', blade: '#a8b0b8', ghost: true },
+    hp: 5600, mp: 999, atk: 138, def: 52, mag: 76, spd: 20, exp: 4800, gold: 2400,
+    elem: { thunder: 1.25, light: 1.25, dark: 0 }, resist: { poison: 0.5, sleep: 1, paralyze: 0.5, silence: 0.5, freeze: 1 }, drops: [],
+    desc: '15년 전 폭풍에 선원 전원을 잃은 해군 함장. 지금은 잿빛 성가대의 「제4성부」. 밀물과 썰물이 그를 지킨다.',
+    ai(self, B) {
+      const m = self.mem; m.turn = (m.turn || 0) + 1;
+      if (m.next && m.aimRound !== B.round) { const n = m.next; m.next = null; return { skill: n, target: m.mark }; }
+      if (m.next) return { skill: 'saber_slash', target: B.pickTarget('party', 'random') };
+      // 물때가 바뀐다: 밀물(칼날을 흘려보냄) ↔ 썰물(주문을 흩뜨림)
+      if (m.turn % 3 === 1) {
+        m.high = !m.high;
+        m.guard = m.high ? { phys: 0.5, tag: '밀물', color: '#5ab4ff', text: '밀물이 칼날을 흘려보냈다' } : { mag: 0.5, tag: '썰물', color: '#e8c070', text: '썰물의 소용돌이가 주문을 흩뜨렸다' };
+        return { skill: m.high ? 'high_tide' : 'low_tide' };
+      }
+      if (self.hp / self.maxhp < 0.6 && !m.crew1) { m.crew1 = true; return { skill: 'crew_call' }; }
+      if (self.hp / self.maxhp < 0.3 && !m.crew2) { m.crew2 = true; return { skill: 'crew_call' }; }
+      if (m.turn % 3 === 2) { m.next = 'anchor_crash'; m.aimRound = B.round; m.mark = B.pickTarget('party', 'fragile'); return { skill: 'anchor_aim', target: m.mark }; }
+      return { skill: Util.chance(0.5) ? 'cold_command' : 'saber_slash', target: B.pickTarget('party', 'random') };
+    },
+    extraActions(self) { return self.hp / self.maxhp < 0.5 && self.mem.turn % 2 === 0 ? 1 : 0; },
+  },
+  // ── 보스: 심해의 수호자 레비아 ──
+  levia: {
+    name: '심해의 수호자 레비아', art: 'kraken', boss: true, pal: { body: '#5a3a7a', dark: '#2a1a44', light: '#8a6ab0', spot: '#c8a8e8', eye: '#ffe040', flame: true },
+    hp: 7000, mp: 999, atk: 134, def: 54, mag: 80, spd: 16, exp: 6400, gold: 3000,
+    elem: { thunder: 1.5, ice: 0.5, fire: 0.75, dark: 0.5 }, resist: { poison: 0.5, sleep: 1, paralyze: 0.7, silence: 0.5, freeze: 1 }, drops: [],
+    desc: '파도 종을 지키던 심해의 수호자. 잿빛 불꽃에 물들어 날뛰고 있다. 촉수가 많을수록 파도가 높아진다.',
+    phases: [{ key: 'p2', below: 0.5 }],
+    onPhase(self, B, key) {
+      if (key !== 'p2') return [];
+      self.mem.phase = 2;
+      const ev = [{ type: 'shake', mag: 6 }, { type: 'msg', text: '레비아가 몸을 뒤틀며 깊은 바닷속의 노래를 부르기 시작했다…' }];
+      const cas = B.party.find((a) => a.id === 'cassandra' && a.alive);
+      if (cas) {
+        for (const a of B.alivePartyList) a.buffs.def = { mult: 1.3, turns: 4 };
+        ev.push({ type: 'msg', text: '[g]카산드라가 그 노래 위로 자신의 노래를 겹쳐 불렀다! 일행의 방어력이 올랐다![/]' });
+      }
+      return ev;
+    },
+    ai(self, B) {
+      const m = self.mem; m.turn = (m.turn || 0) + 1;
+      const tentacles = B.enemies.filter((e) => e.alive && e.defId === 'levia_tentacle').length;
+      // 해일: 터지는 순간 살아 있는 촉수가 있으면 대해일
+      if (m.next === 'wave' && m.aimRound !== B.round) { m.next = null; return { skill: ['tidal_wave', 'great_wave', 'raging_wave'][Math.min(2, tentacles)] }; }
+      if (m.next === 'wave') return { skill: 'ice_shard', target: B.pickTarget('party', 'random') };
+      if (tentacles < 2 && m.turn % 4 === 2 && m.turn > 2) return { skill: 'regrow' };
+      if (m.turn % 4 === 0) { m.next = 'wave'; m.aimRound = B.round; return { skill: 'wave_rise' }; }
+      if ((m.phase || 1) === 2 && m.turn % 4 === 1) return { skill: 'abyss_song' };
+      return { skill: Util.chance(0.5) ? 'ice_shard' : 'attack', target: B.pickTarget('party', 'random') };
+    },
+    extraActions(self) { return self.mem.phase === 2 && self.mem.turn % 3 === 0 ? 1 : 0; },
+  },
+  levia_tentacle: {
+    name: '레비아의 촉수', art: 'tentacle', pal: { body: '#6a4a8a', dark: '#3a2a54', sucker: '#e8c8ff' },
+    hp: 560, mp: 0, atk: 124, def: 46, mag: 40, spd: 18, exp: 0, gold: 0,
+    elem: { thunder: 1.5, fire: 1.25, ice: 0.5 }, resist: { poison: 0.5, sleep: 0.5, freeze: 0.5 }, drops: [],
+    desc: '레비아의 촉수. 사람을 휘감아 놓아주지 않는다. 쓰러뜨리면 붙잡힌 동료가 풀려난다.',
+    ai(self, B) {
+      const holding = B.party.some((a) => a.alive && a.status.bind && a.bindBy === self.uid);
+      if (!holding && Util.chance(0.5)) return { skill: 'tentacle_grab', target: B.pickTarget('party', 'random') };
+      return { skill: Util.chance(0.3) ? 'tentacle_lash' : 'tentacle_strike', target: B.pickTarget('party', 'random') };
+    },
   },
 };
 for (const id in MONSTERS) MONSTERS[id].id = id;
@@ -661,6 +869,35 @@ const ENCOUNTERS = {
       { w: 6, e: ['mummy', 'mummy'] }, { w: 6, e: ['temple_guardian'] }, { w: 5, e: ['sand_spirit', 'mummy'] },
       { w: 5, e: ['choir_knight', 'choir_acolyte'] }, { w: 4, e: ['temple_guardian', 'sand_spirit'] }, { w: 3, e: ['mummy', 'mummy', 'sand_spirit'] },
       { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
+    ],
+  },
+  coast: {
+    bg: 'snowfield', rate: [14, 22],
+    groups: [
+      { w: 7, e: ['frost_gull', 'frost_gull'] }, { w: 6, e: ['snow_wolf', 'snow_wolf'] }, { w: 6, e: ['ice_crab'] },
+      { w: 5, e: ['brine_jelly', 'frost_gull'] }, { w: 4, e: ['snow_wolf', 'ice_crab'] }, { w: 3, e: ['frost_gull', 'frost_gull', 'brine_jelly'] },
+      { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
+    ],
+  },
+  icecave: {
+    bg: 'icecave', rate: [12, 20],
+    groups: [
+      { w: 7, e: ['ice_bat', 'ice_bat', 'ice_bat'] }, { w: 6, e: ['frost_golem'] }, { w: 6, e: ['frost_wisp', 'ice_bat'] },
+      { w: 5, e: ['ice_crab', 'frost_wisp'] }, { w: 3, e: ['frost_golem', 'frost_wisp'] }, { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
+    ],
+  },
+  ship: {
+    bg: 'ship', rate: [12, 20],
+    groups: [
+      { w: 7, e: ['drowned_sailor', 'drowned_sailor'] }, { w: 6, e: ['ghost_lantern', 'drowned_sailor'] }, { w: 5, e: ['ghost_lantern', 'ghost_lantern'] },
+      { w: 4, e: ['drowned_sailor', 'drowned_sailor', 'ghost_lantern'] }, { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
+    ],
+  },
+  sunken: {
+    bg: 'sunken', rate: [12, 20],
+    groups: [
+      { w: 7, e: ['deep_jelly', 'deep_jelly'] }, { w: 6, e: ['angler'] }, { w: 6, e: ['drowned_knight'] },
+      { w: 5, e: ['angler', 'deep_jelly'] }, { w: 3, e: ['drowned_knight', 'deep_jelly'] }, { w: 1, e: ['glimmer_jelly', 'glimmer_jelly'] },
     ],
   },
   cellar: {

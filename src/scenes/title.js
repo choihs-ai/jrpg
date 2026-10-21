@@ -54,7 +54,8 @@ const Title = (() => {
       Text.draw(ctx, '별빛 종의 이방인', 320, 92, { size: 50, bold: true, align: 'center', color: '#ffe9a8', shadow: false });
       ctx.restore();
       Text.draw(ctx, '─ Stranger of the Starlit Bell ─', 320, 156, { size: 17, align: 'center', color: '#bcd0ff' });
-      Text.draw(ctx, '제1장 잠든 종의 유적 · 제2장 왕도로 가는 길 · 제3장 사막의 종', 320, 184, { size: 15, align: 'center', color: Theme.dim });
+      Text.draw(ctx, '제1장 잠든 종의 유적 · 제2장 왕도로 가는 길', 320, 180, { size: 15, align: 'center', color: Theme.dim });
+      Text.draw(ctx, '제3장 사막의 종 · 제4장 파도의 종', 320, 202, { size: 15, align: 'center', color: Theme.dim });
       ctx.globalAlpha = 1;
       if (!pressed && t > 0.8 && Math.floor(t * 1.6) % 2 === 0) Text.draw(ctx, '화면을 누르거나 아무 키나 누르세요', 320, 300, { size: 18, align: 'center' });
       Text.draw(ctx, '© 2026 · 모든 그래픽과 음악은 코드로 생성되었습니다', 320, 456, { size: 11, align: 'center', color: '#6a6a90' });

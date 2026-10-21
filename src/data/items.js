@@ -4,7 +4,7 @@
 //  kind: consumable | weapon | armor | shield | helm | accessory | key
 //  가격(price) = 구매가. 판매가는 절반. key 종류는 팔 수 없다.
 // ─────────────────────────────────────────────────────────────
-const ALL = ['hero', 'bran', 'linette', 'mio', 'nell'];
+const ALL = ['hero', 'bran', 'linette', 'mio', 'nell', 'cassandra'];
 const ITEMS = {
   // ── 소모품 ──
   herb: { name: '약초', kind: 'consumable', price: 8, desc: '아군 한 명의 HP를 약 35 회복한다.', use: { type: 'heal', amount: 35, target: 'ally' }, battle: true, field: true },
@@ -12,16 +12,18 @@ const ITEMS = {
   ether: { name: '마력의 이슬', kind: 'consumable', price: 120, desc: '새벽 이슬에 마력이 깃든 것. MP를 25 회복한다.', use: { type: 'mp', amount: 25, target: 'ally' }, battle: true, field: true },
   antidote: { name: '해독초', kind: 'consumable', price: 6, desc: '쓴맛이 강한 풀. 독을 치료한다.', use: { type: 'cure', cures: ['poison'], target: 'ally' }, battle: true, field: true },
   smelling: { name: '정신 드는 향', kind: 'consumable', price: 15, desc: '코를 찌르는 향. 수면과 마비를 치료한다.', use: { type: 'cure', cures: ['sleep', 'paralyze'], target: 'ally' }, battle: true, field: true },
-  panacea: { name: '만능약', kind: 'consumable', price: 60, desc: '독·수면·마비·침묵을 모두 치료한다.', use: { type: 'cure', cures: ['poison', 'sleep', 'paralyze', 'silence'], target: 'ally' }, battle: true, field: true },
+  panacea: { name: '만능약', kind: 'consumable', price: 60, desc: '독·수면·마비·침묵·빙결·속박을 모두 치료한다.', use: { type: 'cure', cures: ['poison', 'sleep', 'paralyze', 'silence', 'freeze', 'bind'], target: 'ally' }, battle: true, field: true },
   feather: { name: '되살림 깃털', kind: 'consumable', price: 150, desc: '불사조의 깃털이라 불리는 물건. 쓰러진 동료를 HP 절반으로 되살린다.', use: { type: 'revive', pct: 0.5, target: 'deadAlly' }, battle: true, field: true },
   starwater: { name: '별의 물', kind: 'consumable', price: 400, desc: '별빛을 머금은 물. 아군 한 명의 HP와 MP를 모두 회복한다.', use: { type: 'full', target: 'ally' }, battle: true, field: true },
   firebomb: { name: '화염병', kind: 'consumable', price: 45, desc: '던지면 터지는 기름병. 적 전체에 불 속성 피해(약 30).', use: { type: 'damage', power: 30, element: 'fire', target: 'enemies', anim: 'fire' }, battle: true, field: false },
-  return_wing: { name: '귀환의 날개', kind: 'consumable', price: 20, desc: '던지면 가 본 적 있는 마을(리벨·왕도·사미라)로 돌아간다. (필드·던전에서 사용)', use: { type: 'return', target: 'none' }, battle: false, field: true },
+  return_wing: { name: '귀환의 날개', kind: 'consumable', price: 20, desc: '던지면 가 본 적 있는 마을(리벨·왕도·사미라·마레아)로 돌아간다. (필드·던전에서 사용)', use: { type: 'return', target: 'none' }, battle: false, field: true },
   hi_potion: { name: '고급 상처약', kind: 'consumable', price: 90, desc: '왕도 약방의 고급 상처약. HP를 약 200 회복한다.', use: { type: 'heal', amount: 200, target: 'ally' }, battle: true, field: true },
   thunder_flask: { name: '번개병', kind: 'consumable', price: 80, desc: '마도학원 실험실에서 나온 번개를 가둔 병. 적 전체에 번개 속성 피해(약 60).', use: { type: 'damage', power: 60, element: 'thunder', target: 'enemies', anim: 'thunder' }, battle: true, field: false },
   mega_potion: { name: '오아시스의 물', kind: 'consumable', price: 220, desc: '사미라 오아시스의 맑은 샘물. HP를 약 400 회복한다.', use: { type: 'heal', amount: 400, target: 'ally' }, battle: true, field: true },
   hi_ether: { name: '사막의 이슬', kind: 'consumable', price: 320, desc: '선인장 꽃에 맺힌 진한 이슬. MP를 60 회복한다.', use: { type: 'mp', amount: 60, target: 'ally' }, battle: true, field: true },
   sand_bomb: { name: '모래 폭탄', kind: 'consumable', price: 140, desc: '모래와 화약을 섞은 폭탄. 적 전체에 피해(약 110)를 주고 명중률을 떨어뜨린다.', use: { type: 'damage', power: 110, target: 'enemies', anim: 'impact', debuffAll: { hit: 0.75 } }, battle: true, field: false },
+  elixir: { name: '엘릭서', kind: 'consumable', price: 1500, desc: '전설의 영약. 아군 한 명의 HP와 MP를 모두 회복한다.', use: { type: 'full', target: 'ally' }, battle: true, field: true },
+  warm_soup: { name: '따끈한 생선 수프', kind: 'consumable', price: 90, desc: '마레아 선술집의 명물. HP를 약 200 회복하고 빙결을 녹인다.', use: { type: 'heal', amount: 200, cures: ['freeze'], target: 'ally' }, battle: true, field: true },
   incense: { name: '정령의 향', kind: 'consumable', price: 25, desc: '마물이 싫어하는 향. 한동안(약 120걸음) 마물과 마주치지 않는다.', use: { type: 'ward', steps: 120, target: 'none' }, battle: false, field: true },
 
   // ── 무기 ──
@@ -45,6 +47,12 @@ const ITEMS = {
   sand_axe: { name: '사구의 도끼', kind: 'weapon', price: 2900, stats: { atk: 48, spd: -2 }, who: ['bran'], desc: '모래 바람에도 녹슬지 않는 검은 쇠 도끼. 민첩 -2.' },
   scorpion_dagger: { name: '전갈 꼬리 단검', kind: 'weapon', price: 2400, stats: { atk: 36, spd: 7 }, who: ['nell', 'hero'], onHit: { poison: 0.3 }, desc: '전갈 여왕의 꼬리를 깎아 만든 단검. 공격 시 가끔 독. 민첩 +7.' },
   sun_staff: { name: '태양의 지팡이', kind: 'weapon', price: 2500, stats: { atk: 12, mag: 22 }, who: ['linette', 'mio'], desc: '꼭대기에 태양석이 박힌 지팡이. 마력 +22.' },
+  frost_brand: { name: '서리의 검', kind: 'weapon', price: 4200, stats: { atk: 52 }, who: ['hero', 'bran', 'nell'], element: 'ice', desc: '북해의 대장장이가 얼음 바다에서 담금질한 검. 공격에 얼음 속성이 깃든다.' },
+  tide_axe: { name: '파도 도끼', kind: 'weapon', price: 4500, stats: { atk: 60, spd: -2 }, who: ['bran'], desc: '포경선의 작살 날을 녹여 만든 도끼. 무겁지만 강하다.' },
+  coral_dagger: { name: '산호 단검', kind: 'weapon', price: 3800, stats: { atk: 45, spd: 8 }, who: ['nell', 'hero'], desc: '붉은 산호를 깎아 만든 단검. 민첩 +8.' },
+  pearl_staff: { name: '진주 지팡이', kind: 'weapon', price: 4000, stats: { atk: 14, mag: 28 }, who: ['linette', 'mio'], desc: '꼭대기에 커다란 흑진주가 박힌 지팡이. 마력 +28.' },
+  silver_harp: { name: '은빛 하프', kind: 'weapon', price: 1800, stats: { atk: 9, mag: 16 }, who: ['cassandra'], desc: '보육원 시절부터 아껴 온 작은 하프. 마력 +16.' },
+  siren_harp: { name: '세이렌의 하프', kind: 'weapon', price: 4300, stats: { atk: 12, mag: 26, spd: 4 }, who: ['cassandra'], desc: '바다 요정의 머리카락으로 줄을 맨 하프. 마력 +26, 민첩 +4.' },
   dorn_axe: { name: '드른의 도끼', kind: 'weapon', price: 0, stats: { atk: 28, def: 3 }, who: ['bran'], desc: '아버지 드른이 아들을 위해 밤새 벼린 도끼. 방어 +3.' },
 
   // ── 갑옷 ──
@@ -52,17 +60,21 @@ const ITEMS = {
   clothes: { name: '여행자의 옷', kind: 'armor', price: 20, stats: { def: 4 }, who: ALL, desc: '질긴 천으로 만든 평범한 여행복.' },
   thief_garb: { name: '도둑의 옷', kind: 'armor', price: 90, stats: { def: 6, spd: 2 }, who: ['nell', 'hero'], desc: '움직이기 편한 검은 옷. 민첩 +2.' },
   leather_armor: { name: '가죽 갑옷', kind: 'armor', price: 110, stats: { def: 8 }, who: ['hero', 'bran', 'nell'], desc: '무두질한 가죽으로 만든 갑옷.' },
-  mage_robe: { name: '마도 로브', kind: 'armor', price: 140, stats: { def: 6, mag: 3 }, who: ['linette', 'mio'], desc: '마력을 머금은 실로 짠 로브. 마력 +3.' },
+  mage_robe: { name: '마도 로브', kind: 'armor', price: 140, stats: { def: 6, mag: 3 }, who: ['linette', 'mio', 'cassandra'], desc: '마력을 머금은 실로 짠 로브. 마력 +3.' },
   vestment: { name: '무녀복', kind: 'armor', price: 160, stats: { def: 7, mag: 2 }, who: ['mio'], desc: '리벨 신전의 무녀복. 마력 +2.' },
   chain_mail: { name: '사슬 갑옷', kind: 'armor', price: 380, stats: { def: 14 }, who: ['hero', 'bran'], desc: '쇠사슬을 촘촘히 엮은 갑옷.' },
   shadow_cloak: { name: '그림자 망토', kind: 'armor', price: 420, stats: { def: 11, spd: 5 }, who: ['nell', 'hero'], desc: '어둠에 녹아드는 망토. 민첩 +5.' },
   mythril_mail: { name: '미스릴 갑옷', kind: 'armor', price: 1200, stats: { def: 22 }, who: ['hero', 'bran'], desc: '미스릴 비늘을 엮은 갑옷. 가볍고 튼튼하다.' },
-  mystic_robe: { name: '신비의 로브', kind: 'armor', price: 1050, stats: { def: 15, mag: 7 }, who: ['linette', 'mio'], desc: '별빛 실로 짠 로브. 마력 +7.' },
+  mystic_robe: { name: '신비의 로브', kind: 'armor', price: 1050, stats: { def: 15, mag: 7 }, who: ['linette', 'mio', 'cassandra'], desc: '별빛 실로 짠 로브. 마력 +7.' },
   night_garb: { name: '밤그림자 옷', kind: 'armor', price: 980, stats: { def: 16, spd: 7 }, who: ['nell', 'hero'], desc: '왕도 뒷골목의 장인이 지은 검은 옷. 민첩 +7.' },
   desert_mail: { name: '사막 비늘 갑옷', kind: 'armor', price: 2700, stats: { def: 29 }, who: ['hero', 'bran'], desc: '모래도마뱀 비늘을 엮은 갑옷. 가볍고 시원하다.' },
-  mirage_robe: { name: '신기루 로브', kind: 'armor', price: 2500, stats: { def: 20, mag: 9 }, who: ['linette', 'mio'], desc: '보는 각도에 따라 색이 일렁이는 로브. 마력 +9.' },
+  mirage_robe: { name: '신기루 로브', kind: 'armor', price: 2500, stats: { def: 20, mag: 9 }, who: ['linette', 'mio', 'cassandra'], desc: '보는 각도에 따라 색이 일렁이는 로브. 마력 +9.' },
   sand_garb: { name: '모래바람 옷', kind: 'armor', price: 2300, stats: { def: 21, spd: 9 }, who: ['nell', 'hero'], desc: '사막 유목민의 가벼운 옷. 민첩 +9.' },
-  sage_robe: { name: '현자의 로브', kind: 'armor', price: 450, stats: { def: 10, mag: 5 }, who: ['linette', 'mio'], desc: '별무늬가 수놓인 고대 로브. 마력 +5.' },
+  whale_mail: { name: '고래뼈 갑옷', kind: 'armor', price: 4200, stats: { def: 35 }, who: ['hero', 'bran'], desc: '고래뼈를 엮어 만든 북해의 갑옷. 가볍고 단단하다.' },
+  seafoam_robe: { name: '물거품 로브', kind: 'armor', price: 3900, stats: { def: 25, mag: 12 }, who: ['linette', 'mio', 'cassandra'], desc: '파도 거품처럼 하얀 로브. 마력 +12.' },
+  sealskin_coat: { name: '물개 가죽 외투', kind: 'armor', price: 3700, stats: { def: 27, spd: 9 }, who: ['nell', 'hero'], resist: { freeze: 0.5 }, desc: '따뜻하고 날렵한 외투. 민첩 +9, 빙결에 조금 강해진다.' },
+  choir_robe: { name: '성가대 예복', kind: 'armor', price: 0, stats: { def: 18, mag: 8 }, who: ['cassandra'], desc: '잿빛 성가대의 예복. 이제는 회색 실을 뜯어내고 별을 수놓았다. 마력 +8.' },
+  sage_robe: { name: '현자의 로브', kind: 'armor', price: 450, stats: { def: 10, mag: 5 }, who: ['linette', 'mio', 'cassandra'], desc: '별무늬가 수놓인 고대 로브. 마력 +5.' },
 
   // ── 방패 ──
   pot_lid: { name: '냄비 뚜껑', kind: 'shield', price: 10, stats: { def: 2 }, who: ['hero', 'bran', 'nell'], desc: '여관 주방에서 굴러다니던 냄비 뚜껑. 없는 것보단 낫다.' },
@@ -74,19 +86,22 @@ const ITEMS = {
   squire_shield: { name: '견습 기사의 방패', kind: 'shield', price: 0, stats: { def: 13, hp: 20 }, who: ['bran'], desc: '입단 시험을 통과한 견습 기사에게 주어지는 방패. 최대 HP +20.' },
   buckler: { name: '은 버클러', kind: 'shield', price: 620, stats: { def: 9, spd: 2 }, who: ['hero', 'bran', 'nell', 'linette'], desc: '가벼운 은 방패. 민첩 +2.' },
 
+  coral_shield: { name: '산호 방패', kind: 'shield', price: 3600, stats: { def: 25 }, who: ['hero', 'bran'], desc: '거대한 산호를 깎아 만든 방패.' },
   sun_shield: { name: '태양의 방패', kind: 'shield', price: 2200, stats: { def: 20 }, who: ['hero', 'bran'], resist: { sleep: 0.5 }, desc: '태양 문양이 새겨진 둥근 방패. 수면에 조금 강해진다.' },
 
   // ── 투구 ──
   leather_hat: { name: '가죽 모자', kind: 'helm', price: 30, stats: { def: 2 }, who: ALL, desc: '햇볕도 막아주는 가죽 모자.' },
-  wizard_hat: { name: '별무늬 모자', kind: 'helm', price: 110, stats: { def: 2, mag: 3 }, who: ['linette', 'mio'], desc: '마도학원 학생들이 쓰는 모자. 마력 +3.' },
+  wizard_hat: { name: '별무늬 모자', kind: 'helm', price: 110, stats: { def: 2, mag: 3 }, who: ['linette', 'mio', 'cassandra'], desc: '마도학원 학생들이 쓰는 모자. 마력 +3.' },
   iron_helm: { name: '철 투구', kind: 'helm', price: 240, stats: { def: 6 }, who: ['hero', 'bran'], desc: '머리를 단단히 지켜주는 투구.' },
-  hairpin: { name: '은방울 머리꽂이', kind: 'helm', price: 260, stats: { def: 4, mag: 2 }, who: ['mio', 'linette', 'nell'], resist: { silence: 1 }, desc: '맑은 소리가 나는 머리꽂이. 침묵에 걸리지 않는다.' },
+  hairpin: { name: '은방울 머리꽂이', kind: 'helm', price: 260, stats: { def: 4, mag: 2 }, who: ['mio', 'linette', 'nell', 'cassandra'], resist: { silence: 1 }, desc: '맑은 소리가 나는 머리꽂이. 침묵에 걸리지 않는다.' },
 
   silver_helm: { name: '은 투구', kind: 'helm', price: 760, stats: { def: 10 }, who: ['hero', 'bran'], desc: '은으로 덧댄 투구.' },
   feather_hat: { name: '깃털 모자', kind: 'helm', price: 680, stats: { def: 6, mag: 3, spd: 3 }, who: ['linette', 'mio', 'nell', 'hero'], desc: '축제 기간에 유행하는 깃털 모자. 마력 +3, 민첩 +3.' },
   festival_mask: { name: '축제 가면', kind: 'helm', price: 0, stats: { def: 5, spd: 6 }, who: ALL, resist: { sleep: 1 }, desc: '별내림 축제의 가면. 쓰면 기분이 들떠 잠이 오지 않는다. 민첩 +6.' },
 
   turban: { name: '사막 터번', kind: 'helm', price: 1600, stats: { def: 9, mag: 2, spd: 2 }, who: ALL, resist: { paralyze: 0.5 }, desc: '머리를 시원하게 지켜 주는 터번. 마비에 조금 강해진다.' },
+  fur_hood: { name: '털 두건', kind: 'helm', price: 2400, stats: { def: 11, mag: 2 }, who: ALL, resist: { freeze: 1 }, desc: '두툼한 털 두건. 얼어붙지 않는다.' },
+  captain_hat: { name: '선장 모자', kind: 'helm', price: 3200, stats: { def: 14, atk: 4 }, who: ALL, desc: '금실로 닻을 수놓은 선장 모자. 공격력 +4.' },
   desert_helm: { name: '모래 투구', kind: 'helm', price: 1900, stats: { def: 14 }, who: ['hero', 'bran'], desc: '모래가 들어가지 않게 만든 투구.' },
 
   // ── 장신구 ──
@@ -104,6 +119,11 @@ const ITEMS = {
   queen_fang: { name: '여왕의 독침', kind: 'accessory', price: 0, stats: { atk: 9, spd: 4 }, who: ALL, resist: { poison: 1 }, desc: '전갈 여왕의 독침을 다듬은 장신구. 공격 +9, 민첩 +4, 독에 걸리지 않는다.' },
   aria_chime: { name: '아리아의 방울', kind: 'accessory', price: 0, stats: { mag: 10, mp: 20, def: 5 }, who: ['mio'], healBonus: 0.2, desc: '미오의 어머니가 쓰던 작은 방울. 마력 +10, 최대 MP +20, 회복 주문 효과 +20%.' },
   sand_badge: { name: '사막의 은인 징표', kind: 'accessory', price: 0, stats: { atk: 8, def: 8, mag: 8, spd: 8 }, who: ALL, desc: '사미라 오아시스가 은인에게 주는 징표. 모든 능력 +8.' },
+  pearl_ring: { name: '진주 반지', kind: 'accessory', price: 3000, stats: { mag: 12, mp: 25 }, who: ALL, desc: '북해의 흑진주 반지. 마력 +12, 최대 MP +25.' },
+  warm_charm: { name: '온기의 부적', kind: 'accessory', price: 1200, stats: { def: 3 }, who: ALL, resist: { freeze: 1, sleep: 0.5 }, desc: '난롯불의 온기가 깃든 부적. 얼어붙지 않고, 잠에도 조금 강해진다.' },
+  sailor_knot: { name: '뱃사람의 매듭', kind: 'accessory', price: 0, stats: { atk: 6, spd: 6 }, who: ALL, resist: { bind: 1 }, desc: '풀리지 않는 매듭. 무엇에도 휘감기지 않는다. 공격·민첩 +6.' },
+  choir_locket: { name: '두 자매의 로켓', kind: 'accessory', price: 0, stats: { mag: 10, spd: 6, mp: 15 }, who: ['cassandra', 'nell'], desc: '두 자매와 엄마가 함께 그려진 낡은 로켓. 마력 +10, 민첩 +6, 최대 MP +15.' },
+  anchor_badge: { name: '마레아의 닻 징표', kind: 'accessory', price: 0, stats: { atk: 12, def: 12, mag: 12, spd: 12 }, who: ALL, desc: '항구 마을 마레아가 은인에게 주는 닻 모양 징표. 모든 능력 +12.' },
   courage_token: { name: '용기의 증표', kind: 'accessory', price: 0, stats: { atk: 4, def: 4, spd: 4 }, who: ALL, desc: '리벨 마을을 구한 영웅에게 장로가 건넨 증표. 공격·방어·민첩 +4.' },
 
   // ── 귀중품 (퀘스트) ──
@@ -129,6 +149,11 @@ const ITEMS = {
   aria_page: { name: '아리아의 일기 조각', kind: 'key', price: 0, desc: '모래에 바랜 일기장의 찢어진 페이지. 단정한 글씨로 「미오에게」라고 적혀 있다.' },
   sand_heart: { name: '모래의 심장', kind: 'key', price: 0, desc: '모래 종에서 빠져나온 구슬. 안에서 고운 모래가 끝없이 흘러내린다.' },
   lost_letter: { name: '대상의 편지', kind: 'key', price: 0, desc: '사막에서 길을 잃은 대상 행렬이 남긴 구조 요청 편지.' },
+  boarding_pass: { name: '승선 허가증', kind: 'key', price: 0, desc: '마도학원과 수호기사단의 인장이 찍힌 북해 항로 승선 허가증.' },
+  wave_heart: { name: '파도의 심장', kind: 'key', price: 0, desc: '파도 종에서 빠져나온 구슬. 귀에 대면 먼 바다의 파도 소리가 들린다.' },
+  frozen_letter: { name: '얼어붙은 편지', kind: 'key', price: 0, desc: '해식 동굴의 얼음 속에서 꺼낸 편지. 「마레아의 마르타에게」라고 적혀 있다.' },
+  crab_claw: { name: '집게왕의 집게발', kind: 'key', price: 0, desc: '해안을 휘젓던 거대 게의 집게발. 현상금의 증거.' },
+  osric_notebook: { name: '알드윈의 수첩', kind: 'key', price: 0, desc: '유령선 선장실에서 발견한 낡은 수첩. 겉장에 어린아이의 낙서가 있다.' },
   star: { name: '별조각', kind: 'key', price: 0, desc: '밤하늘에서 떨어졌다는 작은 별조각. 괴짜 수집가 피포가 모으고 있다.' },
 };
 for (const id in ITEMS) ITEMS[id].id = id;

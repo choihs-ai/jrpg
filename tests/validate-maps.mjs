@@ -32,8 +32,12 @@ function bfs(map, starts, allFlags) {
     // 워프 칸에서는 더 나아가지 않는다(밟으면 이동)
     if (map.warps.some((w) => w.x === x && w.y === y) && !starts.some(([sx, sy]) => sx === x && sy === y)) continue;
     for (const [dx, dy] of D4) {
-      const nx = x + dx, ny = y + dy, k = nx + ',' + ny;
-      if (seen.has(k) || !walkable(map, rt, nx, ny, allFlags)) continue;
+      let nx = x + dx, ny = y + dy;
+      if (!walkable(map, rt, nx, ny, allFlags)) continue;
+      // 얼음: 막힐 때까지 미끄러진다 (지나친 칸에는 멈출 수 없다)
+      while (TILES[rt[ny][nx]].slide && !map.warps.some((w) => w.x === nx && w.y === ny) && walkable(map, rt, nx + dx, ny + dy, allFlags)) { nx += dx; ny += dy; }
+      const k = nx + ',' + ny;
+      if (seen.has(k)) continue;
       seen.add(k); q.push([nx, ny]);
     }
   }
@@ -56,6 +60,10 @@ addEntry('capital', 23, 37, 'returnwing');
 addEntry('cap_inn', 9, 7, 'respawn');
 addEntry('samira', 17, 25, 'returnwing');
 addEntry('samira_inn', 9, 7, 'respawn');
+addEntry('marea', 19, 15, 'returnwing');
+addEntry('marea_inn', 9, 7, 'respawn');
+addEntry('ship_deck', 2, 7, 'boat');
+addEntry('sunken1', 12, 18, 'sinking');
 
 const usedIds = new Set();
 for (const id in MAPS) {
@@ -175,6 +183,24 @@ for (const qid in QUESTS) for (const st of QUESTS[qid].stages) {
   const blocks = [];
   for (let y = zone.y; y < zone.y + zone.h; y++) for (let x = zone.x; x < zone.x + zone.w; x++) blocks.push({ type: 'block', x, y, solid: true });
   { const save = sc.objects; sc.objects = save.concat(blocks); const r = bfs(sc, [[4, 19]], false); sc.objects = save; if (D4.some(([dx, dy]) => r.has((26 + dx) + ',' + (1 + dy)))) err('sandcave: sun key reachable without passing the queen'); }
+}
+// 제4장 관문
+{
+  // 얼음 동굴: 미끄러져서만 위쪽 방에 닿고, 어디서 멈춰도 입구나 출구 중 하나로는 갈 수 있어야 한다 (갇힘 없음)
+  const ic = MAPS.icecave;
+  const entry = [12, 22], exitWarp = ic.warps.find((w) => w.to === 'lighthouse1');
+  const r = bfs(ic, [entry], false);
+  if (!r.has(exitWarp.x + ',' + (exitWarp.y + 1))) err('icecave: walrus room unreachable from the entrance');
+  for (const k of r) {
+    const [x, y] = k.split(',').map(Number);
+    const rr = bfs(ic, [[x, y]], false);
+    if (!rr.has(entry.join(',')) && !rr.has(exitWarp.x + ',' + (exitWarp.y + 1))) { err(`icecave: trapped at (${x},${y})`); break; }
+  }
+  if (!bfs(ic, [[exitWarp.x, exitWarp.y + 1]], false).has(entry.join(','))) err('icecave: cannot walk back out from the walrus room');
+  // 유령선: 선미 갑판(키)은 선창을 거쳐야만 닿는다
+  const deck = MAPS.ship_deck;
+  if (bfs(deck, [[2, 7]], false).has('20,7')) err('ship_deck: helm reachable without going through the hold');
+  if (!bfs(MAPS.ship_hold, [[11, 3]], false).has('22,3') && !bfs(MAPS.ship_hold, [[11, 3]], false).has('21,2')) err('ship_hold: aft ladder unreachable');
 }
 // 별조각 8개
 const stars = [];

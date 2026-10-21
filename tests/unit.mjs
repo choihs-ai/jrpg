@@ -1,4 +1,5 @@
 // 핵심 시스템 단위 테스트 (전투 규칙 · 인벤토리 · 장비 · 성장 · 퀘스트 · 저장)
+import { readFileSync } from 'node:fs';
 import { loadGame } from './load.mjs';
 const G = loadGame();
 const { Game, BattleCore, SKILLS, ITEMS, Quests, Save, Util } = G;
@@ -414,6 +415,90 @@ t('3장 퀘스트: 일기 조각 3개를 모으면 다음 단계로', () => {
   eq(Quests.stage('s_diary'), 1);
   Quests.start('main4');
   eq(Quests.currentGoal().id, 'main4');
+});
+
+console.log('제4장 전투 · 진행');
+t('빙결: 행동하지 못하고, 불 속성 피해를 받으면 즉시 녹는다', () => {
+  party(['hero', 'linette'], 26);
+  const core = new BattleCore({ enemies: ['frost_golem'] });
+  const g = core.enemies[0];
+  g.status.freeze = 3;
+  ok(g.disabled, 'frozen = disabled');
+  const ev = core.execute({ actor: g, cmd: null });
+  ok(ev.some((e) => e.type === 'msg' && e.text.includes('얼음에 갇혀')), 'skips turn');
+  core.useSkill(core.party[1], SKILLS.fire, [g], null);
+  ok(!g.status.freeze, 'fire melts');
+});
+t('속박: 휘감은 촉수가 쓰러지면 풀려난다', () => {
+  party(['hero', 'bran'], 28);
+  const core = new BattleCore({ enemies: ['levia_tentacle', 'levia'], boss: true });
+  const tent = core.enemies[0], h = core.party[0];
+  for (let i = 0; i < 20 && !h.status.bind; i++) core.useSkill(tent, SKILLS.tentacle_grab, [h], null);
+  ok(h.status.bind && h.bindBy === tent.uid, 'bound by tentacle');
+  ok(h.disabled);
+  tent.hp = 1;
+  for (let i = 0; i < 6 && tent.alive; i++) core.useSkill(core.party[1], SKILLS.attack, [tent], null);
+  ok(!tent.alive);
+  ok(!h.status.bind, 'released');
+});
+t('물때 자세: 밀물엔 물리, 썰물엔 주문 피해가 절반', () => {
+  party(['hero', 'linette'], 27);
+  const core = new BattleCore({ enemies: ['orca'], boss: true });
+  const o = core.enemies[0];
+  o.mem.guard = { phys: 0.5, tag: '밀물', text: 't' };
+  eq(core.guardMult(o, 'phys'), 0.5); eq(core.guardMult(o, 'mag'), 1);
+  o.mem.guard = { mag: 0.5, tag: '썰물', text: 't' };
+  eq(core.guardMult(o, 'phys'), 1); eq(core.guardMult(o, 'mag'), 0.5);
+  // 오르카는 1·4·7… 턴마다 물때를 바꾼다
+  o.mem = {};
+  const a1 = o.def.ai(o, core); ok(a1.skill === 'high_tide' && o.mem.guard.phys === 0.5, 'turn1 high tide');
+  o.mem.turn = 3; const a4 = o.def.ai(o, core); ok(a4.skill === 'low_tide' && o.mem.guard.mag === 0.5, 'turn4 low tide');
+});
+t('레비아의 해일: 남은 촉수 수만큼 커진다', () => {
+  party(['hero'], 28);
+  const core = new BattleCore({ enemies: ['levia_tentacle', 'levia', 'levia_tentacle'], boss: true });
+  const lv = core.enemies[1];
+  lv.mem = { turn: 3 };
+  eq(lv.def.ai(lv, core).skill, 'wave_rise');
+  eq(lv.def.ai(lv, core).skill, 'ice_shard', 'same round: no release');
+  core.round++;
+  eq(lv.def.ai(lv, core).skill, 'raging_wave');
+  lv.mem.next = 'wave'; core.round++;
+  for (const e of core.enemies) if (e.defId === 'levia_tentacle') e.hp = 0;
+  eq(lv.def.ai(lv, core).skill, 'tidal_wave');
+});
+t('카산드라 합류: 레벨 보정 · 노래 습득 · 대기 멤버', () => {
+  party(['hero', 'bran', 'linette', 'mio'], 25);
+  Game.join('cassandra');
+  const c = Game.member('cassandra');
+  ok(c.level >= 24, 'level ' + c.level);
+  ok(c.skills.includes('stopped_time') && c.skills.includes('song_valor'));
+  ok(Game.state.reserve.includes('cassandra'));
+  ok(Game.canEquip('cassandra', 'siren_harp') && !Game.canEquip('bran', 'siren_harp'));
+  ok(Game.canEquip('cassandra', 'fur_hood'), 'ALL helm');
+});
+t('4장 진행도: 플래그 순서대로 25 → 32', () => {
+  Game.newState('x');
+  Game.setFlag('chapter3_done'); eq(Game.progress(), 24);
+  const steps = ['ch4_started', 'reached_marea', 'cave4_open', 'walrus_defeated', 'cassandra_joined', 'orca_defeated', 'levia_defeated', 'chapter4_done'];
+  steps.forEach((f, i) => { Game.setFlag(f); eq(Game.progress(), 25 + i, f); });
+});
+
+t('데이터 표에 같은 키가 두 번 정의되지 않는다', () => {
+  // 객체 리터럴의 중복 키는 조용히 앞의 정의를 덮어쓰므로 소스에서 직접 찾는다
+  const files = ['src/data/items.js', 'src/data/skills.js', 'src/data/monsters.js', 'src/data/characters.js', 'src/systems/quests.js'];
+  for (const f of files) {
+    let seen = null;
+    readFileSync(new URL('../' + f, import.meta.url), 'utf8').split('\n').forEach((ln, i) => {
+      if (/^const \w+ = \{/.test(ln)) seen = new Map();
+      else if (/^\};?/.test(ln)) seen = null;
+      const m = seen && ln.match(/^  ([A-Za-z_$][\w$]*)\s*:/);
+      if (!m) return;
+      if (seen.has(m[1])) throw new Error(`${f}:${i + 1} '${m[1]}' 중복 (처음 ${seen.get(m[1])}행)`);
+      seen.set(m[1], i + 1);
+    });
+  }
+  eq(G.QUESTS.s_letter.giver, '여관 주인 마르타');
 });
 
 console.log(`\n${pass} passed, ${fail} failed`);
